@@ -101,6 +101,10 @@ html[data-theme="dark"] #backHome{background:var(--accent); color:#191300; box-s
   #backHome span{display:none;}
   #backHome{padding:11px; right:12px; top:12px;}
 }
+@media(min-width:641px){
+  /* Prevent the fixed back button from overlapping the site title on wide screens */
+  .brand-row{padding-inline-end:198px;}
+}
 
 /* ===================== Header / Nav ===================== */
 header.site{
@@ -115,11 +119,21 @@ header.site{
 .brand h1{font-size:22px; margin:0;}
 .brand small{display:block; color:var(--text-soft); font-size:11px; font-weight:400;}
 
+.tabs-wrap{position:relative; max-width:1180px; margin:0 auto;}
+.tabs-wrap::before,.tabs-wrap::after{
+  content:""; position:absolute; top:0; bottom:10px; width:34px; pointer-events:none; z-index:2;
+  transition:opacity .2s ease;
+}
+.tabs-wrap::before{right:0; background:linear-gradient(to left, var(--bg-alt), transparent);}
+.tabs-wrap::after{left:0; background:linear-gradient(to right, var(--bg-alt), transparent);}
+.tabs-wrap.at-start::before{opacity:0;}
+.tabs-wrap.at-end::after{opacity:0;}
 nav.tabs{
   max-width:1180px; margin:0 auto;
   display:flex; gap:6px; overflow-x:auto; padding-bottom:10px;
-  scrollbar-width:none; position:relative;
+  scrollbar-width:none; position:relative; cursor:grab;
 }
+nav.tabs.dragging{cursor:grabbing; user-select:none;}
 nav.tabs::-webkit-scrollbar{display:none;}
 nav.tabs button{
   white-space:nowrap; padding:9px 16px; border-radius:999px; border:1px solid transparent;
@@ -388,19 +402,75 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
 
 /* ===================== Tutorial overlay ===================== */
 #tutorialOverlay{
-  position:fixed; inset:0; background:rgba(5,15,13,.88); z-index:6000; display:none;
-  flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#fff; padding:24px;
+  position:fixed; inset:0; background:rgba(5,15,13,.72); z-index:6000; display:none;
+  flex-direction:column; align-items:center; text-align:center; color:#fff; padding:24px;
+  padding-top:96px; /* push content up near the top nav bar it points to */
 }
 #tutorialOverlay.show{display:flex;}
-.tut-hand{font-size:44px; animation:swipe 1.4s ease-in-out infinite;}
-@keyframes swipe{0%{transform:translateX(30px);} 50%{transform:translateX(-30px);} 100%{transform:translateX(30px);}}
-#tutorialOverlay p{color:#fff; margin-top:18px; font-size:16px;}
-#tutorialOverlay .hint{position:absolute; bottom:40px; font-size:13px; color:#cfd8d6;}
+.tut-arrow{font-size:34px; animation:bounceUp 1.2s ease-in-out infinite;}
+@keyframes bounceUp{0%{transform:translateY(6px);} 50%{transform:translateY(-6px);} 100%{transform:translateY(6px);}}
+#tutorialOverlay p{color:#fff; margin-top:14px; font-size:16px; max-width:280px;}
+#tutorialOverlay .hint{margin-top:26px; font-size:13px; color:#cfd8d6;}
 
 @media(max-width:640px){
   .times-grid{grid-template-columns:repeat(3,1fr);}
   .mushaf-page{padding:16px 14px;}
+  /* Calendar: shrink cells so 7 columns fit comfortably on narrow phones */
+  .cal-grid{gap:4px;}
+  .cal-day{font-size:11px; border-radius:8px;}
+  .cal-day .g{font-size:12px;}
+  .cal-day .h{font-size:9px;}
+  .cal-head h3{font-size:15px;}
+  .cal-head .btn.outline{padding:8px 10px; font-size:12.5px;}
 }
+@media(max-width:380px){
+  .cal-grid{grid-template-columns:repeat(7,minmax(0,1fr));}
+  .cal-day .h{display:none;}
+}
+
+/* ===================== Settings section ===================== */
+.settings-row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 0; border-bottom:1px dashed var(--border);}
+.settings-row:last-child{border-bottom:none;}
+.settings-row .lbl{font-weight:700; font-size:14.5px;}
+.settings-row .desc{font-size:12.5px; color:var(--text-soft); margin-top:3px;}
+.switch{position:relative; display:inline-block; width:50px; height:28px; flex-shrink:0;}
+.switch input{opacity:0; width:0; height:0;}
+.switch .slider{position:absolute; cursor:pointer; inset:0; background:var(--border); border-radius:999px; transition:.25s;}
+.switch .slider::before{content:""; position:absolute; height:22px; width:22px; right:3px; bottom:3px; background:#fff; border-radius:50%; transition:.25s; box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.switch input:checked + .slider{background:var(--primary);}
+.switch input:checked + .slider::before{transform:translateX(-22px);}
+.preview-box{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:10px;}
+.preview-box .p-ayah{font-family:'Amiri',serif; font-size:var(--ayah-font-size); line-height:2.4; color:var(--text);}
+.preview-box .p-tafsir{font-size:var(--tafsir-font-size); line-height:2; color:var(--text-soft); margin-top:10px; padding-top:10px; border-top:1px dashed var(--border);}
+.order-list{list-style:none; margin:0; padding:0;}
+.order-item{
+  display:flex; align-items:center; gap:10px; padding:12px 14px; margin-bottom:8px; background:var(--bg);
+  border:1px solid var(--border); border-radius:10px; cursor:grab; font-size:14px; font-weight:500;
+}
+.order-item.dragging{opacity:.4;}
+.order-item .handle-ico{color:var(--text-soft); font-size:16px;}
+
+/* ===================== Favorites (المحفوظات) section ===================== */
+.fav-type-select{max-width:260px; margin-bottom:16px;}
+
+/* ===================== Help section ===================== */
+.help-item{padding:16px 0; border-bottom:1px dashed var(--border);}
+.help-item:last-child{border-bottom:none;}
+.help-item h4{margin-bottom:6px; display:flex; align-items:center; gap:8px;}
+.help-item h4 .ic{font-size:18px;}
+.help-item p{font-size:13.5px; margin:0;}
+
+/* ===================== Long-press confirm popup ===================== */
+.lp-popup-back{position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:2200; display:none; align-items:center; justify-content:center;}
+.lp-popup-back.show{display:flex;}
+.lp-popup{background:var(--card); border:1px solid var(--border); border-radius:16px; padding:22px 24px; max-width:300px; width:90%; text-align:center; box-shadow:0 12px 30px var(--shadow);}
+.lp-popup p{color:var(--text); margin:0 0 16px;}
+.lp-popup .row{display:flex; gap:10px;}
+.lp-popup .row button{flex:1;}
+
+/* Hadith library browse mode */
+.lib-nav{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px;}
+.lib-item{padding:14px 0; border-bottom:1px dashed var(--border); font-family:'Amiri',serif; font-size:17px; line-height:2;}
 </style>
 </head>
 <body>
@@ -421,6 +491,7 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
       </div>
     </div>
   </div>
+  <div class="tabs-wrap at-start" id="tabsWrap">
   <nav class="tabs" id="tabs">
     <button data-sec="home" class="active">الرئيسية</button>
     <button data-sec="quran">القرآن الكريم</button>
@@ -430,7 +501,11 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
     <button data-sec="zakat">حساب الزكاة</button>
     <button data-sec="prayer">الصلاة والقبلة والتقويم</button>
     <button data-sec="wird">الورد والحفظ</button>
+    <button data-sec="favorites">المحفوظات</button>
+    <button data-sec="settings">الإعدادات</button>
+    <button data-sec="help">المساعدة</button>
   </nav>
+  </div>
 </header>
 
 <main>
@@ -455,8 +530,8 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
       <div class="grid">
         <div class="card ql-card" data-sec="quran"><svg viewBox="0 0 24 24"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M20 4v13a3 3 0 0 1-3 3"/></svg><div>القرآن والتفسير</div></div>
         <div class="card ql-card" data-sec="hadith"><svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg><div>الأحاديث النبوية</div></div>
-        <div class="card ql-card" data-sec="names"><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div>أسماء الله الحسنى</div></div>
-        <div class="card ql-card" data-sec="prayer"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><div>الصلاة والقبلة</div></div>
+        <div class="card ql-card" data-sec="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.7 7.7 0 0 0 0-2l2-1.6-2-3.5-2.4 1a7.8 7.8 0 0 0-1.7-1L15 3h-4l-.3 2.9a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.5L6.6 11a7.7 7.7 0 0 0 0 2l-2 1.6 2 3.5 2.4-1a7.8 7.8 0 0 0 1.7 1L11 21h4l.3-2.9a7.8 7.8 0 0 0 1.7-1l2.4 1 2-3.5z"/></svg><div>الإعدادات</div></div>
+        <div class="card ql-card" data-sec="help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 .8-1 1.7"/><circle cx="12" cy="17" r="0.6"/></svg><div>المساعدة وكيفية الاستخدام</div></div>
       </div>
     </div>
   </section>
@@ -518,9 +593,28 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
       </nav>
     </div>
     <div class="grid cols-2" id="hadithList" style="margin-top:18px;"></div>
-    <div class="card" style="margin-top:18px;">
-      <h3>الأحاديث المحفوظة</h3>
-      <div id="hadithBookmarksList"><div class="small-note">لا توجد أحاديث محفوظة بعد.</div></div>
+
+    <div class="star-divider" style="margin-top:30px;"><div class="line"></div><span style="font-size:12px;color:var(--text-soft)">المكتبة الشاملة للأحاديث</span><div class="line"></div></div>
+    <div class="card">
+      <p class="small-note">تصفح كتب الحديث كاملة (البخاري، مسلم، أبو داود، الترمذي، النسائي، ابن ماجه، أحمد، الدارمي، الموطأ) عبر واجهة برمجية مفتوحة، لتكون بذلك مكتبة حديثية شاملة إلى جانب المجموعة المختارة الموثقة أعلاه.</p>
+      <div class="quran-toolbar">
+        <div>
+          <label>اختر الكتاب</label>
+          <select id="libBookSelect"><option value="">جاري تحميل الكتب...</option></select>
+        </div>
+        <div>
+          <label>رقم الحديث للبدء منه</label>
+          <input type="number" id="libStartNum" value="1" min="1">
+        </div>
+        <div><button class="btn" id="libLoadBtn">تصفح</button></div>
+      </div>
+      <div id="libInfo" class="small-note"></div>
+      <div id="libList"></div>
+      <div class="lib-nav" id="libNavWrap" style="display:none;">
+        <button class="btn outline sm" id="libPrevBtn">◀ السابقة</button>
+        <span class="small-note" id="libRangeLabel"></span>
+        <button class="btn outline sm" id="libNextBtn">التالية ▶</button>
+      </div>
     </div>
   </section>
 
@@ -681,6 +775,102 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
     </div>
   </section>
 
+  <!-- ============ FAVORITES / المحفوظات ============ -->
+  <section class="section" id="sec-favorites">
+    <h2>المحفوظات</h2>
+    <div class="card">
+      <label>عرض المحفوظات من</label>
+      <select id="favTypeSelect" class="fav-type-select">
+        <option value="ayat">الآيات المرجعية</option>
+        <option value="hadith">الأحاديث المحفوظة</option>
+      </select>
+      <div id="favList"></div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS / الإعدادات ============ -->
+  <section class="section" id="sec-settings">
+    <h2>الإعدادات</h2>
+
+    <div class="card">
+      <h3>حجم الخطوط مع معاينة فورية</h3>
+      <div class="font-controls">
+        <div>
+          <label>حجم خط الآيات: <span id="setAyahSizeLabel">26</span>px</label>
+          <input type="range" id="setAyahSizeRange" min="18" max="40" value="26">
+        </div>
+        <div>
+          <label>حجم خط التفسير: <span id="setTafsirSizeLabel">15</span>px</label>
+          <input type="range" id="setTafsirSizeRange" min="12" max="24" value="15">
+        </div>
+      </div>
+      <div class="preview-box">
+        <div class="p-ayah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ﴿١﴾ الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ﴿٢﴾</div>
+        <div class="p-tafsir">هذا نص معاينة للتفسير يوضح حجم الخط المختار فور تغييره دون الحاجة للانتقال إلى قسم القرآن.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>المظهر</h3>
+      <div class="settings-row">
+        <div>
+          <div class="lbl">الوضع الليلي</div>
+          <div class="desc">التبديل بين المظهر الفاتح والداكن لكامل الموقع</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="setThemeSwitch">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>ترتيب الأقسام</h3>
+      <p class="small-note">اسحب العناصر لإعادة ترتيب ظهور الأقسام في الشريط العلوي حسب رغبتك.</p>
+      <ul class="order-list" id="sectionOrderList"></ul>
+      <button class="btn outline sm" id="resetOrderBtn" style="margin-top:10px;">إعادة الترتيب الافتراضي</button>
+    </div>
+  </section>
+
+  <!-- ============ HELP / المساعدة ============ -->
+  <section class="section" id="sec-help">
+    <h2>المساعدة وكيفية الاستخدام</h2>
+    <div class="card">
+      <div class="help-item">
+        <h4><span class="ic">🧭</span> التنقل بين الأقسام</h4>
+        <p>استخدم الشريط العلوي للانتقال بين الأقسام. على الجوال اسحب الشريط يميناً ويساراً، وعلى الحاسوب يمكنك أيضاً سحب الشريط بالفأرة (اضغط واسحب) للتمرير بين الأقسام غير الظاهرة.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">📖</span> عرض السور والتفسير</h4>
+        <p>من قسم "القرآن الكريم"، اختر السورة من القائمة وستظهر مباشرة دون الحاجة لأي زر إضافي. اضغط على أي آية لعرض تفسيرها في لوحة منزلقة أسفل الشاشة.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">🔖</span> حفظ علامة مرجعية على آية</h4>
+        <p>اضغط مطولاً (Long Press) على أي آية، ستظهر رسالة تسألك: "هل تريد وضع علامة مرجعية؟" اختر "نعم" لحفظها بعنوان تختاره، أو "لا" للتجاهل والعودة كأن شيئاً لم يكن.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">🗂️</span> المحفوظات</h4>
+        <p>قسم "المحفوظات" يجمع كل ما حفظته من آيات وأحاديث في مكان واحد، ويمكنك التبديل بين النوعين من القائمة المنسدلة أعلى القسم.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">📚</span> الأحاديث النبوية</h4>
+        <p>يضم القسم مجموعة مختارة موثقة بالراوي والمصدر ودرجة الحديث، بالإضافة إلى مكتبة شاملة تتيح تصفح كتب الحديث كاملة (البخاري ومسلم وغيرها).</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">⚙️</span> الإعدادات</h4>
+        <p>من قسم "الإعدادات" يمكنك التحكم بحجم خط الآيات والتفسير مع معاينة فورية، وتبديل الوضع الليلي/النهاري، وإعادة ترتيب ظهور الأقسام في الشريط العلوي.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">🕋</span> مواقيت الصلاة والقبلة والتقويم</h4>
+        <p>يعرض القسم مواقيت الصلاة حسب موقعك، وبوصلة اتجاه القبلة، وتقويماً هجرياً يوضح المناسبات، وعداً تنازلياً لأقرب مناسبة إسلامية.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">🧮</span> حساب الزكاة والورد والحفظ</h4>
+        <p>احسب زكاة المال وزكاة الفطر بسهولة، وأنشئ خطة ورد يومي لختم القرآن أو خطة حفظ ومراجعة مع متابعة تقدمك يوماً بيوم.</p>
+      </div>
+    </div>
+  </section>
+
 </main>
 
 <footer class="site">
@@ -710,6 +900,17 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
   <div class="txt" id="drawerText"></div>
 </div>
 
+<!-- Long-press bookmark confirm popup -->
+<div class="lp-popup-back" id="lpPopupBack">
+  <div class="lp-popup">
+    <p>هل تريد وضع علامة مرجعية على هذه الآية؟</p>
+    <div class="row">
+      <button class="btn" id="lpYesBtn">نعم</button>
+      <button class="btn outline" id="lpNoBtn">لا</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal -->
 <div class="modal-back" id="modalBack">
   <div class="modal">
@@ -729,8 +930,8 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
 
 <!-- Tutorial overlay (first mobile visit) -->
 <div id="tutorialOverlay">
-  <div class="tut-hand">👆</div>
-  <p>اسحب القائمة لاكتشاف المزيد من الأقسام</p>
+  <div class="tut-arrow">⬆</div>
+  <p>اسحب الشريط العلوي يميناً ويساراً لاكتشاف المزيد من الأقسام</p>
   <div class="hint">انقر في أي مكان للإغلاق</div>
 </div>
 
@@ -775,6 +976,99 @@ function goSection(name){
 document.querySelectorAll('[data-sec]').forEach(el=>{
   el.addEventListener('click', ()=>{ if(el.dataset.sec) goSection(el.dataset.sec); });
 });
+
+/* ---------- Tabs bar: edge fade hint + desktop mouse drag-to-scroll ---------- */
+const tabsWrap = document.getElementById('tabsWrap');
+const tabsNav = document.getElementById('tabs');
+function updateTabsEdges(){
+  const atStart = tabsNav.scrollLeft >= tabsNav.scrollWidth - tabsNav.clientWidth - 2; // RTL: start = fully right
+  const atEnd = tabsNav.scrollLeft <= 1;
+  tabsWrap.classList.toggle('at-start', atStart);
+  tabsWrap.classList.toggle('at-end', atEnd);
+}
+tabsNav.addEventListener('scroll', updateTabsEdges);
+window.addEventListener('resize', updateTabsEdges);
+updateTabsEdges();
+(function enableDesktopDrag(){
+  let isDown = false, startX = 0, startScroll = 0, draggedFar = false;
+  tabsNav.addEventListener('mousedown', e=>{
+    isDown = true; draggedFar = false;
+    tabsNav.classList.add('dragging');
+    startX = e.pageX; startScroll = tabsNav.scrollLeft;
+  });
+  window.addEventListener('mouseup', ()=>{ isDown = false; tabsNav.classList.remove('dragging'); });
+  window.addEventListener('mousemove', e=>{
+    if(!isDown) return;
+    const dx = e.pageX - startX;
+    if(Math.abs(dx) > 6) draggedFar = true;
+    tabsNav.scrollLeft = startScroll - dx;
+  });
+  // Suppress the click that would fire right after a real drag
+  tabsNav.addEventListener('click', e=>{
+    if(draggedFar){ e.stopPropagation(); e.preventDefault(); draggedFar = false; }
+  }, true);
+})();
+
+/* ---------- Section ordering (customizable from Settings) ---------- */
+const DEFAULT_SECTION_ORDER = ['home','quran','hadith','names','adhkar','zakat','prayer','wird','favorites','settings','help'];
+function applySectionOrder(order){
+  order.forEach(sec=>{
+    const btn = tabsNav.querySelector(`button[data-sec="${sec}"]`);
+    if(btn) tabsNav.appendChild(btn);
+  });
+  updateTabsEdges();
+}
+function getSectionOrder(){
+  const saved = loadJSON('mc-section-order', null);
+  if(!saved) return DEFAULT_SECTION_ORDER.slice();
+  // Merge in any new sections not present in an old saved order
+  const merged = saved.filter(s=>DEFAULT_SECTION_ORDER.includes(s));
+  DEFAULT_SECTION_ORDER.forEach(s=>{ if(!merged.includes(s)) merged.push(s); });
+  return merged;
+}
+applySectionOrder(getSectionOrder());
+
+const SECTION_LABELS = {
+  home:'الرئيسية', quran:'القرآن الكريم', hadith:'الأحاديث النبوية', names:'أسماء الله الحسنى',
+  adhkar:'الأذكار والتسبيح', zakat:'حساب الزكاة', prayer:'الصلاة والقبلة والتقويم', wird:'الورد والحفظ',
+  favorites:'المحفوظات', settings:'الإعدادات', help:'المساعدة'
+};
+function renderSectionOrderList(){
+  const order = getSectionOrder();
+  const ul = document.getElementById('sectionOrderList');
+  ul.innerHTML = order.map(sec=>`<li class="order-item" draggable="true" data-sec="${sec}"><span class="handle-ico">☰</span>${SECTION_LABELS[sec]||sec}</li>`).join('');
+  let dragEl = null;
+  ul.querySelectorAll('.order-item').forEach(li=>{
+    li.addEventListener('dragstart', ()=>{ dragEl = li; li.classList.add('dragging'); });
+    li.addEventListener('dragend', ()=>{ li.classList.remove('dragging'); saveSectionOrderFromList(); });
+    li.addEventListener('dragover', e=>{
+      e.preventDefault();
+      const after = getDragAfterElement(ul, e.clientY);
+      if(!dragEl) return;
+      if(after==null) ul.appendChild(dragEl); else ul.insertBefore(dragEl, after);
+    });
+  });
+}
+function getDragAfterElement(container, y){
+  const items = [...container.querySelectorAll('.order-item:not(.dragging)')];
+  return items.reduce((closest, child)=>{
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height/2;
+    if(offset < 0 && offset > closest.offset) return {offset, element: child};
+    return closest;
+  }, {offset: -Infinity}).element;
+}
+function saveSectionOrderFromList(){
+  const order = [...document.querySelectorAll('#sectionOrderList .order-item')].map(li=>li.dataset.sec);
+  saveJSON('mc-section-order', order);
+  applySectionOrder(order);
+}
+document.getElementById('resetOrderBtn').addEventListener('click', ()=>{
+  saveJSON('mc-section-order', DEFAULT_SECTION_ORDER);
+  applySectionOrder(DEFAULT_SECTION_ORDER);
+  renderSectionOrderList();
+});
+renderSectionOrderList();
 
 /* ---------- Modal helper ---------- */
 const modalBack = document.getElementById('modalBack');
@@ -947,7 +1241,7 @@ async function loadSurah(num, jumpToAyah){
     }
     html += `<div class="mushaf-text" id="mushafText">`;
     ayahs.forEach((a, idx)=>{
-      html += `<span class="ayah-span" data-idx="${idx}">${a.text}<span class="ayah-num-marker">${a.numberInSurah}</span></span><button class="bookmark-btn" data-idx="${idx}" title="إضافة علامة مرجعية">🔖</button> `;
+      html += `<span class="ayah-span" data-idx="${idx}">${a.text}<span class="ayah-num-marker">${a.numberInSurah}</span></span> `;
     });
     html += `</div>`;
     container.innerHTML = html;
@@ -955,12 +1249,7 @@ async function loadSurah(num, jumpToAyah){
 
     container.querySelectorAll('.ayah-span').forEach(span=>{
       span.addEventListener('click', ()=>selectAyah(parseInt(span.dataset.idx)));
-    });
-    container.querySelectorAll('.bookmark-btn').forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
-        e.stopPropagation();
-        openBookmarkModal(parseInt(btn.dataset.idx));
-      });
+      attachLongPress(span, ()=>confirmBookmark(parseInt(span.dataset.idx)));
     });
 
     if(jumpToAyah){
@@ -989,6 +1278,11 @@ document.getElementById('loadSurahBtn').addEventListener('click', ()=>{
   const num = document.getElementById('surahSelect').value;
   if(num) loadSurah(num);
 });
+// Load the surah immediately once chosen from the dropdown - no extra click needed
+document.getElementById('surahSelect').addEventListener('change', ()=>{
+  const num = document.getElementById('surahSelect').value;
+  if(num) loadSurah(num);
+});
 
 /* ---- Font size controls ---- */
 function applyFontSizes(){
@@ -1014,6 +1308,45 @@ document.getElementById('tafsirSizeRange').addEventListener('input', e=>{
   saveJSON('mc-tafsir-size', parseInt(v));
 });
 applyFontSizes();
+
+/* ---- Settings section: synced font controls with live preview ---- */
+function syncSettingsFontUI(){
+  const ayahSize = loadJSON('mc-ayah-size', 26);
+  const tafsirSize = loadJSON('mc-tafsir-size', 15);
+  document.getElementById('setAyahSizeRange').value = ayahSize;
+  document.getElementById('setTafsirSizeRange').value = tafsirSize;
+  document.getElementById('setAyahSizeLabel').textContent = ayahSize;
+  document.getElementById('setTafsirSizeLabel').textContent = tafsirSize;
+}
+syncSettingsFontUI();
+document.getElementById('setAyahSizeRange').addEventListener('input', e=>{
+  const v = e.target.value;
+  document.documentElement.style.setProperty('--ayah-font-size', v+'px');
+  document.getElementById('setAyahSizeLabel').textContent = v;
+  saveJSON('mc-ayah-size', parseInt(v));
+  document.getElementById('ayahSizeRange').value = v;
+  document.getElementById('ayahSizeLabel').textContent = v;
+});
+document.getElementById('setTafsirSizeRange').addEventListener('input', e=>{
+  const v = e.target.value;
+  document.documentElement.style.setProperty('--tafsir-font-size', v+'px');
+  document.getElementById('setTafsirSizeLabel').textContent = v;
+  saveJSON('mc-tafsir-size', parseInt(v));
+  document.getElementById('tafsirSizeRange').value = v;
+  document.getElementById('tafsirSizeLabel').textContent = v;
+});
+// Keep settings sliders in sync if font size is changed from the Quran section itself
+document.getElementById('ayahSizeRange').addEventListener('input', ()=>syncSettingsFontUI());
+document.getElementById('tafsirSizeRange').addEventListener('input', ()=>syncSettingsFontUI());
+
+/* ---- Settings section: theme switch (mirrors footer toggle) ---- */
+const setThemeSwitch = document.getElementById('setThemeSwitch');
+function syncThemeSwitch(){ setThemeSwitch.checked = root.getAttribute('data-theme') === 'dark'; }
+syncThemeSwitch();
+setThemeSwitch.addEventListener('change', ()=>{
+  setTheme(setThemeSwitch.checked ? 'dark' : 'light');
+});
+document.getElementById('themeToggle').addEventListener('click', syncThemeSwitch);
 
 /* ---- Ayah-only search ---- */
 function searchInAyahs(query){
@@ -1082,6 +1415,45 @@ document.getElementById('quranSearchBtn').addEventListener('click', async ()=>{
   }
 });
 
+/* ---- Long press helper (touch + mouse) ---- */
+function attachLongPress(el, callback, duration){
+  duration = duration || 550;
+  let timer = null, moved = false, startX = 0, startY = 0;
+  const start = (x,y)=>{
+    moved = false; startX = x; startY = y;
+    timer = setTimeout(()=>{ if(!moved) callback(); }, duration);
+  };
+  const move = (x,y)=>{
+    if(Math.abs(x-startX) > 10 || Math.abs(y-startY) > 10){ moved = true; clearTimeout(timer); }
+  };
+  const cancel = ()=>{ clearTimeout(timer); };
+  el.addEventListener('touchstart', e=>{ const t=e.touches[0]; start(t.clientX,t.clientY); }, {passive:true});
+  el.addEventListener('touchmove', e=>{ const t=e.touches[0]; move(t.clientX,t.clientY); }, {passive:true});
+  el.addEventListener('touchend', cancel);
+  el.addEventListener('mousedown', e=>{ start(e.clientX,e.clientY); });
+  el.addEventListener('mousemove', e=>{ if(timer) move(e.clientX,e.clientY); });
+  el.addEventListener('mouseup', cancel);
+  el.addEventListener('mouseleave', cancel);
+}
+
+/* ---- Long-press bookmark confirm popup ---- */
+const lpPopupBack = document.getElementById('lpPopupBack');
+let pendingBookmarkIdx = null;
+function confirmBookmark(idx){
+  pendingBookmarkIdx = idx;
+  lpPopupBack.classList.add('show');
+}
+document.getElementById('lpYesBtn').addEventListener('click', ()=>{
+  lpPopupBack.classList.remove('show');
+  if(pendingBookmarkIdx !== null) openBookmarkModal(pendingBookmarkIdx);
+  pendingBookmarkIdx = null;
+});
+document.getElementById('lpNoBtn').addEventListener('click', ()=>{
+  lpPopupBack.classList.remove('show');
+  pendingBookmarkIdx = null;
+});
+lpPopupBack.addEventListener('click', e=>{ if(e.target===lpPopupBack){ lpPopupBack.classList.remove('show'); pendingBookmarkIdx=null; } });
+
 /* ---- Bookmarks ---- */
 function openBookmarkModal(idx){
   if(!currentSurahData) return;
@@ -1105,36 +1477,63 @@ function openBookmarkModal(idx){
     });
     saveJSON('quran-bookmarks', bms);
     modalBack.classList.remove('show');
+    renderFavorites();
   });
 }
-function renderBookmarksModal(){
-  const bms = loadJSON('quran-bookmarks', []);
-  const listHtml = bms.length ? bms.map((b,i)=>`
-    <div class="bm-item">
-      <div class="info" data-i="${i}"><strong>${escapeHtml(b.label)}</strong><span>سورة ${b.surahName} - آية ${b.ayahNum}</span></div>
-      <button data-del="${i}">حذف</button>
-    </div>`).join('') : '<div class="small-note">لا توجد علامات محفوظة بعد.</div>';
-  openModal(`<h3>العلامات المرجعية</h3>${listHtml}`);
-  modalContent.querySelectorAll('.info').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const b = bms[parseInt(el.dataset.i)];
-      document.getElementById('surahSelect').value = b.surahNum;
-      modalBack.classList.remove('show');
-      goSection('quran');
-      loadSurah(b.surahNum, b.ayahNum);
+
+/* ---------- المحفوظات (unified favorites: ayat + hadith) ---------- */
+function renderFavorites(){
+  const type = document.getElementById('favTypeSelect').value;
+  const box = document.getElementById('favList');
+  if(type==='hadith'){
+    const saved = loadJSON('hadith-bookmarks', []);
+    box.innerHTML = saved.length ? saved.map((h,i)=>`
+      <div class="dhikr-item">
+        <div class="txt" style="font-size:15px;">${h.text}</div>
+        <div class="small-note">${h.narrator} - ${h.source}</div>
+        <button class="btn sm outline" data-rm-hadith="${i}" style="margin-top:6px;">إزالة</button>
+      </div>`).join('') : '<div class="small-note">لا توجد أحاديث محفوظة بعد.</div>';
+    box.querySelectorAll('[data-rm-hadith]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const arr = loadJSON('hadith-bookmarks', []);
+        arr.splice(parseInt(btn.dataset.rmHadith),1);
+        saveJSON('hadith-bookmarks', arr);
+        renderFavorites();
+      });
     });
-  });
-  modalContent.querySelectorAll('[data-del]').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      const i = parseInt(btn.dataset.del);
-      bms.splice(i,1);
-      saveJSON('quran-bookmarks', bms);
-      renderBookmarksModal();
+  } else {
+    const bms = loadJSON('quran-bookmarks', []);
+    box.innerHTML = bms.length ? bms.map((b,i)=>`
+      <div class="bm-item">
+        <div class="info" data-i="${i}"><strong>${escapeHtml(b.label)}</strong><span>سورة ${b.surahName} - آية ${b.ayahNum}</span></div>
+        <button data-del-ayah="${i}">حذف</button>
+      </div>`).join('') : '<div class="small-note">لا توجد علامات مرجعية محفوظة بعد.</div>';
+    box.querySelectorAll('.info').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const b = bms[parseInt(el.dataset.i)];
+        document.getElementById('surahSelect').value = b.surahNum;
+        goSection('quran');
+        loadSurah(b.surahNum, b.ayahNum);
+      });
     });
-  });
+    box.querySelectorAll('[data-del-ayah]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const i = parseInt(btn.dataset.delAyah);
+        bms.splice(i,1);
+        saveJSON('quran-bookmarks', bms);
+        renderFavorites();
+      });
+    });
+  }
 }
-document.getElementById('showBookmarksBtn').addEventListener('click', renderBookmarksModal);
+document.getElementById('favTypeSelect').addEventListener('change', renderFavorites);
+renderFavorites();
+document.getElementById('showBookmarksBtn').addEventListener('click', ()=>{
+  goSection('favorites');
+  document.getElementById('favTypeSelect').value = 'ayat';
+  renderFavorites();
+});
 
 /* ============================================================
    HADITH SECTION
@@ -1206,27 +1605,9 @@ function renderHadithList(){
       const saved = loadJSON('hadith-bookmarks', []);
       saved.push(h);
       saveJSON('hadith-bookmarks', saved);
-      renderHadithBookmarks();
+      renderFavorites();
       btn.textContent = 'تم الحفظ ✓';
       setTimeout(()=>btn.textContent='حفظ 🔖', 1500);
-    });
-  });
-}
-function renderHadithBookmarks(){
-  const saved = loadJSON('hadith-bookmarks', []);
-  const box = document.getElementById('hadithBookmarksList');
-  box.innerHTML = saved.length ? saved.map((h,i)=>`
-    <div class="dhikr-item">
-      <div class="txt" style="font-size:15px;">${h.text}</div>
-      <div class="small-note">${h.narrator} - ${h.source}</div>
-      <button class="btn sm outline" data-rm="${i}" style="margin-top:6px;">إزالة</button>
-    </div>`).join('') : '<div class="small-note">لا توجد أحاديث محفوظة بعد.</div>';
-  box.querySelectorAll('[data-rm]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const arr = loadJSON('hadith-bookmarks', []);
-      arr.splice(parseInt(btn.dataset.rm),1);
-      saveJSON('hadith-bookmarks', arr);
-      renderHadithBookmarks();
     });
   });
 }
@@ -1239,7 +1620,72 @@ document.getElementById('hadithGradeTabs').addEventListener('click', e=>{
 });
 document.getElementById('hadithSearchInput').addEventListener('input', renderHadithList);
 renderHadithList();
-renderHadithBookmarks();
+renderFavorites();
+
+/* ============================================================
+   HADITH LIBRARY (full books via public API) - complements the
+   curated, graded HADITH_DB above with a much larger collection.
+   ============================================================ */
+const HADITH_LIB_API = 'https://api.hadith.gading.dev';
+let libBooks = [];
+let libRangeStart = 1;
+const LIB_PAGE_SIZE = 10;
+
+async function initHadithLibrary(){
+  try{
+    const res = await fetch(`${HADITH_LIB_API}/books`);
+    const data = await res.json();
+    libBooks = data.data || [];
+    const sel = document.getElementById('libBookSelect');
+    sel.innerHTML = libBooks.map(b=>`<option value="${b.id}">${b.name} (${b.available} حديث)</option>`).join('');
+  }catch(e){
+    document.getElementById('libBookSelect').innerHTML = '<option value="">تعذر تحميل قائمة الكتب حالياً</option>';
+  }
+}
+initHadithLibrary();
+
+async function loadLibRange(){
+  const bookId = document.getElementById('libBookSelect').value;
+  const info = document.getElementById('libInfo');
+  const list = document.getElementById('libList');
+  const navWrap = document.getElementById('libNavWrap');
+  if(!bookId){ info.textContent = 'الرجاء اختيار كتاب أولاً.'; return; }
+  const end = libRangeStart + LIB_PAGE_SIZE - 1;
+  info.textContent = 'جاري التحميل...';
+  list.innerHTML = '';
+  try{
+    const res = await fetch(`${HADITH_LIB_API}/books/${bookId}?range=${libRangeStart}-${end}`);
+    const data = await res.json();
+    const contents = (data.data && data.data.contents) || [];
+    const bookName = (data.data && data.data.name) || '';
+    if(!contents.length){
+      info.textContent = 'لا توجد نتائج في هذا النطاق.';
+      navWrap.style.display = 'none';
+      return;
+    }
+    info.textContent = `${bookName} — عرض الأحاديث من ${libRangeStart} إلى ${libRangeStart+contents.length-1}`;
+    list.innerHTML = contents.map(c=>`
+      <div class="lib-item">
+        <span class="badge" style="margin-left:8px;">حديث ${c.number}</span>${c.arab}
+      </div>`).join('');
+    document.getElementById('libRangeLabel').textContent = `${libRangeStart} - ${end}`;
+    navWrap.style.display = 'flex';
+  }catch(e){
+    info.textContent = 'تعذر تحميل الأحاديث، تحقق من اتصال الإنترنت وحاول مجدداً.';
+  }
+}
+document.getElementById('libLoadBtn').addEventListener('click', ()=>{
+  libRangeStart = Math.max(1, parseInt(document.getElementById('libStartNum').value) || 1);
+  loadLibRange();
+});
+document.getElementById('libPrevBtn').addEventListener('click', ()=>{
+  libRangeStart = Math.max(1, libRangeStart - LIB_PAGE_SIZE);
+  loadLibRange();
+});
+document.getElementById('libNextBtn').addEventListener('click', ()=>{
+  libRangeStart += LIB_PAGE_SIZE;
+  loadLibRange();
+});
 
 /* ============================================================
    NAMES OF ALLAH (99 names) with supporting references
