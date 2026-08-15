@@ -78,19 +78,28 @@ button{font-family:'Tajawal',sans-serif; cursor:pointer;}
   position:fixed; top:16px; left:16px; z-index:9999;
   display:flex; align-items:center; gap:8px;
   padding:10px 16px;
-  background:rgba(255,255,255,0.10);
+  background:rgba(255,255,255,0.55);
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,0.35);
+  border:1px solid var(--border);
   border-radius:999px;
-  color:#fff;
-  font-weight:500;
+  color:var(--primary);
+  font-weight:700;
   font-size:14px;
   box-shadow:0 4px 18px var(--shadow);
-  transition:background .25s ease, transform .2s ease;
+  transition:background .25s ease, color .25s ease, transform .2s ease;
 }
-#backHome:hover{background:#1e90ff; transform:translateY(-1px);}
-#backHome svg{width:18px;height:18px;fill:#fff;flex-shrink:0;}
+#backHome:hover{background:var(--primary); color:#fff; transform:translateY(-1px);}
+#backHome svg{width:18px;height:18px;fill:var(--primary);flex-shrink:0; transition:fill .25s ease;}
+#backHome:hover svg{fill:#fff;}
+html[data-theme="dark"] #backHome{
+  background:rgba(18,35,32,0.55);
+  border-color:rgba(224,187,85,0.25);
+  color:var(--accent);
+}
+html[data-theme="dark"] #backHome svg{fill:var(--accent);}
+html[data-theme="dark"] #backHome:hover{background:var(--primary); color:#fff;}
+html[data-theme="dark"] #backHome:hover svg{fill:#fff;}
 @media(max-width:640px){
   #backHome span{display:none;}
   #backHome{padding:10px; left:12px; top:12px;}
@@ -335,8 +344,13 @@ footer.site{
     <div class="hero">
       <span class="badge" style="background:rgba(255,255,255,.2); color:#fff;">آية اليوم</span>
       <div class="ayah-box" id="ayahOfDay">جاري التحميل...</div>
+      <button class="btn outline" id="toggleAyahTafsir" style="border-color:rgba(255,255,255,.5); color:#fff; margin-top:10px; font-size:13px; padding:7px 16px; display:none;">عرض التفسير</button>
+      <div class="hadith-box" id="ayahTafsirBox" style="display:none;"></div>
+
       <div class="badge" style="background:rgba(255,255,255,.2); color:#fff; margin-top:16px;">حديث اليوم</div>
       <div class="hadith-box" id="hadithOfDay">جاري التحميل...</div>
+      <button class="btn outline" id="toggleHadithSharh" style="border-color:rgba(255,255,255,.5); color:#fff; margin-top:10px; font-size:13px; padding:7px 16px; display:none;">عرض الشرح</button>
+      <div class="hadith-box" id="hadithSharhBox" style="display:none;"></div>
     </div>
 
     <div class="quick-links">
@@ -453,6 +467,11 @@ footer.site{
       <div class="times-grid" id="timesGrid" style="margin-top:16px;"></div>
     </div>
 
+    <div id="ramadanBanner" style="display:none; align-items:center; gap:10px; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color:#fff; border-radius:14px; padding:14px 18px; margin-top:18px; font-weight:700;">
+      <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:#fff;flex-shrink:0;"><path d="M12 2s6 7.2 6 11.5A6 6 0 0 1 6 13.5C6 9.2 12 2 12 2z"/></svg>
+      <span>نحن الآن في شهر رمضان المبارك، تقبل الله منّا ومنكم صالح الأعمال.</span>
+    </div>
+
     <div class="card" style="margin-top:18px;">
       <h3>العد التنازلي للمناسبة القادمة</h3>
       <div id="nextEventLabel" class="small-note"></div>
@@ -509,7 +528,7 @@ footer.site{
         <div id="hifzProgressWrap" style="display:none; margin-top:16px;">
           <div class="progress-wrap"><div class="progress-bar" id="hifzProgressBar"></div></div>
           <div class="small-note" id="hifzProgressText"></div>
-          <div id="hifzDays" style="margin-top:10px;"></div>
+          <div id="hifzDaysChips" style="margin-top:10px;"></div>
         </div>
       </div>
     </div>
@@ -983,13 +1002,73 @@ loadPrayerTimes();
 /* ---- Hijri calendar ---- */
 let calMonth, calYear, currentHijriMonth=null;
 
+const HIJRI_MONTH_AR = ["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
+
+/* Local (tabular) Gregorian <-> Hijri conversion, used as an offline fallback so the
+   calendar never fully fails even if the external API is unreachable. Accuracy is
+   within ~1 day of moon-sighting-based dates, same margin AlAdhan's own API notes. */
+function gregorianToJD(y, m, d){
+  return Math.floor((1461 * (y + 4800 + Math.floor((m - 14) / 12))) / 4) +
+         Math.floor((367 * (m - 2 - 12 * Math.floor((m - 14) / 12))) / 12) -
+         Math.floor((3 * Math.floor((y + 4900 + Math.floor((m - 14) / 12)) / 100)) / 4) +
+         d - 32075;
+}
+function jdToHijri(jdIn){
+  let jd = jdIn - 1948440 + 10632;
+  const n = Math.floor((jd - 1) / 10631);
+  jd = jd - 10631 * n + 354;
+  const j = (Math.floor((10985 - jd) / 5316)) * (Math.floor((50 * jd) / 17719)) + (Math.floor(jd / 5670)) * (Math.floor((43 * jd) / 15238));
+  jd = jd - (Math.floor((30 - j) / 15)) * (Math.floor((17719 * j) / 50)) - (Math.floor(j / 16)) * (Math.floor((15238 * j) / 43)) + 29;
+  const month = Math.floor((24 * jd) / 709);
+  const day = jd - Math.floor((709 * month) / 24);
+  const year = 30 * n + j - 30;
+  return {day, month, year};
+}
+function gregorianToHijri(y, m, d){ return jdToHijri(gregorianToJD(y, m, d)); }
+
+function fetchWithTimeout(url, ms){
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), ms);
+  return fetch(url, {signal:controller.signal}).finally(()=>clearTimeout(timer));
+}
+
+function buildLocalMonthDays(month, year){
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const arr = [];
+  for(let d=1; d<=daysInMonth; d++){
+    const h = gregorianToHijri(year, month, d);
+    arr.push({
+      gregorian:{ date:`${String(d).padStart(2,'0')}-${String(month).padStart(2,'0')}-${year}`, day:String(d).padStart(2,'0') },
+      hijri:{ day:String(h.day), month:{number:h.month, ar:HIJRI_MONTH_AR[h.month-1]}, year:String(h.year) }
+    });
+  }
+  return arr;
+}
+
+async function fetchMonthDays(month, year){
+  try{
+    const res = await fetchWithTimeout(`https://api.aladhan.com/v1/gToHCalendar/${month}/${year}`, 6000);
+    const data = await res.json();
+    if(data && data.code===200 && Array.isArray(data.data) && data.data.length) return data.data;
+    throw new Error('استجابة غير صالحة من خدمة التقويم');
+  }catch(e){
+    // Fallback: compute the Hijri dates locally so the calendar always renders
+    return buildLocalMonthDays(month, year);
+  }
+}
+
+function checkRamadan(days){
+  const banner = document.getElementById('ramadanBanner');
+  if(!banner) return;
+  const inRamadan = days.some(d=>d.hijri.month.number===9);
+  banner.style.display = inRamadan ? 'flex' : 'none';
+}
+
 async function initCalendarToday(){
   const now = new Date();
   calMonth = now.getMonth()+1; calYear = now.getFullYear();
   await renderCalendar();
 }
-
-const HIJRI_MONTH_AR = ["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
 
 // Known fixed-date (by Hijri month/day) Islamic occasions
 const OCCASIONS = [
@@ -1016,9 +1095,7 @@ async function renderCalendar(){
   const title = document.getElementById('calTitle');
   grid.innerHTML = '<div class="loading">جاري تحميل التقويم...</div>';
   try{
-    const res = await fetch(`https://api.aladhan.com/v1/gToHCalendar/${calMonth}/${calYear}`);
-    const data = await res.json();
-    const days = data.data;
+    const days = await fetchMonthDays(calMonth, calYear);
     if(days.length){
       currentHijriMonth = days[Math.floor(days.length/2)].hijri.month.ar;
     }
@@ -1071,12 +1148,8 @@ initCalendarToday();
 async function initCountdown(){
   try{
     const now = new Date();
-    const dd = String(now.getDate()).padStart(2,'0');
-    const mm = String(now.getMonth()+1).padStart(2,'0');
-    const res = await fetch(`https://api.aladhan.com/v1/gToH/${dd}-${mm}-${now.getFullYear()}`);
-    const data = await res.json();
-    const hijriToday = data.data.hijri;
-    const curH = parseInt(hijriToday.day), curM = hijriToday.month.number, curY = parseInt(hijriToday.year);
+    const hijriToday = gregorianToHijri(now.getFullYear(), now.getMonth()+1, now.getDate());
+    const curH = hijriToday.day, curM = hijriToday.month;
 
     // find the next occasion chronologically (approx, using 354-day hijri year & ~29.5 day months is complex;
     // simplified: compare (month,day) tuples this hijri year, else next hijri year)
@@ -1091,11 +1164,10 @@ async function initCountdown(){
     // Approximate the number of hijri days remaining
     const HIJRI_YEAR_DAYS = 354.36667;
     const HIJRI_MONTH_DAYS = 29.53059;
-    const remainingMonths = (next.hm - curM) + (yearsAhead*12) + (curH>next.hd?0:0);
     let approxDays = Math.round((next.hm - curM + yearsAhead*12) * HIJRI_MONTH_DAYS + (next.hd - curH));
     if(approxDays < 0) approxDays += Math.round(HIJRI_YEAR_DAYS);
 
-    updateCountdownDisplay(approxDays);
+    updateCountdownDisplay(Math.max(approxDays,0));
   }catch(e){
     document.getElementById('nextEventLabel').textContent = 'تعذر حساب المناسبة القادمة حالياً.';
   }
@@ -1232,7 +1304,7 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
     document.getElementById('hifzProgressBar').style.width = (doneCount/days*100)+'%';
     document.getElementById('hifzProgressText').textContent = `أنجزت مراجعة/حفظ ${doneCount} من ${days} يوماً (${Math.round(doneCount/days*100)}%)`;
   }
-  renderDayChips('hifzDays', days, doneArr, refresh);
+  renderDayChips('hifzDaysChips', days, doneArr, refresh);
   refresh();
 });
 
