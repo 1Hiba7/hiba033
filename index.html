@@ -79,10 +79,10 @@ button{font-family:'Tajawal',sans-serif; cursor:pointer;}
 .star-divider svg{width:22px; height:22px; fill:var(--accent);}
 .star-divider .line{flex:1; max-width:180px; height:1px; background:linear-gradient(90deg, transparent, var(--border), transparent);}
 
-/* ===================== Fixed back button (3D flat button, top-right) ===================== */
+/* ===================== Back-to-encyclopedia button (static, footer, under the copyright line) ===================== */
 #backHome{
-  position:fixed; top:16px; right:16px; z-index:9999;
-  display:flex; align-items:center; gap:8px;
+  position:static; margin:18px auto 0;
+  display:flex; align-items:center; justify-content:center; gap:8px;
   padding:11px 18px;
   background:var(--primary);
   border:none;
@@ -90,6 +90,7 @@ button{font-family:'Tajawal',sans-serif; cursor:pointer;}
   color:#fff;
   font-weight:700;
   font-size:14px;
+  width:fit-content;
   box-shadow:0 4px 0 var(--primary-dark), 0 8px 18px var(--shadow);
   transition:transform .12s ease, box-shadow .12s ease, background .2s ease;
 }
@@ -99,14 +100,6 @@ html[data-theme="dark"] #backHome:hover{background:#1e90ff; color:#fff; box-shad
 #backHome:active{transform:translateY(3px); box-shadow:0 1px 0 var(--primary-dark);}
 html[data-theme="dark"] #backHome:active{transform:translateY(3px); box-shadow:0 1px 0 var(--accent-dark);}
 #backHome svg{width:18px;height:18px;fill:currentColor;flex-shrink:0;}
-@media(max-width:640px){
-  #backHome span{display:none;}
-  #backHome{padding:11px; right:12px; top:12px;}
-}
-@media(min-width:641px){
-  /* Prevent the fixed back button from overlapping the site title on wide screens */
-  .brand-row{padding-inline-end:198px;}
-}
 
 /* ===================== Notification bell (fixed top-left) ===================== */
 #notifBell{
@@ -258,14 +251,18 @@ html[data-theme="dark"] .badge.daif{background:#3b1414; color:#e08a8a;}
 }
 .hero .ayah-source{font-family:'Tajawal',sans-serif; font-size:12.5px; opacity:.85; display:block; margin-top:10px;}
 .hero .tafsir-toggle{position:relative; z-index:1; margin-top:10px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); color:#fff; padding:6px 14px; border-radius:999px; font-size:12.5px;}
-.hero .mini-tafsir{display:none; position:relative; z-index:1; margin-top:10px; background:rgba(0,0,0,.15); border-radius:10px; padding:12px; font-size:13.5px; line-height:1.9;}
+.hero .mini-tafsir{display:none; position:relative; z-index:1; margin-top:10px; background:#2e8c7b; border-radius:10px; padding:12px; font-size:13.5px; line-height:1.9; color:#fff;}
 .hero .mini-tafsir.show{display:block;}
-.hero .hadith-box{margin-top:14px; background:rgba(255,255,255,.07); border-radius:14px; padding:18px; font-size:15px; line-height:2; position:relative; z-index:1;}
-.hero .hadith-explain{display:none; font-size:13px; margin-top:8px; opacity:.9;}
+.hero .hadith-box{
+  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); border-radius:14px;
+  margin-top:14px; padding:20px; font-size:15px; line-height:2; position:relative; z-index:1;
+}
+.hero .hadith-explain{display:none; position:relative; z-index:1; margin-top:10px; background:#2e8c7b; border-radius:10px; padding:12px; font-size:13.5px; line-height:1.9; color:#fff;}
 .hero .hadith-explain.show{display:block;}
 .quick-links{margin-top:24px;}
-.quick-links .grid{grid-template-columns:repeat(4,1fr);}
-@media(max-width:900px){.quick-links .grid{grid-template-columns:repeat(2,1fr);}}
+.quick-links .grid{grid-template-columns:repeat(5,1fr);}
+@media(max-width:1000px){.quick-links .grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:640px){.quick-links .grid{grid-template-columns:repeat(2,1fr);}}
 .ql-card{
   display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;
   padding:22px 12px; cursor:pointer;
@@ -284,7 +281,11 @@ html[data-theme="dark"] .ql-card svg{fill:var(--accent);}
   max-width:760px; margin:0 auto; padding:22px 26px; border:1px solid var(--border);
   border-radius:14px; background:var(--bg);
 }
-.basmala{font-family:'Amiri',serif; text-align:center; font-size:24px; padding:6px 0 18px; color:var(--accent);}
+.basmala{font-family:'Amiri',serif; text-align:center; font-size:22px; padding:6px 0 10px; color:var(--accent); font-weight:700;}
+.basmala.basmala-sub{font-size:22px; padding:0 0 18px; color:var(--primary); font-weight:400;}
+html[data-theme="dark"] .basmala.basmala-sub{color:var(--text);}
+.waqf-muanaqah{color:var(--danger); background:rgba(179,69,47,.14); border-radius:4px; padding:0 2px; cursor:help; font-weight:700;}
+html[data-theme="dark"] .waqf-muanaqah{background:rgba(179,69,47,.28);}
 .mushaf-text{
   font-family:'Amiri',serif; font-size:var(--ayah-font-size); line-height:2.6; text-align:justify;
 }
@@ -317,6 +318,9 @@ html[data-theme="dark"] .ql-card svg{fill:var(--accent);}
 .tafsir-drawer .handle{width:44px;height:4px;background:var(--border); border-radius:4px; margin:0 auto 14px;}
 .tafsir-drawer .txt{font-size:var(--tafsir-font-size); line-height:2;}
 .tafsir-drawer .close-drawer{position:absolute; top:14px; left:16px; background:none; border:none; font-size:18px; color:var(--text-soft);}
+.listen-controls{display:flex; align-items:center; justify-content:center; gap:10px; margin-top:16px; flex-wrap:wrap;}
+.listen-controls button{flex:1; min-width:110px;}
+#listenNowPlaying{text-align:center; margin-top:10px;}
 
 /* Bookmarks list */
 .bm-item{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed var(--border);}
@@ -345,6 +349,8 @@ html[data-theme="dark"] .name-card .ar{color:var(--accent);}
 .dhikr-search{margin-bottom:14px;}
 .dhikr-item{padding:16px 0; border-bottom:1px dashed var(--border);}
 .dhikr-item:last-child{border-bottom:none;}
+.dhikr-item.plan-item{cursor:pointer; transition:background .15s ease; border-radius:10px; padding-inline:10px;}
+.dhikr-item.plan-item:hover{background:var(--bg);}
 .dhikr-item .txt{font-family:'Amiri',serif; font-size:19px; line-height:2;}
 .dhikr-item .meta{display:flex; justify-content:space-between; align-items:center; margin-top:8px; flex-wrap:wrap; gap:8px;}
 .dhikr-item .src{font-size:11.5px; color:var(--text-soft);}
@@ -555,12 +561,6 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
 </head>
 <body>
 
-<!-- Fixed back-to-home button -->
-<a href="index.html" id="backHome">
-  <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
-  <span>العودة للموسوعة الرئيسية</span>
-</a>
-
 <!-- Notifications bell -->
 <button id="notifBell" title="الإشعارات">
   <svg viewBox="0 0 24 24"><path d="M12 2a6 6 0 0 0-6 6v3.5c0 .7-.25 1.37-.7 1.9L4 15h16l-1.3-1.6a3 3 0 0 1-.7-1.9V8a6 6 0 0 0-6-6z"/><path d="M9.5 18a2.5 2.5 0 0 0 5 0"/></svg>
@@ -589,6 +589,7 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
   <nav class="tabs" id="tabs">
     <button data-sec="home" class="active">الرئيسية</button>
     <button data-sec="quran">القرآن الكريم</button>
+    <button data-sec="tajwid">أحكام التجويد</button>
     <button data-sec="hadith">الأحاديث النبوية</button>
     <button data-sec="names">أسماء الله الحسنى</button>
     <button data-sec="adhkar">الأذكار والتسبيح</button>
@@ -623,6 +624,7 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
       <div class="star-divider"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
       <div class="grid">
         <div class="card ql-card" data-sec="quran"><svg viewBox="0 0 24 24"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M20 4v13a3 3 0 0 1-3 3"/></svg><div>القرآن والتفسير</div></div>
+        <div class="card ql-card" data-sec="tajwid"><svg viewBox="0 0 24 24"><path d="M4 5a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1zm0 6a1 1 0 0 1 1-1h10a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1zm0 6a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1z"/></svg><div>أحكام التجويد</div></div>
         <div class="card ql-card" data-sec="hadith"><svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg><div>الأحاديث النبوية</div></div>
         <div class="card ql-card" data-sec="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.7 7.7 0 0 0 0-2l2-1.6-2-3.5-2.4 1a7.8 7.8 0 0 0-1.7-1L15 3h-4l-.3 2.9a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.5L6.6 11a7.7 7.7 0 0 0 0 2l-2 1.6 2 3.5 2.4-1a7.8 7.8 0 0 0 1.7 1L11 21h4l.3-2.9a7.8 7.8 0 0 0 1.7-1l2.4 1 2-3.5z"/></svg><div>الإعدادات</div></div>
         <div class="card ql-card" data-sec="help"><svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16z"/><path d="M9.8 9.2a2.4 2.4 0 1 1 3.4 2.2c-.9.5-1.2.9-1.2 1.9h-1.6c0-1.5.5-2.1 1.5-2.7a1 1 0 1 0-1.4-.9z"/><circle cx="12" cy="16.3" r="0.9"/></svg><div>المساعدة وكيفية الاستخدام</div></div>
@@ -643,17 +645,6 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
         <div><button class="btn outline" id="showBookmarksBtn">🔖 العلامات المرجعية</button></div>
       </div>
 
-      <div class="font-controls">
-        <div>
-          <label>حجم خط الآيات: <span id="ayahSizeLabel">26</span>px</label>
-          <input type="range" id="ayahSizeRange" min="18" max="40" value="26">
-        </div>
-        <div>
-          <label>حجم خط التفسير: <span id="tafsirSizeLabel">15</span>px</label>
-          <input type="range" id="tafsirSizeRange" min="12" max="24" value="15">
-        </div>
-      </div>
-
       <div class="star-divider"><div class="line"></div><span style="font-size:12px;color:var(--text-soft)">محرك بحث الآيات</span><div class="line"></div></div>
       <div class="quran-toolbar">
         <div><label>ابحث عن كلمة داخل نص الآيات فقط</label><input type="text" id="quranSearchInput" placeholder="اكتب كلمة للبحث..."></div>
@@ -670,28 +661,173 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
       <div class="loading">اختر سورة لعرضها</div>
     </div>
 
-    <div class="card" style="margin-top:18px;">
-      <h3>📗 أساسيات التجويد</h3>
-      <p class="small-note">مرجع سريع لأهم أحكام التجويد لمساعدتك على تحسين تلاوتك.</p>
+    <div class="card" style="margin-top:18px; text-align:center;">
+      <h3>📗 أحكام التجويد</h3>
+      <p class="small-note">مرجع شامل لكل أحكام التجويد مع أمثلة توضيحية أصبح الآن في قسم مستقل خاص به.</p>
+      <button class="btn outline" data-sec="tajwid">فتح قسم أحكام التجويد</button>
+    </div>
+  </section>
+
+  <!-- ============ TAJWID (independent section) ============ -->
+  <section class="section" id="sec-tajwid">
+    <h2>أحكام التجويد</h2>
+    <p class="small-note">مرجع شامل لأحكام تجويد القرآن الكريم على رواية حفص بن سليمان عن عاصم، مع مثال توضيحي لكل حكم.</p>
+
+    <div class="card">
+      <h3>أحكام النون الساكنة والتنوين</h3>
       <div class="help-item">
-        <h4><span class="ic">۩</span> المدود</h4>
-        <p>إطالة الصوت بحرف من حروف المد (الألف، الواو، الياء الساكنتين المسبوقتين بحركة مجانسة)، وأشهرها المد الطبيعي (حركتان) والمد المتصل والمنفصل (4-5 حركات).</p>
-      </div>
-      <div class="help-item">
-        <h4><span class="ic">۩</span> الغنة</h4>
-        <p>صوت رخيم يخرج من الخيشوم يلازم النون والميم المشددتين، ويظهر أيضاً في أحكام النون الساكنة والتنوين كالإدغام بغنة والإخفاء والإقلاب.</p>
+        <h4><span class="ic">۩</span> الإظهار (الحلقي)</h4>
+        <p>نطق النون الساكنة أو التنوين من مخرجها بلا غنة ظاهرة إذا جاء بعدها أحد حروف الحلق الستة: (ء هـ ع ح غ خ).<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">مَنْ آمَنَ</span> — <span style="font-family:'Amiri',serif; font-size:17px;">عَلِيمٌ حَكِيمٌ</span>.</p>
       </div>
       <div class="help-item">
         <h4><span class="ic">۩</span> الإدغام</h4>
-        <p>إدخال حرف ساكن في حرف متحرك بعده حتى يصيرا حرفاً واحداً مشدداً، ويكون بغنة أو بغير غنة بحسب الحرف المدغم فيه.</p>
+        <p>إدخال النون الساكنة أو التنوين في الحرف الذي يليها من حروف (يرملون) حتى يصيرا حرفاً واحداً مشدداً. وينقسم إلى إدغام بغنة (ي ن م و) وإدغام بغير غنة (ل ر).<br><strong>مثال بغنة:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">مَن يَقُولُ</span>. <strong>مثال بغير غنة:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">مِن رَّبِّهِمْ</span>.</p>
       </div>
       <div class="help-item">
-        <h4><span class="ic">۩</span> الإخفاء والإقلاب</h4>
-        <p>الإخفاء: نطق النون الساكنة أو التنوين بصفة بين الإظهار والإدغام مع الغنة عند حروف الإخفاء. الإقلاب: قلب النون الساكنة أو التنوين ميماً مخفاة عند حرف الباء.</p>
+        <h4><span class="ic">۩</span> الإقلاب</h4>
+        <p>قلب النون الساكنة أو التنوين ميماً مخفاة بغنة عند حرف الباء، مع إخفاء حقيقي لهذه الميم.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">سَمِيعٌ بَصِيرٌ</span> — <span style="font-family:'Amiri',serif; font-size:17px;">أَنۢبَتْنَا</span>.</p>
       </div>
       <div class="help-item" style="border-bottom:none;">
+        <h4><span class="ic">۩</span> الإخفاء (الحقيقي)</h4>
+        <p>نطق النون الساكنة أو التنوين بصفة بين الإظهار والإدغام مع بقاء الغنة، إذا جاء بعدها أحد حروف الإخفاء الخمسة عشر الباقية (ص ذ ث ك ج ش ق س د ط ز ف ت ض ظ).<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">مِن قَبْلُ</span> — <span style="font-family:'Amiri',serif; font-size:17px;">أَنفُسَكُمْ</span>.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>أحكام الميم الساكنة</h3>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> الإخفاء الشفوي</h4>
+        <p>إخفاء الميم الساكنة بغنة إذا جاء بعدها حرف الباء.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">تَرْمِيهِم بِحِجَارَةٍ</span>.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> الإدغام الشفوي (مثلين صغير)</h4>
+        <p>إدغام الميم الساكنة في ميم متحركة بعدها بغنة كاملة.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">لَهُم مَّا يَشَاءُونَ</span>.</p>
+      </div>
+      <div class="help-item" style="border-bottom:none;">
+        <h4><span class="ic">۩</span> الإظهار الشفوي</h4>
+        <p>نطق الميم الساكنة واضحة بلا غنة مع باقي الحروف (غير الباء والميم)، وأشدها وضوحاً عند الواو والفاء.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">عَلَيْهِمْ وَلَا الضَّالِّينَ</span>.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>الغنة</h3>
+      <div class="help-item" style="border-bottom:none;">
+        <h4><span class="ic">۩</span> الغنة الكاملة</h4>
+        <p>صوت رخيم يخرج من الخيشوم بمقدار حركتين، يلازم النون والميم المشددتين بشكل أساسي، ويظهر أيضاً تبعاً في الإدغام بغنة والإقلاب والإخفاء.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">إِنَّ</span> — <span style="font-family:'Amiri',serif; font-size:17px;">ثُمَّ</span>.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>المدود</h3>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> المد الطبيعي (الأصلي)</h4>
+        <p>مد بحرف من حروف المد الثلاثة (ا و ي) بمقدار حركتين، بشرط ألا يأتي بعده همز أو سكون.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">قَالَ</span> — <span style="font-family:'Amiri',serif; font-size:17px;">يَقُولُ</span>.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> المد المتصل</h4>
+        <p>مد واجب إذا جاء حرف المد وحرف الهمز في كلمة واحدة، ومقداره 4 أو 5 حركات وجوباً.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">السَّمَاءِ</span> — <span style="font-family:'Amiri',serif; font-size:17px;">جَاءَ</span>.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> المد المنفصل</h4>
+        <p>مد جائز إذا جاء حرف المد آخر كلمة وحرف الهمز أول الكلمة التالية، ومقداره 4 أو 5 حركات جوازاً.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">يَا أَيُّهَا</span> — <span style="font-family:'Amiri',serif; font-size:17px;">إِنَّا أَعْطَيْنَاكَ</span>.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> مد البدل</h4>
+        <p>أن يتقدم الهمز على حرف المد في الكلمة نفسها دون سبب مد بعده، ومقداره حركتان كالمد الطبيعي.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">آمَنُوا</span> — <span style="font-family:'Amiri',serif; font-size:17px;">إِيمَاناً</span>.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> المد اللازم</h4>
+        <p>مد يأتي بعده سكون أصلي ثابت وصلاً ووقفاً (كلمي أو حرفي، مثقل أو مخفف)، ومقداره 6 حركات وجوباً.<br><strong>مثال:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">الضَّالِّينَ</span> — <span style="font-family:'Amiri',serif; font-size:17px;">الم</span> (في فواتح السور).</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> المد العارض للسكون</h4>
+        <p>أن يقع حرف المد قبل آخر الكلمة الموقوف عليها بسكون عارض بسبب الوقف، ومقداره 2 أو 4 أو 6 حركات جوازاً.<br><strong>مثال:</strong> الوقف على <span style="font-family:'Amiri',serif; font-size:17px;">الرَّحِيمِ</span> أو <span style="font-family:'Amiri',serif; font-size:17px;">نَسْتَعِينُ</span>.</p>
+      </div>
+      <div class="help-item" style="border-bottom:none;">
+        <h4><span class="ic">۩</span> مد اللين</h4>
+        <p>الواو والياء الساكنتان المفتوح ما قبلهما إذا وقع بعدهما سكون عارض بسبب الوقف، ومقداره 2 أو 4 أو 6 حركات جوازاً.<br><strong>مثال:</strong> الوقف على <span style="font-family:'Amiri',serif; font-size:17px;">خَوْفٍ</span> أو <span style="font-family:'Amiri',serif; font-size:17px;">بَيْتِ</span>.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>القلقلة</h3>
+      <div class="help-item" style="border-bottom:none;">
         <h4><span class="ic">۩</span> القلقلة</h4>
-        <p>اضطراب واضح للصوت عند النطق بحرف ساكن من حروف (قطب جد)، ليخرج بصوت واضح غير ممطوط.</p>
+        <p>اضطراب واضح للصوت عند النطق بحرف ساكن من حروف القلقلة (قطب جد) بحيث يخرج بصوت قوي غير ممطوط. تكون صغرى في وسط الكلمة أو الكلام، وكبرى إذا وقع حرف القلقلة آخر الكلمة الموقوف عليها.<br><strong>مثال صغرى:</strong> <span style="font-family:'Amiri',serif; font-size:17px;">يَخْلُقُ</span>. <strong>مثال كبرى:</strong> الوقف على <span style="font-family:'Amiri',serif; font-size:17px;">الفَلَقْ</span>.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>صفات الحروف</h3>
+      <p class="small-note">الصفة هي الكيفية التي يكون عليها الحرف عند خروجه من مخرجه. تنقسم إلى صفات لها ضد وصفات لا ضد لها.</p>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> صفات لها ضد (تُؤخذ أزواجاً)</h4>
+        <p><strong>الهمس ↔ الجهر:</strong> جريان النفس أو انحباسه عند النطق بالحرف. <strong>الشدة ↔ الرخاوة</strong> (والتوسط بينهما): انحباس الصوت أو جريانه مع الحرف. <strong>الاستعلاء ↔ الاستفال:</strong> ارتفاع أقصى اللسان إلى الحنك الأعلى أو عدمه. <strong>الإطباق ↔ الانفتاح:</strong> إطباق اللسان على الحنك الأعلى أو تجافيه عنه. <strong>الإذلاق ↔ الإصمات:</strong> خفة الحرف على طرف اللسان أو ثقله.</p>
+      </div>
+      <div class="help-item" style="border-bottom:none;">
+        <h4><span class="ic">۩</span> صفات لا ضد لها</h4>
+        <p><strong>الصفير:</strong> صوت زائد يشبه صفير الطائر (ص ز س). <strong>القلقلة:</strong> اضطراب الصوت عند النطق بالحرف ساكناً (قطب جد). <strong>اللين:</strong> خروج الواو والياء الساكنتين المفتوح ما قبلهما بسهولة. <strong>الانحراف:</strong> ميل الحرف عن مخرجه إلى مخرج آخر (ل ر). <strong>التكرير:</strong> ارتعاد طرف اللسان عند النطق بالراء. <strong>التفشي:</strong> انتشار الهواء في الفم عند النطق بالشين. <strong>الاستطالة:</strong> امتداد الصوت من أول حافة اللسان إلى آخرها (الضاد). <strong>الغنة:</strong> صوت رخيم في الخيشوم يلازم النون والميم.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>مخارج الحروف</h3>
+      <p class="small-note">المخرج هو الموضع الذي يخرج منه الحرف ويتميز به عن غيره، وتنقسم مخارج الحروف إلى خمسة مخارج عامة.</p>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> الجوف</h4>
+        <p>تجويف الفم والحلق، ومنه تخرج حروف المد الثلاثة الساكنة: الألف والواو والياء المديات.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> الحلق</h4>
+        <p>وله ثلاثة مخارج: أقصى الحلق (الهمزة والهاء)، ووسط الحلق (العين والحاء)، وأدنى الحلق مما يلي الفم (الغين والخاء).</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> اللسان</h4>
+        <p>أكبر مخارج الحروف وأكثرها تفصيلاً، وتخرج منه حروف: القاف، الكاف، الجيم والشين والياء (غير المدية)، الضاد، اللام، النون، الراء، الطاء والدال والتاء، الصاد والزاي والسين، الظاء والذال والثاء.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> الشفتان</h4>
+        <p>يخرج منهما: الفاء (من باطن الشفة السفلى مع أطراف الثنايا العليا)، والباء والميم والواو غير المدية (من بين الشفتين).</p>
+      </div>
+      <div class="help-item" style="border-bottom:none;">
+        <h4><span class="ic">۩</span> الخيشوم</h4>
+        <p>أقصى الأنف من الداخل، ومنه تخرج الغنة اللازمة للنون والميم في جميع أحوالهما (المشددة والمخفاة والمقلوبة والمدغم فيها بغنة).</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>ألقاب الحروف</h3>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> حروف القلقلة</h4>
+        <p>يجمعها قولهم: (قُطْبُ جَدٍّ) — ق ط ب ج د.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> حروف الاستعلاء</h4>
+        <p>يجمعها قولهم: (خُصَّ ضَغْطٍ قِظْ) — خ ص ض غ ط ق ظ.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> حروف الإطباق</h4>
+        <p>أخص من حروف الاستعلاء، وهي أربعة: ص ض ط ظ.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> حروف الصفير</h4>
+        <p>ثلاثة حروف: ص ز س.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> حروف اللين</h4>
+        <p>الواو والياء الساكنتان المفتوح ما قبلهما، مثل الواو والياء في: بَيْت، خَوْف.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> حروف المد</h4>
+        <p>ثلاثة حروف: الألف الساكنة المفتوح ما قبلها، والواو الساكنة المضموم ما قبلها، والياء الساكنة المكسور ما قبلها.</p>
+      </div>
+      <div class="help-item">
+        <h4><span class="ic">۩</span> حروف الذلاقة</h4>
+        <p>يجمعها قولهم: (فِرَّ مِنْ لُبٍّ) — ف ر م ن ل ب، وما عداها حروف إصمات.</p>
+      </div>
+      <div class="help-item" style="border-bottom:none;">
+        <h4><span class="ic">۩</span> حروف الانحراف والتكرير والتفشي والاستطالة</h4>
+        <p>الانحراف: اللام والراء. التكرير: الراء وحدها. التفشي: الشين وحدها. الاستطالة: الضاد وحدها.</p>
       </div>
     </div>
   </section>
@@ -699,10 +835,10 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
   <!-- ============ HADITH ============ -->
   <section class="section" id="sec-hadith">
     <h2>الأحاديث النبوية الشريفة</h2>
-    <p class="small-note">مجموعة مختارة من الأحاديث النبوية الشريفة موثقة بالراوي والمصدر ودرجة الحديث (ملاحظة: هذه مجموعة مختارة وليست كامل كتب الحديث).</p>
+    <p class="small-note">ابحث في مجموعة مختارة موثقة بالراوي والمصدر ودرجة الحديث، أو في المكتبة الشاملة لكتب الحديث كاملة (البخاري، مسلم، أبو داود، الترمذي، النسائي، ابن ماجه، الموطأ، والأربعينات).</p>
     <div class="card">
       <div class="quran-toolbar">
-        <div><label>ابحث في الأحاديث</label><input type="text" id="hadithSearchInput" placeholder="كلمة مفتاحية..."></div>
+        <div><label>ابحث في الأحاديث (يشمل المجموعة المختارة والمكتبة الشاملة الكاملة)</label><input type="text" id="hadithSearchInput" placeholder="كلمة مفتاحية..."></div>
       </div>
       <nav class="tabs" id="hadithGradeTabs" style="margin:6px 0 0;">
         <button data-grade="all" class="active">الكل</button>
@@ -712,6 +848,14 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
       </nav>
     </div>
     <div class="grid cols-2" id="hadithList" style="margin-top:18px;"></div>
+
+    <div id="hadithLibSearchWrap" style="display:none; margin-top:18px;">
+      <div class="star-divider" style="margin-top:10px;"><div class="line"></div><span style="font-size:12px;color:var(--text-soft)">نتائج من المكتبة الشاملة الكاملة</span><div class="line"></div></div>
+      <div class="card">
+        <div id="hadithLibSearchInfo" class="small-note"></div>
+        <div id="hadithLibSearchResults"></div>
+      </div>
+    </div>
 
     <div class="star-divider" style="margin-top:30px;"><div class="line"></div><span style="font-size:12px;color:var(--text-soft)">المكتبة الشاملة للأحاديث</span><div class="line"></div></div>
     <div class="card">
@@ -1139,6 +1283,10 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
     <svg id="themeIcon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.4 5.4 0 0 1 12 3z"/></svg>
     <span id="themeLabel">الوضع الليلي</span>
   </div>
+  <a href="index.html" id="backHome">
+    <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
+    <span>العودة للموسوعة الرئيسية</span>
+  </a>
 </footer>
 
 <!-- Water reminder tool (Ramadan only) -->
@@ -1160,6 +1308,22 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
   <div class="txt" id="drawerText"></div>
   <button class="btn outline sm" id="drawerBookmarkBtn" style="margin-top:16px;">🔖 حفظ الآية</button>
   <button class="btn outline sm" id="drawerAudioBtn" style="margin-top:16px; margin-inline-start:8px;">🔊 استماع للآية</button>
+</div>
+
+<!-- Listen drawer (bottom sheet, matches the tafsir drawer design) -->
+<div class="drawer-back" id="listenDrawerBack"></div>
+<div class="tafsir-drawer" id="listenDrawer">
+  <button class="close-drawer" id="closeListenDrawer">✕</button>
+  <div class="handle"></div>
+  <h3 id="listenDrawerTitle">الاستماع للسورة</h3>
+  <label>اختر القارئ</label>
+  <select id="reciterSelect"></select>
+  <div class="small-note" id="listenNowPlaying"></div>
+  <div class="listen-controls">
+    <button class="btn outline sm" id="listenPrevBtn">⏮ الآية السابقة</button>
+    <button class="btn" id="listenPlayPauseBtn">⏸ إيقاف مؤقت</button>
+    <button class="btn outline sm" id="listenNextBtn">الآية التالية ⏭</button>
+  </div>
 </div>
 
 <!-- Modal -->
@@ -1268,7 +1432,7 @@ updateTabsEdges();
 })();
 
 /* ---------- Section ordering (customizable from Settings) ---------- */
-const DEFAULT_SECTION_ORDER = ['home','quran','hadith','names','adhkar','zakat','prayer','wird','favorites','settings','help'];
+const DEFAULT_SECTION_ORDER = ['home','quran','tajwid','hadith','names','adhkar','zakat','prayer','wird','favorites','settings','help'];
 function applySectionOrder(order){
   order.forEach(sec=>{
     const btn = tabsNav.querySelector(`button[data-sec="${sec}"]`);
@@ -1287,7 +1451,7 @@ function getSectionOrder(){
 applySectionOrder(getSectionOrder());
 
 const SECTION_LABELS = {
-  home:'الرئيسية', quran:'القرآن الكريم', hadith:'الأحاديث النبوية', names:'أسماء الله الحسنى',
+  home:'الرئيسية', quran:'القرآن الكريم', tajwid:'أحكام التجويد', hadith:'الأحاديث النبوية', names:'أسماء الله الحسنى',
   adhkar:'الأذكار والتسبيح', zakat:'حساب الزكاة', prayer:'الصلاة والقبلة والتقويم', wird:'الورد والحفظ',
   favorites:'المحفوظات', settings:'الإعدادات', help:'المساعدة'
 };
@@ -1478,12 +1642,18 @@ async function initSurahSelect(){
 initSurahSelect();
 
 const BASMALA_TEXT = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
+const ISTIADHAH_TEXT = "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ";
 function stripLeadingBasmala(text){
   const t = text.trim();
   if(t.indexOf(BASMALA_TEXT) === 0){
     return t.slice(BASMALA_TEXT.length).trim();
   }
   return t;
+}
+// Highlight waqf al-mu'anaqah (تعانق الوقف) marks - U+06DB ARABIC SMALL HIGH SEEN - so the
+// paired stop-here-or-there mark stands out clearly inside the mushaf text.
+function highlightMuanaqah(text){
+  return text.replace(/\u06DB/g, '<span class="waqf-muanaqah" title="تعانق الوقف: قف عند أحد الموضعين المتقابلين فقط ولا تقف عندهما معاً">\u06DB</span>');
 }
 
 async function loadSurah(num, jumpToAyah){
@@ -1506,15 +1676,17 @@ async function loadSurah(num, jumpToAyah){
 
     let html = `<h3>${arabicEd.name} <span class="small-note">(${arabicEd.englishName} - ${arabicEd.numberOfAyahs} آية)</span></h3>`;
     html += `<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
-      <button class="btn outline sm" id="surahAudioBtn">🔊 استماع للسورة كاملة</button>
+      <button class="btn outline sm" id="surahAudioBtn">🔊 الاستماع</button>
       <button class="btn outline sm" id="surahFavAudioBtn">⭐ إضافة للاستماع المفضل</button>
     </div>`;
+    html += `<div class="basmala">${ISTIADHAH_TEXT}</div>`;
     if(num != 1 && num != 9){
-      html += `<div class="basmala">${BASMALA_TEXT}</div>`;
+      html += `<div class="basmala basmala-sub">${BASMALA_TEXT}</div>`;
     }
+    html += `<div class="small-note" style="text-align:center;">اللون البرتقالي المميز داخل الآيات يشير إلى تعانق الوقف: قف عند أحد الموضعين المتقابلين فقط.</div>`;
     html += `<div class="mushaf-text" id="mushafText">`;
     ayahs.forEach((a, idx)=>{
-      html += `<span class="ayah-span" data-idx="${idx}">${a.text}<span class="ayah-num-marker">${a.numberInSurah}</span></span> `;
+      html += `<span class="ayah-span" data-idx="${idx}">${highlightMuanaqah(a.text)}<span class="ayah-num-marker">${a.numberInSurah}</span></span> `;
     });
     html += `</div>`;
     container.innerHTML = html;
@@ -1523,7 +1695,7 @@ async function loadSurah(num, jumpToAyah){
     container.querySelectorAll('.ayah-span').forEach(span=>{
       span.addEventListener('click', ()=>selectAyah(parseInt(span.dataset.idx)));
     });
-    document.getElementById('surahAudioBtn').addEventListener('click', ()=>playSurahAudio(currentSurahData.num));
+    document.getElementById('surahAudioBtn').addEventListener('click', ()=>openListenDrawer());
     document.getElementById('surahFavAudioBtn').addEventListener('click', ()=>toggleAudioFavorite(currentSurahData.num, arabicEd.name));
     syncSurahFavAudioBtn();
 
@@ -1571,6 +1743,99 @@ function syncSurahFavAudioBtn(){
   btn.textContent = isFav ? '⭐ إزالة من الاستماع المفضل' : '⭐ إضافة للاستماع المفضل';
 }
 
+/* ---- Listen drawer: bottom-sheet popup with reciter select + prev/next/play-pause ---- */
+const RECITERS = [
+  {id:'ar.alafasy', name:'مشاري راشد العفاسي'},
+  {id:'ar.abdulbasitmurattal', name:'عبد الباسط عبد الصمد (مرتل)'},
+  {id:'ar.husary', name:'محمود خليل الحصري'},
+  {id:'ar.minshawi', name:'محمد صديق المنشاوي'},
+  {id:'ar.abdurrahmaansudais', name:'عبدالرحمن السديس'},
+  {id:'ar.mahermuaiqly', name:'ماهر المعيقلي'}
+];
+const listenDrawer = document.getElementById('listenDrawer');
+const listenDrawerBack = document.getElementById('listenDrawerBack');
+let listenAyahIdx = 0;
+let listenIsPlaying = false;
+
+function initReciterSelect(){
+  const sel = document.getElementById('reciterSelect');
+  sel.innerHTML = RECITERS.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  const saved = loadJSON('mc-reciter', 'ar.alafasy');
+  sel.value = saved;
+  sel.addEventListener('change', ()=>{
+    saveJSON('mc-reciter', sel.value);
+    if(listenIsPlaying) playListenAyah(listenAyahIdx);
+  });
+}
+initReciterSelect();
+
+function getSelectedReciter(){
+  const sel = document.getElementById('reciterSelect');
+  return (sel && sel.value) || 'ar.alafasy';
+}
+function updateListenPlayPauseBtn(){
+  document.getElementById('listenPlayPauseBtn').textContent = listenIsPlaying ? '⏸ إيقاف مؤقت' : '▶ تشغيل';
+}
+function updateListenNowPlaying(){
+  if(!currentSurahData) return;
+  const ayahObj = currentSurahData.arabic.ayahs[listenAyahIdx];
+  document.getElementById('listenNowPlaying').textContent = ayahObj
+    ? `سورة ${currentSurahData.arabic.name} - الآية ${ayahObj.numberInSurah}`
+    : '';
+  document.querySelectorAll('.ayah-span').forEach(s=>s.classList.remove('active'));
+  const span = document.querySelector(`.ayah-span[data-idx="${listenAyahIdx}"]`);
+  if(span) span.classList.add('active');
+}
+function playListenAyah(idx){
+  if(!currentSurahData) return;
+  const ayahs = currentSurahData.arabic.ayahs;
+  if(idx<0 || idx>=ayahs.length) return;
+  listenAyahIdx = idx;
+  const ayahObj = ayahs[idx];
+  const globalNum = ayahObj && ayahObj.number;
+  if(!globalNum){ showToast('تعذر تحديد رقم الآية للاستماع.'); return; }
+  quranAudioPlayer.src = `https://cdn.islamic.network/quran/audio/128/${getSelectedReciter()}/${globalNum}.mp3`;
+  quranAudioPlayer.play().catch(()=>showToast('تعذر تشغيل الصوت، تحقق من اتصال الإنترنت.'));
+  updateListenNowPlaying();
+}
+function openListenDrawer(){
+  if(!currentSurahData){ showToast('الرجاء اختيار سورة أولاً.'); return; }
+  document.getElementById('listenDrawerTitle').textContent = `الاستماع - سورة ${currentSurahData.arabic.name}`;
+  listenDrawer.classList.add('show');
+  listenDrawerBack.classList.add('show');
+  playListenAyah(0);
+}
+function closeListenDrawer(){
+  listenDrawer.classList.remove('show');
+  listenDrawerBack.classList.remove('show');
+  quranAudioPlayer.pause();
+}
+document.getElementById('closeListenDrawer').addEventListener('click', closeListenDrawer);
+listenDrawerBack.addEventListener('click', closeListenDrawer);
+document.getElementById('listenPrevBtn').addEventListener('click', ()=>{
+  playListenAyah(Math.max(0, listenAyahIdx-1));
+});
+document.getElementById('listenNextBtn').addEventListener('click', ()=>{
+  if(!currentSurahData) return;
+  playListenAyah(Math.min(currentSurahData.arabic.ayahs.length-1, listenAyahIdx+1));
+});
+document.getElementById('listenPlayPauseBtn').addEventListener('click', ()=>{
+  if(quranAudioPlayer.paused){
+    if(!quranAudioPlayer.src){ playListenAyah(listenAyahIdx); return; }
+    quranAudioPlayer.play();
+  } else {
+    quranAudioPlayer.pause();
+  }
+});
+quranAudioPlayer.addEventListener('play', ()=>{ listenIsPlaying=true; updateListenPlayPauseBtn(); });
+quranAudioPlayer.addEventListener('pause', ()=>{ listenIsPlaying=false; updateListenPlayPauseBtn(); });
+quranAudioPlayer.addEventListener('ended', ()=>{
+  // Auto-advance to the next ayah while the listen drawer is open (continuous listening)
+  if(listenDrawer.classList.contains('show') && currentSurahData && listenAyahIdx < currentSurahData.arabic.ayahs.length-1){
+    playListenAyah(listenAyahIdx+1);
+  }
+});
+
 function selectAyah(idx){
   document.querySelectorAll('.ayah-span').forEach(s=>s.classList.remove('active'));
   const span = document.querySelector(`.ayah-span[data-idx="${idx}"]`);
@@ -1612,60 +1877,30 @@ document.getElementById('continueReadingBtn').addEventListener('click', ()=>{
 });
 refreshContinueReadingBtn();
 
-/* ---- Font size controls ---- */
+/* ---- Font size controls (Settings section only - single source of truth) ---- */
 function applyFontSizes(){
   const ayahSize = loadJSON('mc-ayah-size', 26);
   const tafsirSize = loadJSON('mc-tafsir-size', 15);
   document.documentElement.style.setProperty('--ayah-font-size', ayahSize+'px');
   document.documentElement.style.setProperty('--tafsir-font-size', tafsirSize+'px');
-  document.getElementById('ayahSizeRange').value = ayahSize;
-  document.getElementById('tafsirSizeRange').value = tafsirSize;
-  document.getElementById('ayahSizeLabel').textContent = ayahSize;
-  document.getElementById('tafsirSizeLabel').textContent = tafsirSize;
-}
-document.getElementById('ayahSizeRange').addEventListener('input', e=>{
-  const v = e.target.value;
-  document.documentElement.style.setProperty('--ayah-font-size', v+'px');
-  document.getElementById('ayahSizeLabel').textContent = v;
-  saveJSON('mc-ayah-size', parseInt(v));
-});
-document.getElementById('tafsirSizeRange').addEventListener('input', e=>{
-  const v = e.target.value;
-  document.documentElement.style.setProperty('--tafsir-font-size', v+'px');
-  document.getElementById('tafsirSizeLabel').textContent = v;
-  saveJSON('mc-tafsir-size', parseInt(v));
-});
-applyFontSizes();
-
-/* ---- Settings section: synced font controls with live preview ---- */
-function syncSettingsFontUI(){
-  const ayahSize = loadJSON('mc-ayah-size', 26);
-  const tafsirSize = loadJSON('mc-tafsir-size', 15);
   document.getElementById('setAyahSizeRange').value = ayahSize;
   document.getElementById('setTafsirSizeRange').value = tafsirSize;
   document.getElementById('setAyahSizeLabel').textContent = ayahSize;
   document.getElementById('setTafsirSizeLabel').textContent = tafsirSize;
 }
-syncSettingsFontUI();
 document.getElementById('setAyahSizeRange').addEventListener('input', e=>{
   const v = e.target.value;
   document.documentElement.style.setProperty('--ayah-font-size', v+'px');
   document.getElementById('setAyahSizeLabel').textContent = v;
   saveJSON('mc-ayah-size', parseInt(v));
-  document.getElementById('ayahSizeRange').value = v;
-  document.getElementById('ayahSizeLabel').textContent = v;
 });
 document.getElementById('setTafsirSizeRange').addEventListener('input', e=>{
   const v = e.target.value;
   document.documentElement.style.setProperty('--tafsir-font-size', v+'px');
   document.getElementById('setTafsirSizeLabel').textContent = v;
   saveJSON('mc-tafsir-size', parseInt(v));
-  document.getElementById('tafsirSizeRange').value = v;
-  document.getElementById('tafsirSizeLabel').textContent = v;
 });
-// Keep settings sliders in sync if font size is changed from the Quran section itself
-document.getElementById('ayahSizeRange').addEventListener('input', ()=>syncSettingsFontUI());
-document.getElementById('tafsirSizeRange').addEventListener('input', ()=>syncSettingsFontUI());
+applyFontSizes();
 
 /* ---- Settings section: theme switch (mirrors footer toggle) ---- */
 const setThemeSwitch = document.getElementById('setThemeSwitch');
@@ -1890,19 +2125,46 @@ function renderFavorites(){
       const desc = p.kind==='wird'
         ? `خطة ورد يومي: ${p.pages} صفحة خلال ${p.days} يوماً (${p.perDay} صفحة/يوم تقريباً) — أُنشئت في ${dateStr}`
         : `خطة حفظ: بداية من صفحة ${p.startPage}، اتجاه ${p.direction==='forward'?'تصاعدي':'تنازلي'}، ${p.days} يوماً (${p.hifzDaysCount} يوم حفظ فعلي) — أُنشئت في ${dateStr}`;
-      return `<div class="dhikr-item">
+      return `<div class="dhikr-item plan-item" data-plan-kind="${p.kind}" data-plan-idx="${idx}">
         <div class="txt" style="font-size:14.5px; font-family:'Tajawal',sans-serif;">${desc}</div>
+        <div class="small-note" style="margin-top:4px;">اضغط لعرض تفاصيل الخطة في قسم "الورد والحفظ"</div>
         <button class="btn sm outline" data-rm-plan="${p.kind}:${idx}" style="margin-top:6px;">حذف من المحفوظات</button>
       </div>`;
     }).join('') : '<div class="small-note">لا توجد خطط محفوظة بعد. أنشئ خطة من قسم "الورد والحفظ" ثم اضغط "حفظ هذه الخطة".</div>';
     box.querySelectorAll('[data-rm-plan]').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
         const [kind, idx] = btn.dataset.rmPlan.split(':');
         const key = kind==='wird' ? 'mc-saved-wird-plans' : 'mc-saved-hifz-plans';
         const arr = loadJSON(key, []);
         arr.splice(parseInt(idx),1);
         saveJSON(key, arr);
         renderFavorites();
+      });
+    });
+    box.querySelectorAll('.plan-item').forEach(el=>{
+      el.addEventListener('click', (e)=>{
+        if(e.target.closest('[data-rm-plan]')) return;
+        const kind = el.dataset.planKind;
+        const idx = parseInt(el.dataset.planIdx);
+        const key = kind==='wird' ? 'mc-saved-wird-plans' : 'mc-saved-hifz-plans';
+        const arr = loadJSON(key, []);
+        const p = arr[idx];
+        if(!p) return;
+        goSection('wird');
+        if(kind==='wird'){
+          document.getElementById('wirdPages').value = p.pages;
+          document.getElementById('wirdDuration').value = String(p.days);
+          document.getElementById('wirdCalcBtn').click();
+        } else {
+          document.getElementById('hifzStartMode').value = 'manual';
+          document.getElementById('hifzStartMode').dispatchEvent(new Event('change'));
+          document.getElementById('hifzManualStart').value = p.startPage;
+          document.getElementById('hifzDirection').value = p.direction;
+          document.getElementById('hifzPrevPages').value = p.prevPages;
+          document.getElementById('hifzPerDay').value = p.perDay;
+          document.getElementById('hifzCalcBtn').click();
+        }
       });
     });
     return;
@@ -2149,6 +2411,60 @@ async function loadLibRange(){
     info.textContent = 'تعذر تحميل الأحاديث، تحقق من اتصال الإنترنت وحاول مجدداً.';
   }
 }
+/* Search across the full library (all books), triggered from the same search box
+   used for the curated HADITH_DB above, so a single search box covers both
+   the curated selection AND the complete library - not just the selection. */
+let hadithLibSearchToken = 0;
+async function searchHadithLibraryAll(q){
+  const myToken = ++hadithLibSearchToken;
+  const info = document.getElementById('hadithLibSearchInfo');
+  const list = document.getElementById('hadithLibSearchResults');
+  const wrap = document.getElementById('hadithLibSearchWrap');
+  if(!q || q.length < 2){
+    wrap.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+  wrap.style.display = 'block';
+  info.textContent = 'جاري البحث في المكتبة الشاملة...';
+  list.innerHTML = '';
+  const MAX_RESULTS = 40;
+  const results = [];
+  for(const book of HADITH_LIB_BOOKS){
+    if(myToken !== hadithLibSearchToken) return; // a newer search started meanwhile, abandon this one
+    try{
+      const data = await fetchLibEdition(book.id);
+      const all = data.hadiths || [];
+      for(const h of all){
+        if(h.text && h.text.includes(q)){
+          results.push({book: book.name, num: h.hadithnumber||h.arabicnumber||'', text: h.text});
+          if(results.length >= MAX_RESULTS) break;
+        }
+      }
+    }catch(e){
+      // Skip this book on a network/parse failure and keep searching the rest of the library.
+    }
+    if(results.length >= MAX_RESULTS) break;
+  }
+  if(myToken !== hadithLibSearchToken) return;
+  if(!results.length){
+    info.textContent = 'لا توجد نتائج مطابقة في المكتبة الشاملة.';
+    list.innerHTML = '';
+    return;
+  }
+  info.textContent = `عُثر على ${results.length}${results.length>=MAX_RESULTS?'+':''} نتيجة في المكتبة الشاملة${results.length>=MAX_RESULTS?' (يُعرض أول '+MAX_RESULTS+')':''}:`;
+  list.innerHTML = results.map(r=>`
+    <div class="lib-item">
+      <span class="badge" style="margin-left:8px;">${r.book} - حديث ${r.num}</span>${r.text}
+    </div>`).join('');
+}
+let hadithLibSearchDebounce;
+document.getElementById('hadithSearchInput').addEventListener('input', function(){
+  clearTimeout(hadithLibSearchDebounce);
+  const q = this.value.trim();
+  hadithLibSearchDebounce = setTimeout(()=>searchHadithLibraryAll(q), 600);
+});
+
 document.getElementById('libLoadBtn').addEventListener('click', ()=>{
   libRangeStart = Math.max(1, parseInt(document.getElementById('libStartNum').value) || 1);
   loadLibRange();
