@@ -28,6 +28,7 @@
   --star-op:0.08;
   --ayah-font-size:26px;
   --tafsir-font-size:15px;
+  --container-max:1600px;
 }
 html[data-theme="dark"]{
   --bg:#0A1613;
@@ -166,13 +167,13 @@ header.site{
   border-bottom:1px solid var(--border);
   padding:14px 20px 0;
 }
-.brand-row{display:flex; align-items:center; justify-content:space-between; max-width:1180px; margin:0 auto; padding-bottom:10px;}
+.brand-row{display:flex; align-items:center; justify-content:space-between; max-width:var(--container-max); margin:0 auto; padding-bottom:10px;}
 .brand{display:flex; align-items:center; gap:10px;}
 .brand svg{width:34px;height:34px; fill:var(--accent);}
 .brand h1{font-size:22px; margin:0;}
 .brand small{display:block; color:var(--text-soft); font-size:11px; font-weight:400;}
 
-.tabs-wrap{position:relative; max-width:1180px; margin:0 auto;}
+.tabs-wrap{position:relative; max-width:var(--container-max); margin:0 auto;}
 .tabs-wrap::before,.tabs-wrap::after{
   content:""; position:absolute; top:0; bottom:10px; width:34px; pointer-events:none; z-index:2;
   transition:opacity .2s ease;
@@ -182,7 +183,7 @@ header.site{
 .tabs-wrap.at-start::before{opacity:0;}
 .tabs-wrap.at-end::after{opacity:0;}
 nav.tabs{
-  max-width:1180px; margin:0 auto;
+  max-width:var(--container-max); margin:0 auto;
   display:flex; gap:6px; overflow-x:auto; padding-bottom:10px;
   scrollbar-width:none; position:relative; cursor:grab;
 }
@@ -196,7 +197,7 @@ nav.tabs button{
 nav.tabs button.active{background:var(--primary); color:#fff; box-shadow:0 3px 10px var(--shadow);}
 nav.tabs button:not(.active):hover{background:var(--accent-soft); color:var(--text);}
 
-main{max-width:1180px; margin:0 auto; padding:26px 20px 80px; position:relative; z-index:1;}
+main{max-width:var(--container-max); margin:0 auto; padding:26px clamp(20px, 3vw, 48px) 80px; position:relative; z-index:1;}
 .section{display:none; animation:fadeIn .4s ease;}
 .section.active{display:block;}
 @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
@@ -303,7 +304,7 @@ html[data-theme="dark"] .waqf-muanaqah{background:rgba(179,69,47,.28);}
 .bookmark-btn:hover{opacity:1;}
 .result-item{padding:12px 0; border-bottom:1px dashed var(--border); cursor:pointer;}
 .result-item:hover{background:var(--accent-soft);}
-.result-item mark{background:var(--accent); color:#fff; border-radius:3px; padding:0 2px;}
+mark{background:var(--accent); color:#fff; border-radius:3px; padding:0 2px;}
 
 /* Tafsir drawer (bottom sheet) */
 .drawer-back{position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1400; display:none;}
@@ -463,12 +464,6 @@ footer.site{
   text-align:center; padding:26px 16px 90px; color:var(--text-soft); font-size:13px;
   border-top:1px solid var(--border); position:relative; z-index:1;
 }
-footer.site .foot-theme{
-  margin:16px auto 0; display:flex; align-items:center; justify-content:center; gap:8px;
-  width:fit-content; padding:9px 18px; border-radius:999px; border:1px solid var(--border); background:var(--card);
-}
-footer.site .foot-theme svg{width:18px;height:18px; fill:var(--primary);}
-html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
 
 .small-note{font-size:12px; color:var(--text-soft); margin-top:8px;}
 .loading{text-align:center; padding:30px; color:var(--text-soft);}
@@ -614,7 +609,7 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
       <button class="tafsir-toggle" id="ayahTafsirToggle">عرض التفسير</button>
       <div class="mini-tafsir" id="ayahTafsirBox"></div>
 
-      <div class="badge" style="background:rgba(255,255,255,.2); color:#fff; margin-top:16px;">حديث اليوم</div>
+      <div class="badge" style="background:rgba(255,255,255,.2); color:#fff; margin-top:16px; display:block; width:fit-content;">حديث اليوم</div>
       <div class="hadith-box" id="hadithOfDay">جاري التحميل...</div>
       <button class="tafsir-toggle" id="hadithExplainToggle">عرض الشرح</button>
       <div class="hadith-explain" id="hadithExplainBox"></div>
@@ -958,6 +953,13 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
         <button class="btn outline" id="refreshLocation">تحديث الموقع</button>
       </div>
       <div class="times-grid" id="timesGrid" style="margin-top:16px;"></div>
+      <div style="margin-top:16px; display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:220px;">
+          <label>فارق يدوي لتعديل المواقيت (بالدقائق، تقديم أو تأخير)</label>
+          <input type="number" id="prayerOffsetInput" value="0" min="-60" max="60" step="1">
+        </div>
+        <div class="small-note" style="flex:2; min-width:220px; margin-bottom:10px;">قيمة موجبة تؤخر المواقيت، وقيمة سالبة تقدّمها، مثال: -2 لتقديم كل الأوقات دقيقتين. يُطبَّق الفارق تلقائياً على كل الحسابات والتنبيهات المرتبطة بالمواقيت.</div>
+      </div>
     </div>
 
     <div class="card" style="margin-top:18px;">
@@ -1210,7 +1212,7 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
       </div>
       <div class="help-item" data-kw="وضع ليلي نهاري مظلم">
         <h4><span class="ic">🌙</span> الوضع الليلي والنهاري</h4>
-        <p>بدّل بين المظهر الفاتح والداكن من مفتاح التبديل أعلى قسم "الإعدادات"، أو من أسفل كل صفحة. يبقى اختيارك محفوظاً في زياراتك القادمة.</p>
+        <p>بدّل بين المظهر الفاتح والداكن من مفتاح التبديل في قسم "الإعدادات" — وهو المكان الوحيد لهذا التبديل في الموقع. يبقى اختيارك محفوظاً في زياراتك القادمة.</p>
       </div>
       <div class="help-item" data-kw="بحث قران ايات">
         <h4><span class="ic">🔎</span> البحث في القرآن</h4>
@@ -1268,6 +1270,10 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
         <h4><span class="ic">🧭</span> البوصلة</h4>
         <p>من قسم "الصلاة والقبلة والتقويم" فعّل البوصلة ليعرض الموقع اتجاه القبلة مباشرة بالاعتماد على حساس الاتجاه في جهازك وموقعك الجغرافي.</p>
       </div>
+      <div class="help-item" data-kw="فارق تعديل مواقيت الصلاة تقديم تأخير">
+        <h4><span class="ic">⏱️</span> فارق يدوي لمواقيت الصلاة</h4>
+        <p>إن لاحظت فرقاً بين مواقيت الموقع ومواقيت مسجدك، استخدم حقل "فارق يدوي" أسفل جدول المواقيت في قسم "الصلاة والقبلة والتقويم" لتقديم أو تأخير كل الأوقات بعدد دقائق تختاره. يُطبَّق الفارق تلقائياً على الجدول والتنبيهات معاً.</p>
+      </div>
       <div class="help-item" data-kw="زكاة اموال فطر حساب">
         <h4><span class="ic">🧮</span> حساب الزكاة</h4>
         <p>احسب زكاة المال وزكاة الفطر بسهولة بإدخال البيانات المطلوبة، مع توضيح شروط الوجوب والمقدار الواجب لكل منهما.</p>
@@ -1279,10 +1285,6 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
 
 <footer class="site">
   جميع الحقوق محفوظة لـ هبة كتانة / قلقيلية الشرعية / وزارة الأوقاف / فلسطين
-  <div class="foot-theme" id="themeToggle" title="تبديل الوضع الليلي/النهاري">
-    <svg id="themeIcon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.4 5.4 0 0 1 12 3z"/></svg>
-    <span id="themeLabel">الوضع الليلي</span>
-  </div>
   <a href="index.html" id="backHome">
     <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
     <span>العودة للموسوعة الرئيسية</span>
@@ -1334,6 +1336,18 @@ html[data-theme="dark"] footer.site .foot-theme svg{fill:var(--accent);}
   </div>
 </div>
 
+<!-- First-visit notification permission popup -->
+<div class="lp-popup-back" id="notifPermPopupBack">
+  <div class="lp-popup">
+    <div style="font-size:34px; margin-bottom:10px;">🔔</div>
+    <p>هل تسمح لموقع "المسلم الشامل" بإرسال إشعارات لتذكيرك بمواقيت الصلاة والأذكار وحديث اليوم؟</p>
+    <div class="row">
+      <button class="btn outline sm" id="notifPermDenyBtn">حظر</button>
+      <button class="btn sm" id="notifPermAllowBtn">سماح</button>
+    </div>
+  </div>
+</div>
+
 <!-- Celebration -->
 <div id="celebrateOverlay"></div>
 <div class="celebrate-msg" id="celebrateMsg">
@@ -1364,22 +1378,15 @@ function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val))
 function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function escapeRegExp(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
 
-/* ---------- Theme ---------- */
+/* ---------- Theme ----------
+   Single source of truth: the theme switch lives only in the "الإعدادات"
+   (Settings) section - no other control duplicates it elsewhere on the site. */
 const root = document.documentElement;
-const themeIcon = document.getElementById('themeIcon');
-const themeLabel = document.getElementById('themeLabel');
 function setTheme(t){
   root.setAttribute('data-theme', t);
   localStorage.setItem('mc-theme', t);
-  themeLabel.textContent = t==='dark' ? 'الوضع النهاري' : 'الوضع الليلي';
-  themeIcon.innerHTML = t==='dark'
-    ? '<path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.4 5.4 0 0 1 12 3z"/>'
-    : '<circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>';
 }
 setTheme(localStorage.getItem('mc-theme') || 'light');
-document.getElementById('themeToggle').addEventListener('click', ()=>{
-  setTheme(root.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
-});
 
 /* ---------- Navigation ---------- */
 function goSection(name){
@@ -1902,14 +1909,13 @@ document.getElementById('setTafsirSizeRange').addEventListener('input', e=>{
 });
 applyFontSizes();
 
-/* ---- Settings section: theme switch (mirrors footer toggle) ---- */
+/* ---- Settings section: theme switch (the single, designated appearance control) ---- */
 const setThemeSwitch = document.getElementById('setThemeSwitch');
 function syncThemeSwitch(){ setThemeSwitch.checked = root.getAttribute('data-theme') === 'dark'; }
 syncThemeSwitch();
 setThemeSwitch.addEventListener('change', ()=>{
   setTheme(setThemeSwitch.checked ? 'dark' : 'light');
 });
-document.getElementById('themeToggle').addEventListener('click', syncThemeSwitch);
 
 /* ---- Ayah-only search: diacritic/tashkeel-insensitive ----
    Builds a flexible regex from the user's query so that a plain,
@@ -2299,10 +2305,10 @@ function renderHadithList(){
   list.innerHTML = filtered.map((h,i)=>`
     <div class="card">
       <span class="badge ${h.grade}">${gradeLabel[h.grade]}</span>
-      <span class="badge" style="margin-inline-start:6px;">${h.category}</span>
-      <p style="margin-top:12px; font-family:'Amiri',serif; font-size:17px; color:var(--text);">${h.text}</p>
-      <div class="small-note">الراوي: ${h.narrator}</div>
-      <div class="small-note">المصدر: ${h.source}</div>
+      <span class="badge" style="margin-inline-start:6px;">${q ? highlightMatch(h.category, q) : escapeHtml(h.category)}</span>
+      <p style="margin-top:12px; font-family:'Amiri',serif; font-size:17px; color:var(--text);">${q ? highlightMatch(h.text, q) : escapeHtml(h.text)}</p>
+      <div class="small-note">الراوي: ${q ? highlightMatch(h.narrator, q) : escapeHtml(h.narrator)}</div>
+      <div class="small-note">المصدر: ${escapeHtml(h.source)}</div>
       <div style="margin-top:10px; display:flex; gap:8px;">
         <button class="btn sm outline" data-copy="${HADITH_DB.indexOf(h)}">نسخ</button>
         <button class="btn sm outline" data-save="${HADITH_DB.indexOf(h)}">حفظ 🔖</button>
@@ -2455,7 +2461,7 @@ async function searchHadithLibraryAll(q){
   info.textContent = `عُثر على ${results.length}${results.length>=MAX_RESULTS?'+':''} نتيجة في المكتبة الشاملة${results.length>=MAX_RESULTS?' (يُعرض أول '+MAX_RESULTS+')':''}:`;
   list.innerHTML = results.map(r=>`
     <div class="lib-item">
-      <span class="badge" style="margin-left:8px;">${r.book} - حديث ${r.num}</span>${r.text}
+      <span class="badge" style="margin-left:8px;">${r.book} - حديث ${r.num}</span>${highlightMatch(r.text, q)}
     </div>`).join('');
 }
 let hadithLibSearchDebounce;
@@ -2883,6 +2889,51 @@ document.getElementById('calcFitrBtn').addEventListener('click', ()=>{
    PRAYER TIMES
    ============================================================ */
 let userCoords = null;
+const PRAYER_NAMES = {Fajr:'الفجر', Sunrise:'الشروق', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء'};
+
+/* Manual offset (in minutes, +/-) applied on top of the fetched timings so the
+   user can nudge the site's calculated times to match their local mosque
+   without needing a fresh network request every time they adjust it. */
+function getPrayerOffset(){
+  return Math.max(-60, Math.min(60, parseInt(loadJSON('mc-prayer-offset', 0)) || 0));
+}
+function shiftTimeStr(hhmm, offsetMin){
+  const [h,m] = String(hhmm).split(':').map(Number);
+  let total = h*60 + m + offsetMin;
+  total = ((total % 1440) + 1440) % 1440;
+  const nh = Math.floor(total/60), nm = total%60;
+  return String(nh).padStart(2,'0') + ':' + String(nm).padStart(2,'0');
+}
+function applyPrayerOffset(raw, offsetMin){
+  const out = Object.assign({}, raw);
+  Object.keys(PRAYER_NAMES).forEach(k=>{ if(raw[k]) out[k] = shiftTimeStr(raw[k], offsetMin); });
+  return out;
+}
+
+/* Re-renders the times grid (and everything derived from it) from the last-fetched
+   raw timings + the current manual offset, without hitting the network again. */
+function renderPrayerTimes(){
+  const grid = document.getElementById('timesGrid');
+  const raw = window.__prayerTimingsRaw;
+  if(!raw) return;
+  const t = applyPrayerOffset(raw, getPrayerOffset());
+  const now = new Date();
+  const nowMin = now.getHours()*60+now.getMinutes();
+  let closest=null, closestDiff=Infinity;
+  Object.keys(PRAYER_NAMES).forEach(k=>{
+    const [h,m] = t[k].split(':').map(Number);
+    const diff = (h*60+m) - nowMin;
+    if(diff>=0 && diff<closestDiff){ closestDiff=diff; closest=k; }
+  });
+  grid.innerHTML = Object.entries(PRAYER_NAMES).map(([k,ar])=>`
+    <div class="card time-card ${k===closest?'now':''}">
+      <div class="n">${ar}</div>
+      <div class="t">${t[k]}</div>
+    </div>`).join('');
+  window.__prayerTimings = t;
+  checkWaterTool(t);
+  if(typeof refreshNotifications==='function') refreshNotifications();
+}
 
 async function loadPrayerTimes(){
   const label = document.getElementById('locationLabel');
@@ -2900,24 +2951,8 @@ async function loadPrayerTimes(){
       const ts = Math.floor(Date.now()/1000);
       const res = await fetch(`https://api.aladhan.com/v1/timings/${ts}?latitude=${userCoords.lat}&longitude=${userCoords.lng}&method=3`);
       const data = await res.json();
-      const t = data.data.timings;
-      const names = {Fajr:'الفجر', Sunrise:'الشروق', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء'};
-      const now = new Date();
-      const nowMin = now.getHours()*60+now.getMinutes();
-      let closest=null, closestDiff=Infinity;
-      Object.keys(names).forEach(k=>{
-        const [h,m] = t[k].split(':').map(Number);
-        const diff = (h*60+m) - nowMin;
-        if(diff>=0 && diff<closestDiff){ closestDiff=diff; closest=k; }
-      });
-      grid.innerHTML = Object.entries(names).map(([k,ar])=>`
-        <div class="card time-card ${k===closest?'now':''}">
-          <div class="n">${ar}</div>
-          <div class="t">${t[k]}</div>
-        </div>`).join('');
-      window.__prayerTimings = t;
-      checkWaterTool(t);
-      if(typeof refreshNotifications==='function') refreshNotifications();
+      window.__prayerTimingsRaw = data.data.timings;
+      renderPrayerTimes();
     }catch(e){
       grid.innerHTML = '<div class="loading">تعذر تحميل مواقيت الصلاة.</div>';
     }
@@ -2927,6 +2962,16 @@ async function loadPrayerTimes(){
   });
 }
 document.getElementById('refreshLocation').addEventListener('click', loadPrayerTimes);
+const prayerOffsetInput = document.getElementById('prayerOffsetInput');
+prayerOffsetInput.value = getPrayerOffset();
+prayerOffsetInput.addEventListener('change', function(){
+  let v = parseInt(this.value);
+  if(isNaN(v)) v = 0;
+  v = Math.max(-60, Math.min(60, v));
+  this.value = v;
+  saveJSON('mc-prayer-offset', v);
+  renderPrayerTimes();
+});
 loadPrayerTimes();
 
 /* ============================================================
@@ -3723,6 +3768,46 @@ document.getElementById('helpSearchInput').addEventListener('input', function(){
     emptyMsg.remove();
   }
 });
+
+/* ============================================================
+   FIRST-VISIT NOTIFICATION PERMISSION POPUP
+   Shown once, politely, with two clear options (سماح / حظر) before
+   ever touching the native browser permission dialog. The choice
+   (or a browser-level decision already on record) is remembered so
+   the user is never asked again.
+   ============================================================ */
+(function initNotifPermPopup(){
+  const CHOICE_KEY = 'mc-push-notif-choice';
+  if(loadJSON(CHOICE_KEY, null)) return; // already asked before - never nag again
+  if(!('Notification' in window)) return; // browser doesn't support notifications at all
+
+  if(Notification.permission === 'granted' || Notification.permission === 'denied'){
+    // A decision already exists at the browser level - respect it silently, no popup needed.
+    saveJSON(CHOICE_KEY, Notification.permission);
+    return;
+  }
+
+  const back = document.getElementById('notifPermPopupBack');
+  const allowBtn = document.getElementById('notifPermAllowBtn');
+  const denyBtn = document.getElementById('notifPermDenyBtn');
+  if(!back || !allowBtn || !denyBtn) return;
+
+  setTimeout(()=>{ back.classList.add('show'); }, 1500);
+
+  allowBtn.addEventListener('click', async ()=>{
+    back.classList.remove('show');
+    try{
+      const perm = await Notification.requestPermission();
+      saveJSON(CHOICE_KEY, perm);
+    }catch(e){
+      saveJSON(CHOICE_KEY, 'denied');
+    }
+  });
+  denyBtn.addEventListener('click', ()=>{
+    saveJSON(CHOICE_KEY, 'denied');
+    back.classList.remove('show');
+  });
+})();
 
 })();
 </script>
