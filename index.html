@@ -2143,8 +2143,20 @@ function renderFavorites(){
         const [kind, idx] = btn.dataset.rmPlan.split(':');
         const key = kind==='wird' ? 'mc-saved-wird-plans' : 'mc-saved-hifz-plans';
         const arr = loadJSON(key, []);
+        const removed = arr[parseInt(idx)];
         arr.splice(parseInt(idx),1);
         saveJSON(key, arr);
+        // If the deleted plan is the one currently shown as "تم الحفظ ✓" in the
+        // wird/hifz calculator, give that button back its normal clickable state.
+        if(removed && window.__activeSavedPlanIds[kind] === removed.createdAt){
+          window.__activeSavedPlanIds[kind] = null;
+          const saveBtnId = kind==='wird' ? 'wirdSaveBtn' : 'hifzSaveBtn';
+          const saveBtnEl = document.getElementById(saveBtnId);
+          if(saveBtnEl && saveBtnEl.style.display !== 'none'){
+            saveBtnEl.disabled = false;
+            saveBtnEl.textContent = '💾 حفظ هذه الخطة في المحفوظات';
+          }
+        }
         renderFavorites();
       });
     });
@@ -2162,6 +2174,9 @@ function renderFavorites(){
           document.getElementById('wirdPages').value = p.pages;
           document.getElementById('wirdDuration').value = String(p.days);
           document.getElementById('wirdCalcBtn').click();
+          const sb = document.getElementById('wirdSaveBtn');
+          sb.textContent = 'تم الحفظ ✓'; sb.disabled = true;
+          window.__activeSavedPlanIds.wird = p.createdAt;
         } else {
           document.getElementById('hifzStartMode').value = 'manual';
           document.getElementById('hifzStartMode').dispatchEvent(new Event('change'));
@@ -2170,6 +2185,9 @@ function renderFavorites(){
           document.getElementById('hifzPrevPages').value = p.prevPages;
           document.getElementById('hifzPerDay').value = p.perDay;
           document.getElementById('hifzCalcBtn').click();
+          const sb = document.getElementById('hifzSaveBtn');
+          sb.textContent = 'تم الحفظ ✓'; sb.disabled = true;
+          window.__activeSavedPlanIds.hifz = p.createdAt;
         }
       });
     });
@@ -2889,6 +2907,7 @@ document.getElementById('calcFitrBtn').addEventListener('click', ()=>{
    PRAYER TIMES
    ============================================================ */
 let userCoords = null;
+window.__activeSavedPlanIds = {wird:null, hifz:null};
 const PRAYER_NAMES = {Fajr:'الفجر', Sunrise:'الشروق', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء'};
 
 /* Manual offset (in minutes, +/-) applied on top of the fetched timings so the
@@ -3559,6 +3578,8 @@ document.getElementById('wirdCalcBtn').addEventListener('click', ()=>{
   document.getElementById('wirdProgressWrap').style.display='block';
   const saveBtn = document.getElementById('wirdSaveBtn');
   saveBtn.style.display = '';
+  saveBtn.disabled = false;
+  saveBtn.textContent = '💾 حفظ هذه الخطة في المحفوظات';
   let wirdCelebrated = false;
   function refresh(){
     saveJSON('wird-progress', doneArr);
@@ -3575,10 +3596,12 @@ document.getElementById('wirdCalcBtn').addEventListener('click', ()=>{
 
   saveBtn.onclick = ()=>{
     const plans = loadJSON('mc-saved-wird-plans', []);
-    plans.push({type:'wird', pages, days, perDay, createdAt:Date.now()});
+    const planId = Date.now();
+    plans.push({type:'wird', pages, days, perDay, createdAt:planId});
     saveJSON('mc-saved-wird-plans', plans);
     saveBtn.textContent = 'تم الحفظ ✓';
-    setTimeout(()=>saveBtn.textContent='💾 حفظ هذه الخطة في المحفوظات', 1500);
+    saveBtn.disabled = true;
+    window.__activeSavedPlanIds.wird = planId;
     renderSavedPlans();
   };
 });
@@ -3700,6 +3723,8 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
   document.getElementById('hifzTableWrap').style.display='block';
   const saveBtn = document.getElementById('hifzSaveBtn');
   saveBtn.style.display = '';
+  saveBtn.disabled = false;
+  saveBtn.textContent = '💾 حفظ هذه الخطة في المحفوظات';
 
   let hifzCelebrated = false;
   function refresh(){
@@ -3736,10 +3761,12 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
 
   saveBtn.onclick = ()=>{
     const plans = loadJSON('mc-saved-hifz-plans', []);
-    plans.push({type:'hifz', startPage, direction, prevPages, perDay, days, hifzDaysCount, createdAt:Date.now()});
+    const planId = Date.now();
+    plans.push({type:'hifz', startPage, direction, prevPages, perDay, days, hifzDaysCount, createdAt:planId});
     saveJSON('mc-saved-hifz-plans', plans);
     saveBtn.textContent = 'تم الحفظ ✓';
-    setTimeout(()=>saveBtn.textContent='💾 حفظ هذه الخطة في المحفوظات', 1500);
+    saveBtn.disabled = true;
+    window.__activeSavedPlanIds.hifz = planId;
     renderSavedPlans();
   };
 });
