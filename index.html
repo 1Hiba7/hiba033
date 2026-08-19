@@ -552,6 +552,32 @@ footer.site{
 /* Hadith library browse mode */
 .lib-nav{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px;}
 .lib-item{padding:14px 0; border-bottom:1px dashed var(--border); font-family:'Amiri',serif; font-size:17px; line-height:2;}
+
+/* ===== Enhancements added in this update ===== */
+.listen-controls{flex-wrap:nowrap;}
+.listen-controls button{min-width:0; white-space:nowrap;}
+.listen-repeat-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;margin-top:14px;}
+.listen-repeat-row label{margin:0;}
+.next-prayer-box{padding:16px;border:1px solid var(--border);border-radius:14px;text-align:center;background:var(--bg);}
+.next-prayer-name{font-size:20px;font-weight:800;color:var(--primary);margin:3px 0;}
+.next-prayer-countdown{font-size:30px;font-weight:900;letter-spacing:1px;direction:ltr;}
+.prayer-offset-grid,.prayer-notif-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.prayer-offset-item{display:grid;grid-template-columns:1fr 90px;gap:8px;align-items:center;padding:10px;border:1px solid var(--border);border-radius:12px;}
+.prayer-offset-item label{margin:0;}
+.prayer-notif-list{padding:10px 0 4px;}
+.prayer-notif-grid label{display:flex;gap:7px;align-items:center;margin:0;padding:8px;border:1px solid var(--border);border-radius:10px;background:var(--bg);}
+.i3rab-panel{margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--bg);font-size:var(--i3rab-font-size,15px);line-height:2;}
+@media(max-width:640px){
+  .listen-controls{gap:5px;}
+  .listen-controls button{padding:8px 5px;font-size:11px;}
+  .prayer-offset-grid,.prayer-notif-grid{grid-template-columns:repeat(2,1fr);}
+  .prayer-offset-item{grid-template-columns:1fr 70px;}
+}
+@media(max-width:380px){
+  .listen-controls button{font-size:10px;padding:7px 3px;}
+  .listen-repeat-row{grid-template-columns:1fr 1fr;}
+  .listen-repeat-row label{grid-column:1/-1;}
+}
 </style>
 </head>
 <body>
@@ -656,11 +682,6 @@ footer.site{
       <div class="loading">اختر سورة لعرضها</div>
     </div>
 
-    <div class="card" style="margin-top:18px; text-align:center;">
-      <h3>📗 أحكام التجويد</h3>
-      <p class="small-note">مرجع شامل لكل أحكام التجويد مع أمثلة توضيحية أصبح الآن في قسم مستقل خاص به.</p>
-      <button class="btn outline" data-sec="tajwid">فتح قسم أحكام التجويد</button>
-    </div>
   </section>
 
   <!-- ============ TAJWID (independent section) ============ -->
@@ -953,12 +974,16 @@ footer.site{
         <button class="btn outline" id="refreshLocation">تحديث الموقع</button>
       </div>
       <div class="times-grid" id="timesGrid" style="margin-top:16px;"></div>
-      <div style="margin-top:16px; display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap;">
-        <div style="flex:1; min-width:220px;">
-          <label>فارق يدوي لتعديل المواقيت (بالدقائق، تقديم أو تأخير)</label>
-          <input type="number" id="prayerOffsetInput" value="0" min="-60" max="60" step="1">
-        </div>
-        <div class="small-note" style="flex:2; min-width:220px; margin-bottom:10px;">قيمة موجبة تؤخر المواقيت، وقيمة سالبة تقدّمها، مثال: -2 لتقديم كل الأوقات دقيقتين. يُطبَّق الفارق تلقائياً على كل الحسابات والتنبيهات المرتبطة بالمواقيت.</div>
+      <div class="next-prayer-box" id="nextPrayerBox" style="margin-top:16px;">
+        <div class="small-note">الصلاة القادمة</div>
+        <div class="next-prayer-name" id="nextPrayerName">—</div>
+        <div class="next-prayer-countdown" id="nextPrayerCountdown">—</div>
+        <div class="small-note">الوقت المتبقي للصلاة القادمة</div>
+      </div>
+      <div class="prayer-offsets" id="prayerOffsetsCard" style="margin-top:16px;">
+        <h4 style="margin-top:0;">فارق يدوي لكل صلاة</h4>
+        <p class="small-note">القيمة الموجبة تؤخر وقت الصلاة، والسالبة تقدّمه. يمكن ضبط كل صلاة بشكل مستقل.</p>
+        <div class="prayer-offset-grid" id="prayerOffsetGrid"></div>
       </div>
     </div>
 
@@ -1103,6 +1128,10 @@ footer.site{
           <label>حجم خط التفسير: <span id="setTafsirSizeLabel">15</span>px</label>
           <input type="range" id="setTafsirSizeRange" min="12" max="24" value="15">
         </div>
+        <div>
+          <label>حجم خط الإعراب: <span id="setI3rabSizeLabel">15</span>px</label>
+          <input type="range" id="setI3rabSizeRange" min="12" max="28" value="15">
+        </div>
       </div>
       <div class="preview-box">
         <div class="p-ayah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ﴿١﴾ الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ﴿٢﴾</div>
@@ -1121,6 +1150,17 @@ footer.site{
           <input type="checkbox" id="setThemeSwitch">
           <span class="slider"></span>
         </label>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>المؤثرات الصوتية</h3>
+      <div class="settings-row">
+        <div>
+          <div class="lbl">المؤثرات الصوتية عند النقر والإنجاز</div>
+          <div class="desc">مؤثر صوتي خفيف عند التسبيح، إكمال اليوم، إكمال الحفظ أو المراجعة. الإعداد الافتراضي مطفأ.</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="soundEffectsSwitch"><span class="slider"></span></label>
       </div>
     </div>
 
@@ -1150,10 +1190,20 @@ footer.site{
         </div>
         <label class="switch"><input type="checkbox" class="notif-type-toggle" data-type="prayerTimes" checked><span class="slider"></span></label>
       </div>
+      <div class="prayer-notif-list" id="prayerNotifList" style="display:none;">
+        <div class="small-note" style="margin:6px 0 8px;">اختر الصلوات التي تريد إشعاراً بشأنها:</div>
+        <div class="prayer-notif-grid">
+          <label><input type="checkbox" class="prayer-notif-toggle" data-prayer="Fajr"> الفجر</label>
+          <label><input type="checkbox" class="prayer-notif-toggle" data-prayer="Dhuhr"> الظهر</label>
+          <label><input type="checkbox" class="prayer-notif-toggle" data-prayer="Asr"> العصر</label>
+          <label><input type="checkbox" class="prayer-notif-toggle" data-prayer="Maghrib"> المغرب</label>
+          <label><input type="checkbox" class="prayer-notif-toggle" data-prayer="Isha"> العشاء</label>
+        </div>
+      </div>
       <div class="settings-row" data-notif-type="friday">
         <div>
           <div class="lbl">بريد الجمعة</div>
-          <div class="desc">تذكير يومي بأعمال وسنن يوم الجمعة</div>
+          <div class="desc">تذكير بأعمال وسنن يوم الجمعة</div>
         </div>
         <label class="switch"><input type="checkbox" class="notif-type-toggle" data-type="friday" checked><span class="slider"></span></label>
       </div>
@@ -1174,7 +1224,7 @@ footer.site{
       <div class="settings-row" data-notif-type="nawafilFasting">
         <div>
           <div class="lbl">صيام النوافل</div>
-          <div class="desc">تذكير بالاثنين والخميس وأيام البيض</div>
+          <div class="desc">تذكير بالاثنين والخميس (وأيام البيض)</div>
         </div>
         <label class="switch"><input type="checkbox" class="notif-type-toggle" data-type="nawafilFasting" checked><span class="slider"></span></label>
       </div>
@@ -1236,11 +1286,11 @@ footer.site{
       </div>
       <div class="help-item" data-kw="استماع صوت قارئ تلاوة">
         <h4><span class="ic">🔊</span> الاستماع للقرآن</h4>
-        <p>اضغط على أي آية ثم زر "🔊 استماع للآية" داخل لوحة التفسير لسماع تلاوتها، أو استخدم زر الاستماع للسورة كاملة أعلى صفحة السورة.</p>
+        <p>اضغط على زر الاستماع لفتح لوحة الاستماع دون تشغيل تلقائي. اختر القارئ ثم اضغط تشغيل، ويمكنك الانتقال بين الآيات وتحديد التكرار أو التكرار اللانهائي.</p>
       </div>
       <div class="help-item" data-kw="تجويد قواعد احكام">
         <h4><span class="ic">📗</span> أساسيات التجويد</h4>
-        <p>في قسم "القرآن الكريم" بطاقة مختصرة بأهم أحكام التجويد الأساسية (كالمدود والغنة والإدغام) لمساعدتك على تحسين تلاوتك أثناء القراءة.</p>
+        <p>أصبح "أحكام التجويد" قسماً مستقلاً في الموقع، ويحتوي على مرجع منظم للأحكام مع أمثلة توضيحية.</p>
       </div>
       <div class="help-item" data-kw="تسبيح عداد ذكر">
         <h4><span class="ic">📿</span> عداد التسبيح</h4>
@@ -1273,6 +1323,22 @@ footer.site{
       <div class="help-item" data-kw="فارق تعديل مواقيت الصلاة تقديم تأخير">
         <h4><span class="ic">⏱️</span> فارق يدوي لمواقيت الصلاة</h4>
         <p>إن لاحظت فرقاً بين مواقيت الموقع ومواقيت مسجدك، استخدم حقل "فارق يدوي" أسفل جدول المواقيت في قسم "الصلاة والقبلة والتقويم" لتقديم أو تأخير كل الأوقات بعدد دقائق تختاره. يُطبَّق الفارق تلقائياً على الجدول والتنبيهات معاً.</p>
+      </div>
+      <div class="help-item" data-kw="نسخ الآية إعراب الآية تفسير">
+        <h4><span class="ic">📋</span> أدوات الآية</h4>
+        <p>عند فتح تفسير أي آية يمكنك حفظها أو الاستماع إليها أو نسخها بالتشكيل. ويتوفر زر الإعراب لعرض الإعراب في مساحة منفصلة عندما تتوفر بياناته.</p>
+      </div>
+      <div class="help-item" data-kw="تكرار الاستماع لا نهائي عدد مرات قارئ">
+        <h4><span class="ic">🔁</span> تكرار التلاوة</h4>
+        <p>من لوحة الاستماع اختر عدد مرات التكرار أو التكرار اللانهائي حتى توقفه بنفسك.</p>
+      </div>
+      <div class="help-item" data-kw="مؤثرات صوتية إعدادات">
+        <h4><span class="ic">🔔</span> المؤثرات الصوتية</h4>
+        <p>يمكن تشغيل مؤثرات خفيفة عند التسبيح وبعض أحداث الإنجاز من الإعدادات. تكون مطفأة افتراضياً.</p>
+      </div>
+      <div class="help-item" data-kw="حفظ إعدادات بيانات تسبيحات">
+        <h4><span class="ic">💾</span> حفظ البيانات</h4>
+        <p>يحفظ الموقع التسبيحات والإعدادات والخطط المحفوظة محلياً على جهازك لتبقى بعد إغلاق الموقع وإعادة فتحه.</p>
       </div>
       <div class="help-item" data-kw="زكاة اموال فطر حساب">
         <h4><span class="ic">🧮</span> حساب الزكاة</h4>
@@ -1310,6 +1376,9 @@ footer.site{
   <div class="txt" id="drawerText"></div>
   <button class="btn outline sm" id="drawerBookmarkBtn" style="margin-top:16px;">🔖 حفظ الآية</button>
   <button class="btn outline sm" id="drawerAudioBtn" style="margin-top:16px; margin-inline-start:8px;">🔊 استماع للآية</button>
+  <button class="btn outline sm" id="drawerCopyBtn" style="margin-top:16px; margin-inline-start:8px;">📋 نسخ الآية</button>
+  <button class="btn outline sm" id="drawerI3rabBtn" style="margin-top:16px; margin-inline-start:8px;">إعراب الآية</button>
+  <div id="i3rabPanel" class="i3rab-panel" style="display:none;"></div>
 </div>
 
 <!-- Listen drawer (bottom sheet, matches the tafsir drawer design) -->
@@ -1323,8 +1392,16 @@ footer.site{
   <div class="small-note" id="listenNowPlaying"></div>
   <div class="listen-controls">
     <button class="btn outline sm" id="listenPrevBtn">⏮ الآية السابقة</button>
-    <button class="btn" id="listenPlayPauseBtn">⏸ إيقاف مؤقت</button>
+    <button class="btn" id="listenPlayPauseBtn">▶ تشغيل</button>
     <button class="btn outline sm" id="listenNextBtn">الآية التالية ⏭</button>
+  </div>
+  <div class="listen-repeat-row">
+    <label for="listenRepeatSelect">التكرار</label>
+    <select id="listenRepeatSelect">
+      <option value="0">بدون تكرار</option><option value="2">مرتان</option><option value="3">3 مرات</option>
+      <option value="5">5 مرات</option><option value="10">10 مرات</option><option value="custom">عدد مخصص</option><option value="infinite">∞ لا نهائي</option>
+    </select>
+    <input id="listenRepeatCustom" type="number" min="1" max="999" value="2" placeholder="عدد المرات" style="display:none;">
   </div>
 </div>
 
@@ -1837,10 +1914,18 @@ document.getElementById('listenPlayPauseBtn').addEventListener('click', ()=>{
 quranAudioPlayer.addEventListener('play', ()=>{ listenIsPlaying=true; updateListenPlayPauseBtn(); });
 quranAudioPlayer.addEventListener('pause', ()=>{ listenIsPlaying=false; updateListenPlayPauseBtn(); });
 quranAudioPlayer.addEventListener('ended', ()=>{
-  // Auto-advance to the next ayah while the listen drawer is open (continuous listening)
-  if(listenDrawer.classList.contains('show') && currentSurahData && listenAyahIdx < currentSurahData.arabic.ayahs.length-1){
-    playListenAyah(listenAyahIdx+1);
+  if(!listenDrawer.classList.contains('show') || !currentSurahData) return;
+  const mode=document.getElementById('listenRepeatSelect')?.value || '0';
+  const custom=Math.max(1,parseInt(document.getElementById('listenRepeatCustom')?.value)||2);
+  const count=mode==='custom'?custom:parseInt(mode)||0;
+  if(mode==='infinite'){ playListenAyah(listenAyahIdx); return; }
+  if(count>0){
+    if(repeatRemaining<=0) repeatRemaining=count-1;
+    else repeatRemaining--;
+    if(repeatRemaining>0){ playListenAyah(listenAyahIdx); return; }
+    repeatRemaining=0;
   }
+  if(listenAyahIdx < currentSurahData.arabic.ayahs.length-1) playListenAyah(listenAyahIdx+1);
 });
 
 function selectAyah(idx){
@@ -2143,19 +2228,16 @@ function renderFavorites(){
         const [kind, idx] = btn.dataset.rmPlan.split(':');
         const key = kind==='wird' ? 'mc-saved-wird-plans' : 'mc-saved-hifz-plans';
         const arr = loadJSON(key, []);
-        const removed = arr[parseInt(idx)];
+        const removed=arr[parseInt(idx)];
         arr.splice(parseInt(idx),1);
         saveJSON(key, arr);
-        // If the deleted plan is the one currently shown as "تم الحفظ ✓" in the
-        // wird/hifz calculator, give that button back its normal clickable state.
-        if(removed && window.__activeSavedPlanIds[kind] === removed.createdAt){
-          window.__activeSavedPlanIds[kind] = null;
-          const saveBtnId = kind==='wird' ? 'wirdSaveBtn' : 'hifzSaveBtn';
-          const saveBtnEl = document.getElementById(saveBtnId);
-          if(saveBtnEl && saveBtnEl.style.display !== 'none'){
-            saveBtnEl.disabled = false;
-            saveBtnEl.textContent = '💾 حفظ هذه الخطة في المحفوظات';
-          }
+        if(kind==='wird' && removed && String(loadJSON('mc-current-wird-plan-id', ''))===String(removed.createdAt)){
+          saveJSON('mc-current-wird-plan-id', null);
+          const b=document.getElementById('wirdSaveBtn'); if(b){b.textContent='💾 حفظ هذه الخطة في المحفوظات';b.dataset.saved='false';}
+        }
+        if(kind==='hifz' && removed && String(loadJSON('mc-current-hifz-plan-id', ''))===String(removed.createdAt)){
+          saveJSON('mc-current-hifz-plan-id', null);
+          const b=document.getElementById('hifzSaveBtn'); if(b){b.textContent='💾 حفظ هذه الخطة في المحفوظات';b.dataset.saved='false';}
         }
         renderFavorites();
       });
@@ -2174,9 +2256,6 @@ function renderFavorites(){
           document.getElementById('wirdPages').value = p.pages;
           document.getElementById('wirdDuration').value = String(p.days);
           document.getElementById('wirdCalcBtn').click();
-          const sb = document.getElementById('wirdSaveBtn');
-          sb.textContent = 'تم الحفظ ✓'; sb.disabled = true;
-          window.__activeSavedPlanIds.wird = p.createdAt;
         } else {
           document.getElementById('hifzStartMode').value = 'manual';
           document.getElementById('hifzStartMode').dispatchEvent(new Event('change'));
@@ -2185,9 +2264,6 @@ function renderFavorites(){
           document.getElementById('hifzPrevPages').value = p.prevPages;
           document.getElementById('hifzPerDay').value = p.perDay;
           document.getElementById('hifzCalcBtn').click();
-          const sb = document.getElementById('hifzSaveBtn');
-          sb.textContent = 'تم الحفظ ✓'; sb.disabled = true;
-          window.__activeSavedPlanIds.hifz = p.createdAt;
         }
       });
     });
@@ -2907,7 +2983,6 @@ document.getElementById('calcFitrBtn').addEventListener('click', ()=>{
    PRAYER TIMES
    ============================================================ */
 let userCoords = null;
-window.__activeSavedPlanIds = {wird:null, hifz:null};
 const PRAYER_NAMES = {Fajr:'الفجر', Sunrise:'الشروق', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء'};
 
 /* Manual offset (in minutes, +/-) applied on top of the fetched timings so the
@@ -2981,16 +3056,7 @@ async function loadPrayerTimes(){
   });
 }
 document.getElementById('refreshLocation').addEventListener('click', loadPrayerTimes);
-const prayerOffsetInput = document.getElementById('prayerOffsetInput');
-prayerOffsetInput.value = getPrayerOffset();
-prayerOffsetInput.addEventListener('change', function(){
-  let v = parseInt(this.value);
-  if(isNaN(v)) v = 0;
-  v = Math.max(-60, Math.min(60, v));
-  this.value = v;
-  saveJSON('mc-prayer-offset', v);
-  renderPrayerTimes();
-});
+
 loadPrayerTimes();
 
 /* ============================================================
@@ -3578,8 +3644,11 @@ document.getElementById('wirdCalcBtn').addEventListener('click', ()=>{
   document.getElementById('wirdProgressWrap').style.display='block';
   const saveBtn = document.getElementById('wirdSaveBtn');
   saveBtn.style.display = '';
-  saveBtn.disabled = false;
-  saveBtn.textContent = '💾 حفظ هذه الخطة في المحفوظات';
+  const savedWird=loadJSON('mc-saved-wird-plans',[]);
+  const currentWirdId=loadJSON('mc-current-wird-plan-id',null);
+  const matchingWird=savedWird.some(p=>String(p.createdAt)===String(currentWirdId) && p.pages===pages && p.days===days);
+  saveBtn.textContent=matchingWird?'تم الحفظ ✓':'💾 حفظ هذه الخطة في المحفوظات';
+  saveBtn.dataset.saved=matchingWird?'true':'false';
   let wirdCelebrated = false;
   function refresh(){
     saveJSON('wird-progress', doneArr);
@@ -3596,12 +3665,12 @@ document.getElementById('wirdCalcBtn').addEventListener('click', ()=>{
 
   saveBtn.onclick = ()=>{
     const plans = loadJSON('mc-saved-wird-plans', []);
-    const planId = Date.now();
-    plans.push({type:'wird', pages, days, perDay, createdAt:planId});
+    const savedPlan={type:'wird', pages, days, perDay, createdAt:Date.now()};
+    plans.push(savedPlan);
     saveJSON('mc-saved-wird-plans', plans);
+    saveJSON('mc-current-wird-plan-id', savedPlan.createdAt);
     saveBtn.textContent = 'تم الحفظ ✓';
-    saveBtn.disabled = true;
-    window.__activeSavedPlanIds.wird = planId;
+    saveBtn.dataset.saved = 'true';
     renderSavedPlans();
   };
 });
@@ -3669,9 +3738,9 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
     box.textContent='لا يمكن اختيار أكثر من 20 صفحة حفظاً يومياً.';
     return;
   }
-  if(prevPages > TOTAL_MUSHAF_PAGES){
+  if(prevPages >= TOTAL_MUSHAF_PAGES){
     box.style.display='block'; box.className='result-box err';
-    box.textContent='عدد الصفحات المحفوظة سابقاً لا يمكن أن يتجاوز 604 صفحة (إجمالي صفحات المصحف).';
+    box.textContent='عدد الصفحات المحفوظة سابقاً يجب أن يكون أقل من 604 صفحة. أدخل قيمة من 0 إلى 603.';
     return;
   }
 
@@ -3723,8 +3792,11 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
   document.getElementById('hifzTableWrap').style.display='block';
   const saveBtn = document.getElementById('hifzSaveBtn');
   saveBtn.style.display = '';
-  saveBtn.disabled = false;
-  saveBtn.textContent = '💾 حفظ هذه الخطة في المحفوظات';
+  const savedHifz=loadJSON('mc-saved-hifz-plans',[]);
+  const currentHifzId=loadJSON('mc-current-hifz-plan-id',null);
+  const matchingHifz=savedHifz.some(p=>String(p.createdAt)===String(currentHifzId) && p.startPage===startPage && p.direction===direction && p.prevPages===prevPages && p.perDay===perDay);
+  saveBtn.textContent=matchingHifz?'تم الحفظ ✓':'💾 حفظ هذه الخطة في المحفوظات';
+  saveBtn.dataset.saved=matchingHifz?'true':'false';
 
   let hifzCelebrated = false;
   function refresh(){
@@ -3761,12 +3833,12 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
 
   saveBtn.onclick = ()=>{
     const plans = loadJSON('mc-saved-hifz-plans', []);
-    const planId = Date.now();
-    plans.push({type:'hifz', startPage, direction, prevPages, perDay, days, hifzDaysCount, createdAt:planId});
+    const savedPlan={type:'hifz', startPage, direction, prevPages, perDay, days, hifzDaysCount, createdAt:Date.now()};
+    plans.push(savedPlan);
     saveJSON('mc-saved-hifz-plans', plans);
+    saveJSON('mc-current-hifz-plan-id', savedPlan.createdAt);
     saveBtn.textContent = 'تم الحفظ ✓';
-    saveBtn.disabled = true;
-    window.__activeSavedPlanIds.hifz = planId;
+    saveBtn.dataset.saved = 'true';
     renderSavedPlans();
   };
 });
@@ -3835,6 +3907,292 @@ document.getElementById('helpSearchInput').addEventListener('input', function(){
     back.classList.remove('show');
   });
 })();
+
+
+/* ============================================================
+   FINAL ENHANCEMENTS / requested update
+   ============================================================ */
+
+// Persistent tasbih counter.
+tasbihCount = loadJSON('mc-tasbih-count', 0);
+document.getElementById('tasbihCount').textContent = tasbihCount;
+tapCircle.addEventListener('click', ()=>{
+  saveJSON('mc-tasbih-count', tasbihCount);
+  if(loadJSON('mc-sound-effects', false)) playUiSound('tap');
+});
+document.getElementById('resetTasbih').addEventListener('click', ()=>saveJSON('mc-tasbih-count', 0));
+
+// Lightweight optional sound effects. Off by default.
+function playUiSound(kind='tap'){
+  if(!loadJSON('mc-sound-effects', false)) return;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;
+    if(!C) return;
+    const ctx=new C(), o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.value=kind==='success'?660:520;
+    g.gain.setValueAtTime(0.0001,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.035,ctx.currentTime+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+0.11);
+    o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.12);
+    o.addEventListener('ended',()=>ctx.close().catch(()=>{}));
+  }catch(e){}
+}
+const soundSwitch=document.getElementById('soundEffectsSwitch');
+if(soundSwitch){
+  soundSwitch.checked=loadJSON('mc-sound-effects',false);
+  soundSwitch.addEventListener('change',()=>saveJSON('mc-sound-effects',soundSwitch.checked));
+}
+
+// Persist plan save-state and make it stay "تم الحفظ" until deletion.
+function syncPlanSaveButton(btn,key,defaultText){
+  if(!btn) return;
+  const plans=loadJSON(key,[]);
+  if(plans.length){ btn.textContent='تم الحفظ ✓'; btn.dataset.saved='true'; }
+}
+const __wirdSaveBtn=document.getElementById('wirdSaveBtn');
+if(__wirdSaveBtn){
+  const origWirdHandler=__wirdSaveBtn.onclick;
+  __wirdSaveBtn.onclick=function(e){
+    const r=origWirdHandler ? origWirdHandler.call(this,e) : null;
+    this.textContent='تم الحفظ ✓'; this.dataset.saved='true';
+    playUiSound('success');
+    return r;
+  };
+}
+const __hifzSaveButtons=[...document.querySelectorAll('[id*="hifzSave"], #hifzSaveBtn')];
+__hifzSaveButtons.forEach(btn=>{
+  const old=btn.onclick;
+  if(old) btn.onclick=function(e){const r=old.call(this,e);this.textContent='تم الحفظ ✓';this.dataset.saved='true';playUiSound('success');return r;};
+});
+
+// Prayer: independent offsets for each prayer.
+const PRAYER_OFFSET_KEYS=['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+const prayerOffsetLabels={Fajr:'الفجر',Dhuhr:'الظهر',Asr:'العصر',Maghrib:'المغرب',Isha:'العشاء'};
+function getPrayerOffsets(){
+  const saved=loadJSON('mc-prayer-offsets',{});
+  const out={}; PRAYER_OFFSET_KEYS.forEach(k=>out[k]=Math.max(-60,Math.min(60,parseInt(saved[k])||0))); return out;
+}
+function savePrayerOffsets(v){saveJSON('mc-prayer-offsets',v);}
+function applyIndependentPrayerOffsets(raw){
+  const o=getPrayerOffsets(), out=Object.assign({},raw);
+  Object.keys(PRAYER_NAMES).forEach(k=>{if(raw[k]) out[k]=shiftTimeStr(raw[k],o[k]||0);});
+  return out;
+}
+// Replace the old single-offset behavior at runtime.
+applyPrayerOffset = function(raw){ return applyIndependentPrayerOffsets(raw); };
+const offsetGrid=document.getElementById('prayerOffsetGrid');
+if(offsetGrid){
+  const offsets=getPrayerOffsets();
+  offsetGrid.innerHTML=PRAYER_OFFSET_KEYS.map(k=>`<div class="prayer-offset-item"><label>${prayerOffsetLabels[k]}</label><input type="number" min="-60" max="60" step="1" data-prayer-offset="${k}" value="${offsets[k]}"></div>`).join('');
+  offsetGrid.querySelectorAll('[data-prayer-offset]').forEach(inp=>inp.addEventListener('change',()=>{
+    const v=getPrayerOffsets(); let n=parseInt(inp.value); if(isNaN(n))n=0; n=Math.max(-60,Math.min(60,n)); inp.value=n; v[inp.dataset.prayerOffset]=n; savePrayerOffsets(v); renderPrayerTimes();
+  }));
+}
+const oldPrayerOffsetInput=document.getElementById('prayerOffsetInput');
+if(oldPrayerOffsetInput) oldPrayerOffsetInput.closest('div[style*="display:flex"]')?.remove();
+
+// Next prayer countdown.
+let nextPrayerTimer=null;
+function updateNextPrayerCountdown(){
+  const t=window.__prayerTimings; if(!t) return;
+  const keys=['Fajr','Dhuhr','Asr','Maghrib','Isha']; const now=new Date();
+  let best=null,bestMs=Infinity;
+  for(const k of keys){
+    if(!t[k])continue; const [h,m]=t[k].split(':').map(Number);
+    const d=new Date(now); d.setHours(h,m,0,0);
+    if(d<=now)d.setDate(d.getDate()+1);
+    const ms=d-now; if(ms<bestMs){bestMs=ms;best={k,d};}
+  }
+  if(!best)return;
+  document.getElementById('nextPrayerName').textContent=prayerOffsetLabels[best.k];
+  const sec=Math.max(0,Math.floor(bestMs/1000));
+  const hh=Math.floor(sec/3600), mm=Math.floor((sec%3600)/60), ss=sec%60;
+  document.getElementById('nextPrayerCountdown').textContent=`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+}
+updateNextPrayerCountdown(); clearInterval(nextPrayerTimer); nextPrayerTimer=setInterval(updateNextPrayerCountdown,1000);
+
+// Notification settings: browser permission + individual prayers.
+function browserNotificationsAllowed(){return ('Notification' in window && Notification.permission==='granted');}
+const prayerNotifList=document.getElementById('prayerNotifList');
+function syncPrayerNotifUI(){
+  const s=notifSettings();
+  if(prayerNotifList) prayerNotifList.style.display=s.master && s.prayerTimes ? '' : 'none';
+  document.querySelectorAll('.prayer-notif-toggle').forEach(cb=>cb.checked=s['prayer_'+cb.dataset.prayer]!==false);
+}
+// Extend default settings safely.
+const ns=notifSettings();
+PRAYER_OFFSET_KEYS.forEach(k=>{if(typeof ns['prayer_'+k]!=='boolean')ns['prayer_'+k]=true;});
+saveNotifSettings(ns);
+document.querySelectorAll('.prayer-notif-toggle').forEach(cb=>cb.addEventListener('change',()=>{
+  const s=notifSettings(); s['prayer_'+cb.dataset.prayer]=cb.checked; saveNotifSettings(s); refreshNotifications();
+}));
+syncPrayerNotifUI();
+
+// Reconcile master switch with the real browser permission.
+function reconcileNotificationMaster(){
+  const s=notifSettings();
+  if(browserNotificationsAllowed()===false && Notification.permission==='denied') s.master=false;
+  saveNotifSettings(s); syncNotifSettingsUI(); syncPrayerNotifUI();
+}
+reconcileNotificationMaster();
+const master=document.getElementById('notifMasterSwitch');
+if(master){
+  master.addEventListener('change',async function(){
+    const s=notifSettings();
+    if(this.checked){
+      if('Notification' in window && Notification.permission==='default'){
+        try{
+          const perm=await Notification.requestPermission();
+          s.master=perm==='granted';
+        }catch(e){s.master=false;}
+      }else{
+        s.master=Notification.permission==='granted';
+      }
+    }else{s.master=false;}
+    saveNotifSettings(s); this.checked=s.master; syncNotifSettingsUI(); syncPrayerNotifUI(); refreshNotifications();
+  });
+}
+
+// Make notification generation respect the master switch and per-prayer switches.
+const __originalBuildNotifications=buildNotifications;
+buildNotifications=function(){
+  const s=notifSettings();
+  if(!s.master || ('Notification' in window && Notification.permission==='denied')) return [];
+  const list=__originalBuildNotifications();
+  return list.filter(n=>n.category!=='prayerTimes' || s['prayer_'+String(n.id).split('-').pop()]!==false);
+};
+
+// Keep notification settings labels synchronized with the requested wording.
+const fridayDesc=[...document.querySelectorAll('[data-notif-type="friday"] .desc')][0]; if(fridayDesc) fridayDesc.textContent='تذكير بأعمال وسنن يوم الجمعة';
+const fastDesc=[...document.querySelectorAll('[data-notif-type="nawafilFasting"] .desc')][0]; if(fastDesc) fastDesc.textContent='تذكير بالاثنين والخميس (وأيام البيض)';
+
+// Listen drawer: opening it must NEVER start playback.
+const __origOpenListenDrawer=openListenDrawer;
+openListenDrawer=function(){
+  if(!currentSurahData){showToast('الرجاء اختيار سورة أولاً.');return;}
+  document.getElementById('listenDrawerTitle').textContent=`الاستماع - سورة ${currentSurahData.arabic.name}`;
+  listenAyahIdx=0; quranAudioPlayer.pause(); quranAudioPlayer.removeAttribute('src'); quranAudioPlayer.load();
+  updateListenNowPlaying(); updateListenPlayPauseBtn();
+  listenDrawer.classList.add('show'); listenDrawerBack.classList.add('show');
+};
+
+// More reciters from the same Islamic Network audio source.
+const EXTRA_RECITERS=[
+ ['ar.hudhaify','علي عبد الله جابر'],['ar.husarymujawwad','محمود خليل الحصري (مجود)'],['ar.minshawimujawwad','محمد صديق المنشاوي (مجود)'],
+ ['ar.muhammadayyoub','محمد أيوب'],['ar.muhammadjibreel','محمد جبريل'],['ar.saoodshuraym','سعود الشريم'],['ar.ahmedajamy','أحمد العجمي'],
+ ['ar.nasseralkatami','ناصر القطامي'],['ar.yasseraldossari','ياسر الدوسري'],['ar.faresabbad','فارس عباد'],['ar.abdullahbasfar','عبدالله بصفر'],
+ ['ar.abdullahmatroud','عبدالله مطرود'],['ar.muhammadluhaidan','محمد اللحيدان']
+];
+EXTRA_RECITERS.forEach(([id,name])=>{if(!RECITERS.some(r=>r.id===id))RECITERS.push({id,name});});
+const recSel=document.getElementById('reciterSelect');
+if(recSel){
+  const current=recSel.value; recSel.innerHTML=RECITERS.map(r=>`<option value="${r.id}">${r.name}</option>`).join(''); recSel.value=current||loadJSON('mc-reciter','ar.alafasy');
+}
+
+// Repeat playback.
+let repeatRemaining=0, repeatMode=loadJSON('mc-repeat-mode','0');
+const repeatSel=document.getElementById('listenRepeatSelect'), repeatCustom=document.getElementById('listenRepeatCustom');
+if(repeatSel){
+  repeatSel.value=loadJSON('mc-repeat-mode','0');
+  repeatCustom.style.display=repeatSel.value==='custom'?'':'none';
+  repeatSel.addEventListener('change',()=>{repeatMode=repeatSel.value;saveJSON('mc-repeat-mode',repeatMode);repeatCustom.style.display=repeatMode==='custom'?'':'none';});
+}
+if(repeatCustom) repeatCustom.addEventListener('change',()=>saveJSON('mc-repeat-custom',Math.max(1,parseInt(repeatCustom.value)||2)));
+// Repeat playback is handled by the single ended listener above.
+
+
+// Copy + i'rab panel for the selected ayah.
+function currentAyahText(){
+  if(!currentSurahData)return '';
+  const a=currentSurahData.arabic.ayahs[currentDrawerAyahIdx];
+  return a ? (a.text || a.ayah || '') : '';
+}
+const copyBtn=document.getElementById('drawerCopyBtn');
+if(copyBtn) copyBtn.addEventListener('click',async()=>{
+  const text=currentAyahText(); if(!text)return;
+  try{await navigator.clipboard.writeText(text);copyBtn.textContent='تم النسخ ✓';setTimeout(()=>copyBtn.textContent='📋 نسخ الآية',1200);}catch(e){showToast('تعذر نسخ الآية.');}
+});
+const i3btn=document.getElementById('drawerI3rabBtn'), i3panel=document.getElementById('i3rabPanel');
+if(i3btn) i3btn.addEventListener('click',async()=>{
+  const a=currentSurahData?.arabic?.ayahs?.[currentDrawerAyahIdx];
+  if(!a)return;
+  i3panel.style.display='block'; i3panel.textContent='جاري تحميل إعراب الآية…';
+  // Quranpedia is known to provide i'rab content for Quran verses, but its public v1
+  // endpoint does not expose a stable documented book id for i'rab here. Do not invent data.
+  // Provide a direct, verse-specific fallback page instead of showing fabricated grammar.
+  const surah=currentSurahData.num, ayah=a.numberInSurah;
+  i3panel.innerHTML=`<strong>إعراب الآية</strong><p>يمكن فتح صفحة الآية في موسوعة Quranpedia لعرض الإعراب من مصادره المتاحة.</p><a class="btn outline sm" target="_blank" rel="noopener" href="https://quranpedia.net/ayah/${surah}/${ayah}">فتح إعراب الآية</a>`;
+});
+
+// I'rab font size.
+function applyI3rabSize(){
+  const v=loadJSON('mc-i3rab-size',15); document.documentElement.style.setProperty('--i3rab-font-size',v+'px');
+  const r=document.getElementById('setI3rabSizeRange'),l=document.getElementById('setI3rabSizeLabel'); if(r){r.value=v;r.oninput=()=>{const n=parseInt(r.value);saveJSON('mc-i3rab-size',n);document.documentElement.style.setProperty('--i3rab-font-size',n+'px');l.textContent=n;};l.textContent=v;}
+}
+applyI3rabSize();
+
+// Expand the dhikr collection with additional vocalized items; keep existing entries intact.
+Object.assign(ADHKAR_DATA,{
+  'أذكار الصباح والمساء (موسعة)':[
+    {t:'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ.',c:1,src:'سنن أبي داود وابن ماجه',v:''},
+    {t:'رَضِيتُ بِاللَّهِ رَبًّا، وَبِالإِسْلَامِ دِينًا، وَبِمُحَمَّدٍ نَبِيًّا.',c:3,src:'سنن أبي داود والترمذي',v:''},
+    {t:'يَا حَيُّ يَا قَيُّومُ، بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ.',c:1,src:'سنن النسائي الكبرى',v:''},
+    {t:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ.',c:3,src:'صحيح مسلم',v:''}
+  ],
+  'أذكار الطعام والشراب':[
+    {t:'بِسْمِ اللَّهِ.',c:1,src:'سنن أبي داود والترمذي',v:'يقال عند بدء الطعام.'},
+    {t:'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا، وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ.',c:1,src:'سنن أبي داود والترمذي',v:''},
+    {t:'الْحَمْدُ لِلَّهِ حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ، غَيْرَ مَكْفِيٍّ وَلَا مُوَدَّعٍ وَلَا مُسْتَغْنًى عَنْهُ رَبُّنَا.',c:1,src:'صحيح البخاري',v:''}
+  ],
+  'أذكار السفر':[
+    {t:'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَى رَبِّنَا لَمُنقَلِبُونَ.',c:1,src:'القرآن الكريم، سورة الزخرف: 13-14',v:'من دعاء الركوب والسفر.'},
+    {t:'اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى، وَمِنَ الْعَمَلِ مَا تَرْضَى.',c:1,src:'صحيح مسلم',v:''},
+    {t:'اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَذَا، وَاطْوِ عَنَّا بُعْدَهُ.',c:1,src:'صحيح مسلم',v:''}
+  ],
+  'أذكار المطر والريح':[
+    {t:'اللَّهُمَّ صَيِّبًا نَافِعًا.',c:1,src:'صحيح البخاري',v:'يقال عند نزول المطر.'},
+    {t:'اللَّهُمَّ حَوَالَيْنَا وَلَا عَلَيْنَا، اللَّهُمَّ عَلَى الْآكَامِ وَالظِّرَابِ، وَبُطُونِ الْأَوْدِيَةِ، وَمَنَابِتِ الشَّجَرِ.',c:1,src:'صحيح البخاري ومسلم',v:'يقال عند شدة المطر.'},
+    {t:'اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَهَا، وَخَيْرَ مَا فِيهَا، وَخَيْرَ مَا أُرْسِلَتْ بِهِ، وَأَعُوذُ بِكَ مِنْ شَرِّهَا، وَشَرِّ مَا فِيهَا، وَشَرِّ مَا أُرْسِلَتْ بِهِ.',c:1,src:'صحيح مسلم',v:'من دعاء الريح.'}
+  ]
+});
+// Ensure newly added categories appear immediately in the selector.
+const adhSel=document.getElementById('adhkarCategory'); if(adhSel){const cur=adhSel.value;adhSel.innerHTML=Object.keys(ADHKAR_DATA).map(k=>`<option value="${k}">${k}</option>`).join('');adhSel.value=cur||Object.keys(ADHKAR_DATA)[0];renderAdhkarList(adhSel.value);}
+
+// Add vocalized forms for the existing mosque and several common adhkar.
+const vocalMap={
+'اللهم افتح لي أبواب رحمتك.':'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ.',
+'اللهم إني أسألك من فضلك.':'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ.',
+'سبحان الله وبحمده.':'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ.',
+'سبحان الله.':'سُبْحَانَ اللَّهِ.',
+'الحمد لله.':'الْحَمْدُ لِلَّهِ.',
+'الله أكبر.':'اللَّهُ أَكْبَرُ.',
+'أستغفر الله.':'أَسْتَغْفِرُ اللَّهَ.',
+'لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير.':'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.'
+};
+
+Object.assign(vocalMap,{
+  "أصبحنا وأصبح الملك لله، والحمد لله، لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير.": "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.",
+  "اللهم بك أصبحنا، وبك أمسينا، وبك نحيا، وبك نموت وإليك النشور.": "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ.",
+  "اللهم أنت ربي لا إله إلا أنت، خلقتني وأنا عبدك، وأنا على عهدك ووعدك ما استطعت (سيد الاستغفار).": "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ.",
+  "لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير.": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.",
+  "أمسينا وأمسى الملك لله، والحمد لله، لا إله إلا الله وحده لا شريك له.": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ.",
+  "اللهم بك أمسينا، وبك أصبحنا، وبك نحيا وبك نموت وإليك المصير.": "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ.",
+  "أعوذ بكلمات الله التامات من شر ما خلق.": "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ.",
+  "حسبي الله لا إله إلا هو عليه توكلت وهو رب العرش العظيم.": "حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ، وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ.",
+  "أستغفر الله (ثلاثاً)، اللهم أنت السلام ومنك السلام تباركت يا ذا الجلال والإكرام.": "أَسْتَغْفِرُ اللَّهَ (ثَلَاثًا)، اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ.",
+  "باسمك اللهم أموت وأحيا.": "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا.",
+  "اللهم قني عذابك يوم تبعث عبادك.": "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ.",
+  "الحمد لله الذي أحيانا بعد ما أماتنا وإليه النشور.": "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ.",
+  "بسم الله ولجنا، وبسم الله خرجنا، وعلى الله ربنا توكلنا.": "بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا.",
+  "بسم الله، توكلت على الله، ولا حول ولا قوة إلا بالله.": "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ.",
+  "بسم الله أرقيك من كل شيء يؤذيك، من شر كل نفس أو عين حاسد الله يشفيك، بسم الله أرقيك.": "بِسْمِ اللَّهِ أَرْقِيكَ، مِنْ كُلِّ شَيْءٍ يُؤْذِيكَ، مِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنِ حَاسِدٍ، اللَّهُ يَشْفِيكَ، بِسْمِ اللَّهِ أَرْقِيكَ.",
+  "اللهم رب الناس، أذهب الباس، اشف أنت الشافي، لا شفاء إلا شفاؤك، شفاء لا يغادر سقماً.": "اللَّهُمَّ رَبَّ النَّاسِ، أَذْهِبِ الْبَاسَ، اشْفِ أَنْتَ الشَّافِيَ، لَا شِفَاءَ إِلَّا شِفَاؤُكَ، شِفَاءً لَا يُغَادِرُ سَقَمًا."
+});
+Object.values(ADHKAR_DATA).forEach(arr=>arr.forEach(d=>{if(vocalMap[d.t])d.t=vocalMap[d.t];}));
+
+// Sound on completion of a dhikr/day: hook the existing celebration function without altering it.
+const __celebrateOriginal=celebrate;
+celebrate=function(title,text){if(loadJSON('mc-sound-effects',false))playUiSound('success');return __celebrateOriginal(title,text);};
 
 })();
 </script>
