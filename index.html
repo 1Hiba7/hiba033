@@ -403,7 +403,10 @@ html[data-theme="dark"] .time-card .t{color:var(--accent);}
 html[data-theme="dark"] .qibla-kaaba{background:var(--accent);}
 
 .cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
-.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px; text-align:center;}
+.cal-months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.cal-month{min-width:0;border:1px solid var(--border);border-radius:14px;padding:10px;background:var(--bg);}
+.cal-month-title{text-align:center;font-weight:800;margin:2px 0 10px;font-size:14px;}
+.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:5px; text-align:center;}
 .cal-grid .dow{font-size:12px; color:var(--text-soft); padding:6px 0;}
 .cal-day{
   aspect-ratio:1; border-radius:10px; background:var(--bg); border:1px solid var(--border);
@@ -496,13 +499,16 @@ footer.site{
 @media(max-width:640px){
   .times-grid{grid-template-columns:repeat(3,1fr);}
   .mushaf-page{padding:16px 14px;}
-  /* Calendar: shrink cells so 7 columns fit comfortably on narrow phones */
+  .cal-months{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
   .cal-grid{gap:4px;}
   .cal-day{font-size:11px; border-radius:8px;}
   .cal-day .g{font-size:12px;}
   .cal-day .h{font-size:9px;}
   .cal-head h3{font-size:15px;}
   .cal-head .btn.outline{padding:8px 10px; font-size:12.5px;}
+}
+@media(max-width:700px){
+  .cal-months{grid-template-columns:1fr;}
 }
 @media(max-width:380px){
   .cal-grid{grid-template-columns:repeat(7,minmax(0,1fr));}
@@ -566,7 +572,6 @@ footer.site{
 .prayer-offset-item label{margin:0;}
 .prayer-notif-list{padding:10px 0 4px;}
 .prayer-notif-grid label{display:flex;gap:7px;align-items:center;margin:0;padding:8px;border:1px solid var(--border);border-radius:10px;background:var(--bg);}
-.i3rab-panel{margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--bg);font-size:var(--i3rab-font-size,15px);line-height:2;}
 @media(max-width:640px){
   .listen-controls{gap:5px;}
   .listen-controls button{padding:8px 5px;font-size:11px;}
@@ -1011,7 +1016,7 @@ footer.site{
         <h3 id="calTitle">التقويم</h3>
         <button class="btn outline" id="nextMonth">التالي ▶</button>
       </div>
-      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-months" id="calGrid"></div>
       <div class="small-note">اضغط على أي يوم لعرض المناسبات الخاصة به. (التقويم محسوب حسابياً وقد يختلف يوماً واحداً عن الرؤية الشرعية الفعلية)</div>
     </div>
 
@@ -1128,10 +1133,6 @@ footer.site{
           <label>حجم خط التفسير: <span id="setTafsirSizeLabel">15</span>px</label>
           <input type="range" id="setTafsirSizeRange" min="12" max="24" value="15">
         </div>
-        <div>
-          <label>حجم خط الإعراب: <span id="setI3rabSizeLabel">15</span>px</label>
-          <input type="range" id="setI3rabSizeRange" min="12" max="28" value="15">
-        </div>
       </div>
       <div class="preview-box">
         <div class="p-ayah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ﴿١﴾ الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ﴿٢﴾</div>
@@ -1176,7 +1177,7 @@ footer.site{
       <div class="settings-row">
         <div>
           <div class="lbl">تشغيل / إيقاف جميع الإشعارات</div>
-          <div class="desc">مفتاح رئيسي يتحكم بكل أنواع الإشعارات دفعة واحدة</div>
+          <div class="desc">مفتاح رئيسي يتحكم بكل أنواع الإشعارات دفعة واحدة. عند السماح سيظهر تنبيه ويب على جهازك قبل الصلاة المختارة.</div>
         </div>
         <label class="switch">
           <input type="checkbox" id="notifMasterSwitch" checked>
@@ -1224,7 +1225,7 @@ footer.site{
       <div class="settings-row" data-notif-type="nawafilFasting">
         <div>
           <div class="lbl">صيام النوافل</div>
-          <div class="desc">تذكير بالاثنين والخميس (وأيام البيض)</div>
+          <div class="desc">تذكير بالاثنين والخميس (والأيام البيض)</div>
         </div>
         <label class="switch"><input type="checkbox" class="notif-type-toggle" data-type="nawafilFasting" checked><span class="slider"></span></label>
       </div>
@@ -1322,11 +1323,11 @@ footer.site{
       </div>
       <div class="help-item" data-kw="فارق تعديل مواقيت الصلاة تقديم تأخير">
         <h4><span class="ic">⏱️</span> فارق يدوي لمواقيت الصلاة</h4>
-        <p>إن لاحظت فرقاً بين مواقيت الموقع ومواقيت مسجدك، استخدم حقل "فارق يدوي" أسفل جدول المواقيت في قسم "الصلاة والقبلة والتقويم" لتقديم أو تأخير كل الأوقات بعدد دقائق تختاره. يُطبَّق الفارق تلقائياً على الجدول والتنبيهات معاً.</p>
+        <p>إن لاحظت فرقاً بين مواقيت الموقع ومواقيت مسجدك، استخدم حقول "فارق يدوي لكل صلاة" لضبط الفجر والظهر والعصر والمغرب والعشاء بشكل مستقل. يُطبَّق كل فارق على وقت الصلاة والعد التنازلي والتنبيهات.</p>
       </div>
-      <div class="help-item" data-kw="نسخ الآية إعراب الآية تفسير">
+      <div class="help-item" data-kw="نسخ الآية تفسير استماع الآية">
         <h4><span class="ic">📋</span> أدوات الآية</h4>
-        <p>عند فتح تفسير أي آية يمكنك حفظها أو الاستماع إليها أو نسخها بالتشكيل. ويتوفر زر الإعراب لعرض الإعراب في مساحة منفصلة عندما تتوفر بياناته.</p>
+        <p>عند فتح تفسير أي آية يمكنك حفظها أو الاستماع إلى الآية منفردة أو نسخها مع رقمها وبالتشكيل.</p>
       </div>
       <div class="help-item" data-kw="تكرار الاستماع لا نهائي عدد مرات قارئ">
         <h4><span class="ic">🔁</span> تكرار التلاوة</h4>
@@ -1376,9 +1377,7 @@ footer.site{
   <div class="txt" id="drawerText"></div>
   <button class="btn outline sm" id="drawerBookmarkBtn" style="margin-top:16px;">🔖 حفظ الآية</button>
   <button class="btn outline sm" id="drawerAudioBtn" style="margin-top:16px; margin-inline-start:8px;">🔊 استماع للآية</button>
-  <button class="btn outline sm" id="drawerCopyBtn" style="margin-top:16px; margin-inline-start:8px;">📋 نسخ الآية</button>
-  <button class="btn outline sm" id="drawerI3rabBtn" style="margin-top:16px; margin-inline-start:8px;">إعراب الآية</button>
-  <div id="i3rabPanel" class="i3rab-panel" style="display:none;"></div>
+  <button class="btn outline sm" id="drawerCopyBtn" style="margin-top:16px; margin-inline-start:8px;">📋 نسخ الآية مع رقمها</button>
 </div>
 
 <!-- Listen drawer (bottom sheet, matches the tafsir drawer design) -->
@@ -1390,13 +1389,19 @@ footer.site{
   <label>اختر القارئ</label>
   <select id="reciterSelect"></select>
   <div class="small-note" id="listenNowPlaying"></div>
+  <div class="small-note" id="listenModeNote" style="text-align:center; margin-top:6px;">سيتم تشغيل آية واحدة في كل مرة، ويمكنك الانتقال يدوياً بالآية السابقة أو التالية.</div>
   <div class="listen-controls">
     <button class="btn outline sm" id="listenPrevBtn">⏮ الآية السابقة</button>
     <button class="btn" id="listenPlayPauseBtn">▶ تشغيل</button>
     <button class="btn outline sm" id="listenNextBtn">الآية التالية ⏭</button>
   </div>
   <div class="listen-repeat-row">
-    <label for="listenRepeatSelect">التكرار</label>
+    <label for="listenRepeatType">نوع التكرار</label>
+    <select id="listenRepeatType">
+      <option value="ayah">تكرار الآية</option>
+      <option value="surah">تكرار السورة</option>
+    </select>
+    <label for="listenRepeatSelect">عدد المرات</label>
     <select id="listenRepeatSelect">
       <option value="0">بدون تكرار</option><option value="2">مرتان</option><option value="3">3 مرات</option>
       <option value="5">5 مرات</option><option value="10">10 مرات</option><option value="custom">عدد مخصص</option><option value="infinite">∞ لا نهائي</option>
@@ -1827,106 +1832,154 @@ function syncSurahFavAudioBtn(){
   btn.textContent = isFav ? '⭐ إزالة من الاستماع المفضل' : '⭐ إضافة للاستماع المفضل';
 }
 
-/* ---- Listen drawer: bottom-sheet popup with reciter select + prev/next/play-pause ---- */
+/* ---- Listen drawer: reciter selection + single-ayah/surah playback ---- */
 const RECITERS = [
   {id:'ar.alafasy', name:'مشاري راشد العفاسي'},
   {id:'ar.abdulbasitmurattal', name:'عبد الباسط عبد الصمد (مرتل)'},
   {id:'ar.husary', name:'محمود خليل الحصري'},
   {id:'ar.minshawi', name:'محمد صديق المنشاوي'},
-  {id:'ar.abdurrahmaansudais', name:'عبدالرحمن السديس'},
+  {id:'ar.abdurrahmaansudais', name:'عبد الرحمن السديس'},
   {id:'ar.mahermuaiqly', name:'ماهر المعيقلي'}
 ];
-const listenDrawer = document.getElementById('listenDrawer');
-const listenDrawerBack = document.getElementById('listenDrawerBack');
-let listenAyahIdx = 0;
-let listenIsPlaying = false;
+const listenDrawer=document.getElementById('listenDrawer');
+const listenDrawerBack=document.getElementById('listenDrawerBack');
+let listenAyahIdx=0, listenIsPlaying=false, listenMode='surah', repeatRemaining=0, repeatType=loadJSON('mc-repeat-type','ayah');
+let audioRequestToken=0;
 
-function initReciterSelect(){
-  const sel = document.getElementById('reciterSelect');
-  sel.innerHTML = RECITERS.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
-  const saved = loadJSON('mc-reciter', 'ar.alafasy');
-  sel.value = saved;
-  sel.addEventListener('change', ()=>{
-    saveJSON('mc-reciter', sel.value);
-    if(listenIsPlaying) playListenAyah(listenAyahIdx);
-  });
+function populateReciterSelect(){
+  const sel=document.getElementById('reciterSelect'); if(!sel)return;
+  sel.innerHTML=RECITERS.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  sel.value=loadJSON('mc-reciter','ar.alafasy');
 }
-initReciterSelect();
+populateReciterSelect();
 
-function getSelectedReciter(){
-  const sel = document.getElementById('reciterSelect');
-  return (sel && sel.value) || 'ar.alafasy';
+async function loadAllArabicReciters(){
+  try{
+    const res=await fetch('https://api.alquran.cloud/v1/edition?format=audio&language=ar&type=versebyverse');
+    const data=await res.json();
+    const list=(data.data||[]).filter(e=>e.identifier&&e.format==='audio'&&e.language==='ar');
+    list.forEach(e=>{
+      if(!RECITERS.some(r=>r.id===e.identifier)) RECITERS.push({id:e.identifier,name:e.name||e.englishName||e.identifier});
+    });
+    populateReciterSelect();
+  }catch(e){ /* keep the reliable built-in list */ }
 }
-function updateListenPlayPauseBtn(){
-  document.getElementById('listenPlayPauseBtn').textContent = listenIsPlaying ? '⏸ إيقاف مؤقت' : '▶ تشغيل';
-}
+loadAllArabicReciters();
+
+document.getElementById('reciterSelect')?.addEventListener('change',()=>{
+  saveJSON('mc-reciter',document.getElementById('reciterSelect').value);
+  if(listenIsPlaying) playListenAyah(listenAyahIdx);
+});
+function getSelectedReciter(){return document.getElementById('reciterSelect')?.value||'ar.alafasy';}
+function updateListenPlayPauseBtn(){document.getElementById('listenPlayPauseBtn').textContent=listenIsPlaying?'⏸ إيقاف مؤقت':'▶ تشغيل';}
 function updateListenNowPlaying(){
-  if(!currentSurahData) return;
-  const ayahObj = currentSurahData.arabic.ayahs[listenAyahIdx];
-  document.getElementById('listenNowPlaying').textContent = ayahObj
-    ? `سورة ${currentSurahData.arabic.name} - الآية ${ayahObj.numberInSurah}`
-    : '';
+  if(!currentSurahData)return;
+  const a=currentSurahData.arabic.ayahs[listenAyahIdx];
+  document.getElementById('listenNowPlaying').textContent=a?`سورة ${currentSurahData.arabic.name} - الآية ${a.numberInSurah}`:'';
   document.querySelectorAll('.ayah-span').forEach(s=>s.classList.remove('active'));
-  const span = document.querySelector(`.ayah-span[data-idx="${listenAyahIdx}"]`);
-  if(span) span.classList.add('active');
+  const span=document.querySelector(`.ayah-span[data-idx="${listenAyahIdx}"]`); if(span)span.classList.add('active');
 }
-function playListenAyah(idx){
-  if(!currentSurahData) return;
-  const ayahs = currentSurahData.arabic.ayahs;
-  if(idx<0 || idx>=ayahs.length) return;
-  listenAyahIdx = idx;
-  const ayahObj = ayahs[idx];
-  const globalNum = ayahObj && ayahObj.number;
-  if(!globalNum){ showToast('تعذر تحديد رقم الآية للاستماع.'); return; }
-  quranAudioPlayer.src = `https://cdn.islamic.network/quran/audio/128/${getSelectedReciter()}/${globalNum}.mp3`;
-  quranAudioPlayer.play().catch(()=>showToast('تعذر تشغيل الصوت، تحقق من اتصال الإنترنت.'));
-  updateListenNowPlaying();
-}
-function openListenDrawer(){
-  if(!currentSurahData){ showToast('الرجاء اختيار سورة أولاً.'); return; }
-  document.getElementById('listenDrawerTitle').textContent = `الاستماع - سورة ${currentSurahData.arabic.name}`;
-  listenDrawer.classList.add('show');
-  listenDrawerBack.classList.add('show');
-  playListenAyah(0);
-}
-function closeListenDrawer(){
-  listenDrawer.classList.remove('show');
-  listenDrawerBack.classList.remove('show');
-  quranAudioPlayer.pause();
-}
-document.getElementById('closeListenDrawer').addEventListener('click', closeListenDrawer);
-listenDrawerBack.addEventListener('click', closeListenDrawer);
-document.getElementById('listenPrevBtn').addEventListener('click', ()=>{
-  playListenAyah(Math.max(0, listenAyahIdx-1));
-});
-document.getElementById('listenNextBtn').addEventListener('click', ()=>{
-  if(!currentSurahData) return;
-  playListenAyah(Math.min(currentSurahData.arabic.ayahs.length-1, listenAyahIdx+1));
-});
-document.getElementById('listenPlayPauseBtn').addEventListener('click', ()=>{
-  if(quranAudioPlayer.paused){
-    if(!quranAudioPlayer.src){ playListenAyah(listenAyahIdx); return; }
-    quranAudioPlayer.play();
-  } else {
-    quranAudioPlayer.pause();
+function updateListenModeUI(){
+  const note=document.getElementById('listenModeNote');
+  const title=document.getElementById('listenDrawerTitle');
+  if(listenMode==='ayah'){
+    title.textContent=`الاستماع للآية - سورة ${currentSurahData.arabic.name}`;
+    note.textContent='يتم تشغيل آية واحدة فقط في كل مرة. استخدم السابق والتالي للانتقال، ثم اضغط تشغيل لتشغيل الآية المختارة.';
+  }else{
+    title.textContent=`الاستماع - سورة ${currentSurahData.arabic.name}`;
+    note.textContent='يتم تشغيل آية واحدة ثم الانتقال تلقائياً إلى الآية التالية حتى نهاية السورة.';
   }
+  const type=document.getElementById('listenRepeatType'); if(type)type.value=listenMode==='ayah'?'ayah':repeatType;
+}
+async function resolveAyahAudioUrl(globalNum,reciter){
+  const res=await fetch(`https://api.alquran.cloud/v1/ayah/${globalNum}/${encodeURIComponent(reciter)}`);
+  if(!res.ok)throw new Error('audio-api');
+  const data=await res.json();
+  const url=data?.data?.audio;
+  if(!url)throw new Error('audio-url');
+  return url;
+}
+async function playListenAyah(idx){
+  if(!currentSurahData)return;
+  const ayahs=currentSurahData.arabic.ayahs;
+  if(idx<0||idx>=ayahs.length)return;
+  listenAyahIdx=idx; updateListenNowPlaying();
+  const token=++audioRequestToken;
+  try{
+    const url=await resolveAyahAudioUrl(ayahs[idx].number,getSelectedReciter());
+    if(token!==audioRequestToken)return;
+    quranAudioPlayer.src=url;
+    await quranAudioPlayer.play();
+  }catch(e){
+    if(token===audioRequestToken)showToast('تعذر تشغيل الصوت لهذا القارئ حالياً.');
+  }
+}
+function openListenDrawer(mode='surah',idx=0){
+  if(!currentSurahData){showToast('الرجاء اختيار سورة أولاً.');return;}
+  listenMode=mode; if(mode==='ayah') repeatType='ayah'; listenAyahIdx=Math.max(0,Math.min(currentSurahData.arabic.ayahs.length-1,idx));
+  repeatRemaining=0; audioRequestToken++;
+  quranAudioPlayer.pause(); quranAudioPlayer.removeAttribute('src'); quranAudioPlayer.load(); listenIsPlaying=false;
+  updateListenModeUI(); updateListenNowPlaying(); updateListenPlayPauseBtn();
+  listenDrawer.classList.add('show'); listenDrawerBack.classList.add('show');
+}
+function closeListenDrawer(){listenDrawer.classList.remove('show');listenDrawerBack.classList.remove('show');audioRequestToken++;quranAudioPlayer.pause();quranAudioPlayer.removeAttribute('src');quranAudioPlayer.load();listenIsPlaying=false;updateListenPlayPauseBtn();}
+document.getElementById('closeListenDrawer').addEventListener('click',closeListenDrawer);
+listenDrawerBack.addEventListener('click',closeListenDrawer);
+document.getElementById('listenPrevBtn').addEventListener('click',()=>{repeatRemaining=0;playListenAyah(Math.max(0,listenAyahIdx-1));});
+document.getElementById('listenNextBtn').addEventListener('click',()=>{repeatRemaining=0;if(currentSurahData)playListenAyah(Math.min(currentSurahData.arabic.ayahs.length-1,listenAyahIdx+1));});
+document.getElementById('listenPlayPauseBtn').addEventListener('click',async()=>{
+  if(quranAudioPlayer.src){
+    if(quranAudioPlayer.paused){try{await quranAudioPlayer.play();}catch(e){showToast('تعذر تشغيل الصوت، تحقق من اتصال الإنترنت.');}}else quranAudioPlayer.pause();
+  }else playListenAyah(listenAyahIdx);
 });
-quranAudioPlayer.addEventListener('play', ()=>{ listenIsPlaying=true; updateListenPlayPauseBtn(); });
-quranAudioPlayer.addEventListener('pause', ()=>{ listenIsPlaying=false; updateListenPlayPauseBtn(); });
-quranAudioPlayer.addEventListener('ended', ()=>{
-  if(!listenDrawer.classList.contains('show') || !currentSurahData) return;
-  const mode=document.getElementById('listenRepeatSelect')?.value || '0';
+quranAudioPlayer.addEventListener('play',()=>{listenIsPlaying=true;updateListenPlayPauseBtn();});
+quranAudioPlayer.addEventListener('pause',()=>{listenIsPlaying=false;updateListenPlayPauseBtn();});
+quranAudioPlayer.addEventListener('ended',async()=>{
+  if(!listenDrawer.classList.contains('show')||!currentSurahData)return;
+  const countMode=document.getElementById('listenRepeatSelect')?.value||'0';
   const custom=Math.max(1,parseInt(document.getElementById('listenRepeatCustom')?.value)||2);
-  const count=mode==='custom'?custom:parseInt(mode)||0;
-  if(mode==='infinite'){ playListenAyah(listenAyahIdx); return; }
-  if(count>0){
-    if(repeatRemaining<=0) repeatRemaining=count-1;
-    else repeatRemaining--;
-    if(repeatRemaining>0){ playListenAyah(listenAyahIdx); return; }
+  const count=countMode==='custom'?custom:parseInt(countMode)||0;
+  const type=document.getElementById('listenRepeatType')?.value||'ayah';
+  repeatType=type; saveJSON('mc-repeat-type',repeatType);
+
+  // Single-ayah mode: never move automatically to another ayah.
+  if(listenMode==='ayah'){
+    if(type==='ayah' && countMode!=='0'){
+      if(countMode==='infinite') return playListenAyah(listenAyahIdx);
+      if(repeatRemaining<=0) repeatRemaining=count-1; else repeatRemaining--;
+      if(repeatRemaining>0) return playListenAyah(listenAyahIdx);
+      repeatRemaining=0;
+    }
+    return;
+  }
+
+  // Full-surah mode. "تكرار الآية" repeats every ayah individually;
+  // "تكرار السورة" restarts the entire surah only after its last ayah.
+  if(type==='ayah' && countMode!=='0'){
+    if(countMode==='infinite') return playListenAyah(listenAyahIdx);
+    if(repeatRemaining<=0) repeatRemaining=count-1; else repeatRemaining--;
+    if(repeatRemaining>0) return playListenAyah(listenAyahIdx);
     repeatRemaining=0;
   }
-  if(listenAyahIdx < currentSurahData.arabic.ayahs.length-1) playListenAyah(listenAyahIdx+1);
+
+  if(listenAyahIdx < currentSurahData.arabic.ayahs.length-1){
+    return playListenAyah(listenAyahIdx+1);
+  }
+
+  // We reached the end of the surah. Only here does "تكرار السورة" apply.
+  if(type==='surah' && countMode!=='0'){
+    if(countMode==='infinite') return playListenAyah(0);
+    if(repeatRemaining<=0) repeatRemaining=count-1; else repeatRemaining--;
+    if(repeatRemaining>0) return playListenAyah(0);
+    repeatRemaining=0;
+  }
 });
+
+const repeatTypeSel=document.getElementById('listenRepeatType');
+if(repeatTypeSel)repeatTypeSel.addEventListener('change',()=>{repeatType=repeatTypeSel.value;saveJSON('mc-repeat-type',repeatType);repeatRemaining=0;});
+const repeatSel=document.getElementById('listenRepeatSelect'), repeatCustom=document.getElementById('listenRepeatCustom');
+if(repeatSel){repeatSel.value=loadJSON('mc-repeat-mode','0');repeatCustom.style.display=repeatSel.value==='custom'?'':'none';repeatSel.addEventListener('change',()=>{saveJSON('mc-repeat-mode',repeatSel.value);repeatRemaining=0;repeatCustom.style.display=repeatSel.value==='custom'?'':'none';});}
+if(repeatCustom)repeatCustom.value=loadJSON('mc-repeat-custom',2),repeatCustom.addEventListener('change',()=>saveJSON('mc-repeat-custom',Math.max(1,parseInt(repeatCustom.value)||2)));
 
 function selectAyah(idx){
   document.querySelectorAll('.ayah-span').forEach(s=>s.classList.remove('active'));
@@ -2134,7 +2187,7 @@ document.getElementById('drawerBookmarkBtn').addEventListener('click', ()=>{
   if(currentDrawerAyahIdx !== null) openBookmarkModal(currentDrawerAyahIdx);
 });
 document.getElementById('drawerAudioBtn').addEventListener('click', ()=>{
-  if(currentDrawerAyahIdx !== null) playAyahAudio(currentDrawerAyahIdx);
+  if(currentDrawerAyahIdx !== null) openListenDrawer('ayah', currentDrawerAyahIdx);
 });
 function openBookmarkModal(idx){
   if(!currentSurahData) return;
@@ -3178,7 +3231,7 @@ let todayHijriMonthName = null; // Arabic name of the ACTUAL current hijri month
 const OCCASIONS = [
   {hm:1, hd:1, name:"رأس السنة الهجرية"},
   {hm:1, hd:10, name:"يوم عاشوراء"},
-  {hm:3, hd:12, name:"المولد النبوي الشريف"},
+  {hm:3, hd:12, name:"المولد النبوي الشريف", fixedGregorian:{2026:"2026-08-25"}},
   {hm:7, hd:27, name:"ذكرى الإسراء والمعراج"},
   {hm:8, hd:15, name:"ليلة النصف من شعبان"},
   {hm:9, hd:1, name:"بداية شهر رمضان المبارك"},
@@ -3195,43 +3248,37 @@ occasionsListRender();
 
 let calMonth, calYear;
 function renderCalendar(){
-  const grid = document.getElementById('calGrid');
+  const wrap = document.getElementById('calGrid');
   const title = document.getElementById('calTitle');
-  title.textContent = `${new Date(calYear,calMonth-1).toLocaleDateString('ar-EG',{month:'long'})} ${calYear} م`;
-
+  const monthNames = Array.from({length:3},(_,i)=>new Date(calYear,calMonth-1+i).toLocaleDateString('ar-EG',{month:'long',year:'numeric'}));
+  title.textContent = `${monthNames[0]} — ${monthNames[2]}`;
   const dowNames = ["أحد","اثنين","ثلاثاء","أربعاء","خميس","جمعة","سبت"];
-  const firstDow = new Date(calYear, calMonth-1, 1).getDay();
-  const totalDays = daysInGregorianMonth(calYear, calMonth);
-  let html = dowNames.map(d=>`<div class="dow">${d}</div>`).join('');
-  for(let i=0;i<firstDow;i++) html += `<div class="cal-day empty"></div>`;
-
   const todayStr = new Date().toDateString();
-  let midHijriName = null;
-
-  for(let day=1; day<=totalDays; day++){
-    const h = gregorianToHijri(calYear, calMonth, day);
-    if(day === Math.floor(totalDays/2)) midHijriName = HIJRI_MONTH_AR[h.month-1];
-    const gDate = new Date(calYear, calMonth-1, day);
-    const isToday = gDate.toDateString()===todayStr;
-    const hasEvent = OCCASIONS.some(o=>o.hm===h.month && o.hd===h.day);
-    const gStr = `${String(day).padStart(2,'0')}-${String(calMonth).padStart(2,'0')}-${calYear}`;
-    html += `<div class="cal-day ${isToday?'today':''} ${hasEvent?'event':''}" data-g="${gStr}" data-hd="${h.day}" data-hm="${h.month}" data-hname="${HIJRI_MONTH_AR[h.month-1]}" data-hyear="${h.year}">
-      <div class="g">${day}</div><div class="h">${h.day} ${HIJRI_MONTH_AR[h.month-1]}</div>
-    </div>`;
+  let allHtml='';
+  for(let offset=0; offset<3; offset++){
+    const d0=new Date(calYear,calMonth-1+offset,1);
+    const y=d0.getFullYear(), m=d0.getMonth()+1;
+    const totalDays=daysInGregorianMonth(y,m), firstDow=d0.getDay();
+    let html=`<div class="cal-month"><div class="cal-month-title">${d0.toLocaleDateString('ar-EG',{month:'long',year:'numeric'})}</div><div class="cal-grid">`;
+    html += dowNames.map(d=>`<div class="dow">${d}</div>`).join('');
+    for(let i=0;i<firstDow;i++) html += `<div class="cal-day empty"></div>`;
+    for(let day=1;day<=totalDays;day++){
+      const h=gregorianToHijri(y,m,day), gDate=new Date(y,m-1,day);
+      const isToday=gDate.toDateString()===todayStr;
+      const hasEvent=OCCASIONS.some(o=>o.hm===h.month&&o.hd===h.day);
+      const gStr=`${String(day).padStart(2,'0')}-${String(m).padStart(2,'0')}-${y}`;
+      html += `<div class="cal-day ${isToday?'today':''} ${hasEvent?'event':''}" data-g="${gStr}" data-hd="${h.day}" data-hm="${h.month}" data-hname="${HIJRI_MONTH_AR[h.month-1]}" data-hyear="${h.year}"><div class="g">${day}</div><div class="h">${h.day} ${HIJRI_MONTH_AR[h.month-1]}</div></div>`;
+    }
+    html+='</div></div>'; allHtml+=html;
   }
-  grid.innerHTML = html;
-  currentHijriMonth = midHijriName; // reflects whatever month is being BROWSED - never used for the water reminder
-
-  grid.querySelectorAll('.cal-day:not(.empty)').forEach(dayEl=>{
-    dayEl.addEventListener('click', ()=>{
-      const hd = parseInt(dayEl.dataset.hd), hm = parseInt(dayEl.dataset.hm);
-      const evs = OCCASIONS.filter(o=>o.hm===hm && o.hd===hd);
-      const evText = evs.length ? evs.map(e=>`• ${e.name}`).join('<br>') : 'لا توجد مناسبة خاصة مسجلة لهذا اليوم.';
-      openModal(`<h3>${dayEl.dataset.g} م الموافق ${hd} ${dayEl.dataset.hname} ${dayEl.dataset.hyear} هـ</h3><p>${evText}</p>`);
-    });
-  });
-  // Note: the water reminder is intentionally NOT re-evaluated here. It must only ever depend on
-  // todayHijriMonthName (the real current date), never on whichever month the user is browsing.
+  wrap.innerHTML=allHtml;
+  currentHijriMonth = HIJRI_MONTH_AR[gregorianToHijri(calYear,calMonth,Math.min(15,daysInGregorianMonth(calYear,calMonth))).month-1];
+  wrap.querySelectorAll('.cal-day:not(.empty)').forEach(dayEl=>dayEl.addEventListener('click',()=>{
+    const hd=parseInt(dayEl.dataset.hd),hm=parseInt(dayEl.dataset.hm);
+    const evs=OCCASIONS.filter(o=>o.hm===hm&&o.hd===hd);
+    const evText=evs.length?evs.map(e=>`• ${e.name}`).join('<br>'):'لا توجد مناسبة خاصة مسجلة لهذا اليوم.';
+    openModal(`<h3>${dayEl.dataset.g} م الموافق ${hd} ${dayEl.dataset.hname} ${dayEl.dataset.hyear} هـ</h3><p>${evText}</p>`);
+  }));
 }
 document.getElementById('prevMonth').addEventListener('click', ()=>{
   calMonth--; if(calMonth<1){calMonth=12; calYear--;}
@@ -3267,7 +3314,7 @@ function initCountdown(){
     let found = null;
     for(let i=0; i<400; i++){
       const h = gregorianToHijri(gDate.getFullYear(), gDate.getMonth()+1, gDate.getDate());
-      if(h.month===next.hm && h.day===next.hd){ found = new Date(gDate); break; }
+      if(next.fixedGregorian && next.fixedGregorian[gDate.getFullYear()]){ const fixed=new Date(next.fixedGregorian[gDate.getFullYear()]+'T00:00:00'); if(gDate.toDateString()===fixed.toDateString()){found=fixed;break;} } else if(h.month===next.hm && h.day===next.hd){ found = new Date(gDate); break; }
       gDate.setDate(gDate.getDate()+1);
     }
     if(found){
@@ -3458,7 +3505,7 @@ function buildNotifications(){
       const h = gregorianToHijri(now.getFullYear(), now.getMonth()+1, now.getDate());
       const isWhiteDays = [13,14,15].includes(h.day);
       if(day===1 || day===4 || isWhiteDays){
-        const reason = isWhiteDays ? 'أيام البيض (13، 14، 15 من الشهر الهجري)' : (day===1?'يوم الاثنين':'يوم الخميس');
+        const reason = isWhiteDays ? 'الأيام البيض (13، 14، 15 من الشهر الهجري)' : (day===1?'يوم الاثنين':'يوم الخميس');
         const body = `اليوم ${reason}، وهو من أيام السنن المستحبة لصيام النافلة.`;
         list.push({id:`fasting-${todayDateKey(now)}`, category:'nawafilFasting', emoji:'🌾',
           title:'تذكير بصيام النافلة', snippet:truncate(body,42), body, ts: now.getTime()-1});
@@ -3481,18 +3528,18 @@ function buildNotifications(){
   // Prayer alert: only the single next upcoming prayer, 15 minutes before it - never a
   // prayer that has already passed.
   if(s.prayerTimes && window.__prayerTimings){
-    const names = {Fajr:'الفجر', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء'};
-    const nowMin = now.getHours()*60+now.getMinutes();
-    let next = null, nextDiff = Infinity;
+    const names={Fajr:'الفجر',Dhuhr:'الظهر',Asr:'العصر',Maghrib:'المغرب',Isha:'العشاء'};
+    const nowMin=now.getHours()*60+now.getMinutes();
+    let next=null,nextDiff=Infinity;
     Object.keys(names).forEach(k=>{
-      const [h,m] = window.__prayerTimings[k].split(':').map(Number);
-      const diff = (h*60+m) - nowMin;
-      if(diff>=0 && diff<nextDiff){ nextDiff=diff; next=k; }
+      if(s['prayer_'+k]===false)return;
+      const [h,m]=window.__prayerTimings[k].split(':').map(Number);
+      const diff=(h*60+m)-nowMin;
+      if(diff>=0&&diff<nextDiff){nextDiff=diff;next=k;}
     });
-    if(next && nextDiff<=15){
-      const body = `اقتربت صلاة ${names[next]} 🕌 باقي على الصلاة ${nextDiff} دقيقة.`;
-      list.push({id:`prayer-${todayDateKey(now)}-${next}`, category:'prayerTimes', emoji:'🕌',
-        title:`اقتربت صلاة ${names[next]}`, snippet:`باقي ${nextDiff} دقيقة على الصلاة`, body, ts: now.getTime()+100});
+    if(next&&nextDiff<=15){
+      const body=`اقتربت صلاة ${names[next]} 🕌 باقي على الصلاة ${nextDiff} دقيقة.`;
+      list.push({id:`prayer-${todayDateKey(now)}-${next}`,category:'prayerTimes',emoji:'🕌',title:`اقتربت صلاة ${names[next]}`,snippet:`باقي ${nextDiff} دقيقة على الصلاة`,body,ts:now.getTime()+100});
     }
   }
 
@@ -3544,9 +3591,10 @@ function refreshNotifications(){
   // window (fires once per prayer, never blocks the page content).
   const prayerNotif = list.find(n=>n.category==='prayerTimes');
   if(prayerNotif && prayerNotif.id !== lastToastedPrayerId){
-    showToast(prayerNotif.body, 6000);
-    lastToastedPrayerId = prayerNotif.id;
-    saveJSON('mc-last-prayer-toast', lastToastedPrayerId);
+    showToast(prayerNotif.body,6000);
+    showPrayerWebNotification(prayerNotif.title,prayerNotif.body,prayerNotif.id);
+    lastToastedPrayerId=prayerNotif.id;
+    saveJSON('mc-last-prayer-toast',lastToastedPrayerId);
   }
 }
 function updateNotifBadge(list, readIds){
@@ -4011,6 +4059,25 @@ function updateNextPrayerCountdown(){
 }
 updateNextPrayerCountdown(); clearInterval(nextPrayerTimer); nextPrayerTimer=setInterval(updateNextPrayerCountdown,1000);
 
+// Web notification / service-worker support. True background Web Push still requires a push
+// subscription and a server/VAPID key; this page can nevertheless show OS-level web notifications
+// while it is open, and the service worker is prepared to receive future push events.
+let prayerWebNotificationShown={};
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+async function showPrayerWebNotification(title,body,tag){
+  if(!browserNotificationsAllowed())return;
+  try{
+    const reg=await navigator.serviceWorker?.ready;
+    if(reg && reg.showNotification){
+      await reg.showNotification(title,{body,tag,icon:'',badge:'',dir:'rtl',lang:'ar'});
+    }else{
+      new Notification(title,{body,tag,dir:'rtl',lang:'ar'});
+    }
+  }catch(e){try{new Notification(title,{body,tag});}catch(_){} }
+}
+
 // Notification settings: browser permission + individual prayers.
 function browserNotificationsAllowed(){return ('Notification' in window && Notification.permission==='granted');}
 const prayerNotifList=document.getElementById('prayerNotifList');
@@ -4064,72 +4131,19 @@ buildNotifications=function(){
 
 // Keep notification settings labels synchronized with the requested wording.
 const fridayDesc=[...document.querySelectorAll('[data-notif-type="friday"] .desc')][0]; if(fridayDesc) fridayDesc.textContent='تذكير بأعمال وسنن يوم الجمعة';
-const fastDesc=[...document.querySelectorAll('[data-notif-type="nawafilFasting"] .desc')][0]; if(fastDesc) fastDesc.textContent='تذكير بالاثنين والخميس (وأيام البيض)';
+const fastDesc=[...document.querySelectorAll('[data-notif-type="nawafilFasting"] .desc')][0]; if(fastDesc) fastDesc.textContent='تذكير بالاثنين والخميس (والأيام البيض)';
 
-// Listen drawer: opening it must NEVER start playback.
-const __origOpenListenDrawer=openListenDrawer;
-openListenDrawer=function(){
-  if(!currentSurahData){showToast('الرجاء اختيار سورة أولاً.');return;}
-  document.getElementById('listenDrawerTitle').textContent=`الاستماع - سورة ${currentSurahData.arabic.name}`;
-  listenAyahIdx=0; quranAudioPlayer.pause(); quranAudioPlayer.removeAttribute('src'); quranAudioPlayer.load();
-  updateListenNowPlaying(); updateListenPlayPauseBtn();
-  listenDrawer.classList.add('show'); listenDrawerBack.classList.add('show');
-};
-
-// More reciters from the same Islamic Network audio source.
-const EXTRA_RECITERS=[
- ['ar.hudhaify','علي عبد الله جابر'],['ar.husarymujawwad','محمود خليل الحصري (مجود)'],['ar.minshawimujawwad','محمد صديق المنشاوي (مجود)'],
- ['ar.muhammadayyoub','محمد أيوب'],['ar.muhammadjibreel','محمد جبريل'],['ar.saoodshuraym','سعود الشريم'],['ar.ahmedajamy','أحمد العجمي'],
- ['ar.nasseralkatami','ناصر القطامي'],['ar.yasseraldossari','ياسر الدوسري'],['ar.faresabbad','فارس عباد'],['ar.abdullahbasfar','عبدالله بصفر'],
- ['ar.abdullahmatroud','عبدالله مطرود'],['ar.muhammadluhaidan','محمد اللحيدان']
-];
-EXTRA_RECITERS.forEach(([id,name])=>{if(!RECITERS.some(r=>r.id===id))RECITERS.push({id,name});});
-const recSel=document.getElementById('reciterSelect');
-if(recSel){
-  const current=recSel.value; recSel.innerHTML=RECITERS.map(r=>`<option value="${r.id}">${r.name}</option>`).join(''); recSel.value=current||loadJSON('mc-reciter','ar.alafasy');
-}
-
-// Repeat playback.
-let repeatRemaining=0, repeatMode=loadJSON('mc-repeat-mode','0');
-const repeatSel=document.getElementById('listenRepeatSelect'), repeatCustom=document.getElementById('listenRepeatCustom');
-if(repeatSel){
-  repeatSel.value=loadJSON('mc-repeat-mode','0');
-  repeatCustom.style.display=repeatSel.value==='custom'?'':'none';
-  repeatSel.addEventListener('change',()=>{repeatMode=repeatSel.value;saveJSON('mc-repeat-mode',repeatMode);repeatCustom.style.display=repeatMode==='custom'?'':'none';});
-}
-if(repeatCustom) repeatCustom.addEventListener('change',()=>saveJSON('mc-repeat-custom',Math.max(1,parseInt(repeatCustom.value)||2)));
-// Repeat playback is handled by the single ended listener above.
-
-
-// Copy + i'rab panel for the selected ayah.
+// Copy the selected ayah with its ayah number.
 function currentAyahText(){
   if(!currentSurahData)return '';
   const a=currentSurahData.arabic.ayahs[currentDrawerAyahIdx];
-  return a ? (a.text || a.ayah || '') : '';
+  return a ? `${a.text || a.ayah || ''} ﴿${a.numberInSurah}﴾` : '';
 }
 const copyBtn=document.getElementById('drawerCopyBtn');
-if(copyBtn) copyBtn.addEventListener('click',async()=>{
-  const text=currentAyahText(); if(!text)return;
-  try{await navigator.clipboard.writeText(text);copyBtn.textContent='تم النسخ ✓';setTimeout(()=>copyBtn.textContent='📋 نسخ الآية',1200);}catch(e){showToast('تعذر نسخ الآية.');}
+if(copyBtn)copyBtn.addEventListener('click',async()=>{
+  const text=currentAyahText();if(!text)return;
+  try{await navigator.clipboard.writeText(text);copyBtn.textContent='تم النسخ ✓';setTimeout(()=>copyBtn.textContent='📋 نسخ الآية مع رقمها',1200);}catch(e){showToast('تعذر نسخ الآية.');}
 });
-const i3btn=document.getElementById('drawerI3rabBtn'), i3panel=document.getElementById('i3rabPanel');
-if(i3btn) i3btn.addEventListener('click',async()=>{
-  const a=currentSurahData?.arabic?.ayahs?.[currentDrawerAyahIdx];
-  if(!a)return;
-  i3panel.style.display='block'; i3panel.textContent='جاري تحميل إعراب الآية…';
-  // Quranpedia is known to provide i'rab content for Quran verses, but its public v1
-  // endpoint does not expose a stable documented book id for i'rab here. Do not invent data.
-  // Provide a direct, verse-specific fallback page instead of showing fabricated grammar.
-  const surah=currentSurahData.num, ayah=a.numberInSurah;
-  i3panel.innerHTML=`<strong>إعراب الآية</strong><p>يمكن فتح صفحة الآية في موسوعة Quranpedia لعرض الإعراب من مصادره المتاحة.</p><a class="btn outline sm" target="_blank" rel="noopener" href="https://quranpedia.net/ayah/${surah}/${ayah}">فتح إعراب الآية</a>`;
-});
-
-// I'rab font size.
-function applyI3rabSize(){
-  const v=loadJSON('mc-i3rab-size',15); document.documentElement.style.setProperty('--i3rab-font-size',v+'px');
-  const r=document.getElementById('setI3rabSizeRange'),l=document.getElementById('setI3rabSizeLabel'); if(r){r.value=v;r.oninput=()=>{const n=parseInt(r.value);saveJSON('mc-i3rab-size',n);document.documentElement.style.setProperty('--i3rab-font-size',n+'px');l.textContent=n;};l.textContent=v;}
-}
-applyI3rabSize();
 
 // Expand the dhikr collection with additional vocalized items; keep existing entries intact.
 Object.assign(ADHKAR_DATA,{
