@@ -194,7 +194,11 @@ nav.tabs button{
   background:transparent; color:var(--text-soft); font-size:14.5px; font-weight:500;
   transition:all .2s ease;
 }
-nav.tabs button.active{background:var(--primary); color:#fff; box-shadow:0 3px 10px var(--shadow);}
+nav.tabs button.active{background:var(--primary); color:#fff; box-shadow:-4px 3px 10px var(--shadow); position:relative;}
+nav.tabs button.active::after{content:"";position:absolute;left:8px;bottom:4px;width:18px;height:2px;border-radius:2px;background:var(--accent);opacity:.9;}
+.auto-dhikr-picker{margin-top:8px;padding:10px;border:1px dashed var(--border);border-radius:12px;background:var(--bg);}
+.auto-dhikr-picker label{display:flex;align-items:center;gap:8px;margin:6px 0;color:var(--text);}
+.auto-dhikr-picker input{width:auto;}
 nav.tabs button:not(.active):hover{background:var(--accent-soft); color:var(--text);}
 
 main{max-width:var(--container-max); margin:0 auto; padding:26px clamp(20px, 3vw, 48px) 80px; position:relative; z-index:1;}
@@ -275,6 +279,19 @@ html[data-theme="dark"] .ql-card svg{fill:var(--accent);}
 /* ===================== Quran - Mushaf mode ===================== */
 .quran-toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;}
 .quran-toolbar > div{flex:1; min-width:160px;}
+.quran-search-inline{display:flex;gap:10px;align-items:flex-end;flex-wrap:nowrap;width:100%;}
+.quran-search-inline .qsearch-main{flex:1;min-width:0;}
+.quran-search-inline .qsearch-scope{width:170px;flex:0 0 170px;}
+.quran-search-inline .qsearch-btn{flex:0 0 auto;}
+.tajwid-search-wrap{display:flex;gap:10px;align-items:flex-end;margin-bottom:16px;}
+.tajwid-search-wrap>div:first-child{flex:1;min-width:0;}
+.quick-access{margin-top:18px;}
+.quick-access-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;}
+.quick-access-item{border:1px solid var(--border);background:var(--bg);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease;font-weight:700;font-size:13px;}
+.quick-access-item:hover{transform:translateY(-2px);border-color:var(--primary);background:var(--accent-soft);}
+@media(max-width:900px){.quick-access-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.quran-search-inline{flex-wrap:wrap}.quran-search-inline .qsearch-scope{flex:1 1 160px;width:auto}.quran-search-inline .qsearch-btn{flex:1 1 90px}.quick-access-grid{grid-template-columns:repeat(2,1fr);}}
+
 .font-controls{display:flex; gap:18px; flex-wrap:wrap; margin-top:14px;}
 .font-controls > div{flex:1; min-width:180px;}
 .font-controls .row{display:flex; align-items:center; gap:8px;}
@@ -403,7 +420,8 @@ html[data-theme="dark"] .time-card .t{color:var(--accent);}
 html[data-theme="dark"] .qibla-kaaba{background:var(--accent);}
 
 .cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
-.cal-months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.cal-months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;} 
+@media(min-width:1400px){.cal-months{gap:10px}.cal-month{padding:8px}.cal-grid{gap:3px}.cal-day{font-size:12px}}
 .cal-month{min-width:0;border:1px solid var(--border);border-radius:14px;padding:10px;background:var(--bg);}
 .cal-month-title{text-align:center;font-weight:800;margin:2px 0 10px;font-size:14px;}
 .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:5px; text-align:center;}
@@ -583,6 +601,13 @@ footer.site{
   .listen-repeat-row{grid-template-columns:1fr 1fr;}
   .listen-repeat-row label{grid-column:1/-1;}
 }
+
+.dhikr-item.dhikr-done{opacity:.55;background:var(--bg);border-radius:12px;padding:12px;}
+.dhikr-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:10px;}
+.dhikr-check{width:28px;height:28px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;}
+.dhikr-check.checked{background:var(--primary);color:#fff;border-color:var(--primary);}
+.tasbih-selected-dhikr{padding:10px 12px;border:1px dashed var(--border);border-radius:10px;line-height:1.9;font-family:'Amiri',serif;}
+.settings-danger-card{border-color:#b88989;}
 </style>
 </head>
 <body>
@@ -656,6 +681,18 @@ footer.site{
         <div class="card ql-card" data-sec="help"><svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16z"/><path d="M9.8 9.2a2.4 2.4 0 1 1 3.4 2.2c-.9.5-1.2.9-1.2 1.9h-1.6c0-1.5.5-2.1 1.5-2.7a1 1 0 1 0-1.4-.9z"/><circle cx="12" cy="16.3" r="0.9"/></svg><div>المساعدة وكيفية الاستخدام</div></div>
       </div>
     </div>
+    <div class="card quick-access">
+      <h3 style="margin-bottom:6px;">الوصول السريع</h3>
+      <p class="small-note">اختصارات لأكثر الأقسام استخداماً، دون استبدال شريط التنقل العلوي.</p>
+      <div class="quick-access-grid">
+        <div class="quick-access-item" data-sec="quran">📖<br>القرآن</div>
+        <div class="quick-access-item" data-sec="adhkar">📿<br>الأذكار والتسبيح</div>
+        <div class="quick-access-item" data-sec="prayer">🕌<br>الصلاة والتقويم</div>
+        <div class="quick-access-item" data-sec="wird">📚<br>الورد والحفظ</div>
+        <div class="quick-access-item" data-sec="favorites">🔖<br>المحفوظات</div>
+        <div class="quick-access-item" data-sec="tajwid">📘<br>أحكام التجويد</div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ QURAN ============ -->
@@ -672,12 +709,12 @@ footer.site{
       </div>
 
       <div class="star-divider"><div class="line"></div><span style="font-size:12px;color:var(--text-soft)">محرك بحث الآيات</span><div class="line"></div></div>
-      <div class="quran-toolbar">
-        <div><label>ابحث عن كلمة داخل نص الآيات فقط</label><input type="text" id="quranSearchInput" placeholder="اكتب كلمة للبحث..."></div>
-        <div style="max-width:170px;"><label>نطاق البحث</label>
+      <div class="quran-search-inline">
+        <div class="qsearch-main"><label>ابحث عن كلمة داخل نص الآيات فقط</label><input type="text" id="quranSearchInput" placeholder="اكتب كلمة للبحث..."></div>
+        <div class="qsearch-scope"><label>نطاق البحث</label>
           <select id="searchScope"><option value="current">السورة الحالية</option><option value="all">كل المصحف</option></select>
         </div>
-        <div><button class="btn outline" id="quranSearchBtn">بحث</button></div>
+        <div class="qsearch-btn"><button class="btn outline" id="quranSearchBtn">بحث</button></div>
       </div>
       <div id="searchResultsInfo" class="small-note"></div>
       <div id="searchResultsList"></div>
@@ -693,6 +730,10 @@ footer.site{
   <section class="section" id="sec-tajwid">
     <h2>أحكام التجويد</h2>
     <p class="small-note">مرجع شامل لأحكام تجويد القرآن الكريم على رواية حفص بن سليمان عن عاصم، مع مثال توضيحي لكل حكم.</p>
+    <div class="card tajwid-search-wrap">
+      <div><label>البحث في أحكام التجويد</label><input type="search" id="tajwidSearchInput" placeholder="ابحث عن حكم أو درس تجويدي..."></div>
+      <button class="btn outline" id="tajwidSearchClear" type="button">مسح</button>
+    </div>
 
     <div class="card">
       <h3>أحكام النون الساكنة والتنوين</h3>
@@ -919,6 +960,8 @@ footer.site{
         <h3>عداد التسبيح</h3>
         <label>اختر الذكر</label>
         <select id="tasbihSelect"></select>
+        <div id="autoDhikrOptions" class="small-note" style="display:none;margin-top:8px;"></div>
+        <div id="tasbihSelectedDhikr" class="tasbih-selected-dhikr" style="margin-top:10px;"></div>
         <input type="text" id="tasbihCustomInput" placeholder="اكتب ذكرك المخصص هنا..." style="display:none; margin-top:8px;">
         <label style="margin-top:10px;">الهدف (عدد التكرار)</label>
         <input type="number" id="tasbihTarget" value="33">
@@ -1041,6 +1084,10 @@ footer.site{
           <option value="7">أسبوع (7 أيام)</option>
         </select>
         <button class="btn" style="margin-top:14px;" id="wirdCalcBtn">إنشاء الخطة</button>
+        <div id="wirdPlanNameWrap" style="display:none; margin-top:12px;">
+          <label>اسم مخصص للخطة (اختياري)</label>
+          <input type="text" id="wirdPlanName" maxlength="80" placeholder="مثلاً: ورد رمضان أو ختمة الصيف">
+        </div>
         <button class="btn outline sm" style="margin-top:14px; display:none;" id="wirdSaveBtn">💾 حفظ هذه الخطة في المحفوظات</button>
         <div class="result-box" id="wirdResult" style="display:none;"></div>
         <div id="wirdProgressWrap" style="display:none; margin-top:16px;">
@@ -1085,6 +1132,10 @@ footer.site{
         <div class="small-note">الافتراضي: كل الأيام أيام حفظ. اضغط على اليوم لتبديله بين حفظ ← مراجعة ← راحة.</div>
 
         <button class="btn" style="margin-top:14px;" id="hifzCalcBtn">إنشاء خطة الحفظ</button>
+        <div id="hifzPlanNameWrap" style="display:none; margin-top:12px;">
+          <label>اسم مخصص للخطة (اختياري)</label>
+          <input type="text" id="hifzPlanName" maxlength="80" placeholder="مثلاً: خطة حفظ الجزء الثلاثين">
+        </div>
         <button class="btn outline sm" style="margin-top:14px; display:none;" id="hifzSaveBtn">💾 حفظ هذه الخطة في المحفوظات</button>
         <div class="result-box" id="hifzResult" style="display:none;"></div>
         <div id="hifzTableWrap" style="display:none; margin-top:16px;">
@@ -1165,6 +1216,12 @@ footer.site{
       </div>
     </div>
 
+    <div class="card settings-danger-card" style="margin-top:18px;">
+      <h3>إعادة ضبط الإعدادات</h3>
+      <p class="small-note">يعيد إعدادات الموقع وعداد التسبيح وترتيب الأقسام والتفضيلات إلى القيم الافتراضية. لا يحذف الخطط أو الآيات أو الأحاديث المحفوظة.</p>
+      <button class="btn outline sm" id="resetAllSettingsBtn">إعادة تعيين جميع الإعدادات</button>
+    </div>
+
     <div class="card" style="margin-top:18px;">
       <h3>ترتيب الأقسام</h3>
       <p class="small-note">اسحب العناصر لإعادة ترتيب ظهور الأقسام في الشريط العلوي حسب رغبتك.</p>
@@ -1243,6 +1300,13 @@ footer.site{
         </div>
         <label class="switch"><input type="checkbox" class="notif-type-toggle" data-type="salawat" checked><span class="slider"></span></label>
       </div>
+      <div class="settings-row" data-notif-type="planReminders">
+        <div>
+          <div class="lbl">تذكير بخطط الورد والحفظ</div>
+          <div class="desc">تذكير دوري بالخطط التي أنشأتها وحفظتها في الموقع</div>
+        </div>
+        <label class="switch"><input type="checkbox" class="notif-type-toggle" data-type="planReminders" checked><span class="slider"></span></label>
+      </div>
     </div>
   </section>
 
@@ -1265,7 +1329,47 @@ footer.site{
         <h4><span class="ic">🌙</span> الوضع الليلي والنهاري</h4>
         <p>بدّل بين المظهر الفاتح والداكن من مفتاح التبديل في قسم "الإعدادات" — وهو المكان الوحيد لهذا التبديل في الموقع. يبقى اختيارك محفوظاً في زياراتك القادمة.</p>
       </div>
-      <div class="help-item" data-kw="بحث قران ايات">
+      <div class="help-item" data-kw="البحث التجويد أحكام">
+        <h4><span class="ic">🔎</span> البحث في أحكام التجويد</h4>
+        <p>في قسم «أحكام التجويد» يمكنك استخدام شريط البحث للعثور بسرعة على حكم أو درس تجويدي؛ وتُخفى البطاقات التي لا تطابق كلمة البحث.</p>
+      </div>
+      <div class="help-item" data-kw="خطة اسم مخصص الورد الحفظ">
+        <h4><span class="ic">🏷️</span> تسمية خطط الورد والحفظ</h4>
+        <p>عند إنشاء خطة ورد أو حفظ يمكنك إعطاؤها اسماً مخصصاً اختيارياً، ثم يظهر الاسم في المحفوظات ليسهل تمييز الخطط المختلفة.</p>
+      </div>
+      <div class="help-item" data-kw="تلقائي قائمة أذكار">
+        <h4><span class="ic">🔄</span> الذكر التلقائي</h4>
+        <p>اختر «تلقائي (قائمة أذكار يختارها المستخدم)» من قائمة السبحة، ثم حدد الأذكار التي تريدها. عند إكمال عدد ذكر ينتقل الموقع تلقائياً إلى الذكر التالي ويعرض هدفه وعداده.</p>
+      </div>
+      <div class="help-item" data-kw="قراء مصادر متعددة">
+        <h4><span class="ic">🎧</span> تنوع مصادر القراء</h4>
+        <p>يحاول الموقع تحميل قائمة القراء من أكثر من مصدر موثوق، مع إزالة التكرارات واختيار رابط الصوت المناسب للمصدر والنسخة المتاحة.</p>
+      </div>
+      <div class="help-item" data-kw="إشعارات خطة الورد الحفظ">
+        <h4><span class="ic">🔔</span> تذكيرات خطط الورد والحفظ</h4>
+        <p>يمكن تفعيل أو تعطيل تذكيرات الخطط المحفوظة من إعدادات الإشعارات. عند وجود خطة محفوظة يظهر تذكير دوري لمتابعتها.</p>
+      </div>
+      <div class="help-item" data-kw="أزرار الإشعارات تسبيح الصلاة على النبي">
+        <h4><span class="ic">📲</span> أزرار داخل الإشعارات</h4>
+        <p>تحتوي إشعارات التسبيح والصلاة على النبي ﷺ على زر سريع ينقلك إلى قسم الأذكار والتسبيح، كما يمكن لإشعار النظام استخدام زر إجراء عند دعم المتصفح لذلك.</p>
+      </div>
+      <div class="help-item" data-kw="الوصول السريع الصفحة الرئيسية اختصارات">
+        <h4><span class="ic">⚡</span> الوصول السريع</h4>
+        <p>تحتوي الصفحة الرئيسية على اختصارات سريعة لأهم الأقسام. وهي إضافة إلى شريط التنقل العلوي وليست بديلاً عنه.</p>
+      </div>
+      <div class="help-item" data-kw="تقويم ثلاثة أشهر رزنامة">
+        <h4><span class="ic">📅</span> عرض عدة أشهر في التقويم</h4>
+        <p>على الشاشات الكبيرة يعرض التقويم ثلاثة أشهر معاً لاستغلال المساحة، بينما يقل العدد تلقائياً على الشاشات الأصغر حتى تبقى القراءة مريحة.</p>
+      </div>
+      <div class="help-item" data-kw="بحث القرآن نطاق سطر واحد">
+        <h4><span class="ic">🔎</span> بحث القرآن بشكل أسرع</h4>
+        <p>حقل البحث ونطاق البحث وزر البحث تظهر معاً في صف واحد على الشاشات الواسعة لتوفير المساحة.</p>
+      </div>
+      <div class="help-item" data-kw="إشعارات أزرار تفاعلية">
+        <h4><span class="ic">🔔</span> الأزرار التفاعلية في الإشعارات</h4>
+        <p>عند دعم المتصفح لإجراءات إشعارات الويب، يظهر زر سريع داخل إشعار التسبيح أو الصلاة على النبي ﷺ، وينقلك مباشرة إلى القسم المناسب. وتظهر أيضاً أزرار سريعة داخل لوحة إشعارات الموقع.</p>
+      </div>
+
         <h4><span class="ic">🔎</span> البحث في القرآن</h4>
         <p>من قسم "القرآن الكريم" يمكنك البحث داخل السورة المفتوحة أو داخل المصحف كاملاً، مع تمييز الكلمة المطابقة والانتقال المباشر إلى موضعها.</p>
       </div>
@@ -1297,7 +1401,19 @@ footer.site{
         <h4><span class="ic">📿</span> عداد التسبيح</h4>
         <p>من قسم "الأذكار والتسبيح" اختر الذكر وحدد هدف التكرار، ثم اضغط الدائرة لتسبيح، ويحفظ الموقع تقدمك تلقائياً.</p>
       </div>
-      <div class="help-item" data-kw="اشعارات جرس نقطة حمراء">
+      <div class="help-item" data-kw="الأذكار السبحة اختيار الذكر عدد المرات إكمال علامة صح">
+        <h4><span class="ic">📿</span> اختيار الذكر للسبحة</h4>
+        <p>من قائمة الأذكار اضغط «اختيار للسبحة» لنقل الذكر وعدد مرات قوله إلى عداد التسبيح. عند الضغط على زر التسبيح ينقص العدد المتبقي حتى يصل إلى الصفر، ثم يُنقل الذكر إلى نهاية قائمته ويُخفّف مظهره وتظهر بجانبه علامة صح. يمكنك وضع العلامة أو إزالتها يدوياً.</p>
+      </div>
+      <div class="help-item" data-kw="إعادة الإعدادات الافتراضي تأكيد">
+        <h4><span class="ic">♻️</span> إعادة تعيين الإعدادات</h4>
+        <p>يمكنك من الإعدادات إعادة الإعدادات إلى الوضع الافتراضي، مع تأكيد قبل التنفيذ. كما يتطلب إعادة ترتيب الأقسام وإعادة عداد التسبيح تأكيداً لتقليل الضغط بالخطأ.</p>
+      </div>
+      <div class="help-item" data-kw="قراء استماع تكرار الآية السورة">
+        <h4><span class="ic">🎧</span> القراء والاستماع والتكرار</h4>
+        <p>يمكن اختيار القارئ من قائمة القراء المتاحة، وتشغيل السورة أو آية واحدة. عند اختيار آية واحدة لا يبدأ الصوت تلقائياً، وتظهر أزرار تشغيل/إيقاف والسابق والتالي. ويمكن تحديد تكرار الآية أو تكرار السورة.</p>
+      </div>
+<div class="help-item" data-kw="اشعارات جرس نقطة حمراء">
         <h4><span class="ic">🔔</span> الإشعارات</h4>
         <p>زر الجرس أعلى يسار الموقع يعرض إشعاراتك. تظهر نقطة حمراء صغيرة عند وجود إشعار غير مقروء، وتختفي بعد قراءته أو بالضغط على علامة ✓ بجانبه. الإشعارات ديناميكية وتظهر وتختفي في وقتها المناسب تلقائياً.</p>
       </div>
@@ -1733,11 +1849,17 @@ initSurahSelect();
 const BASMALA_TEXT = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
 const ISTIADHAH_TEXT = "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ";
 function stripLeadingBasmala(text){
-  const t = text.trim();
-  if(t.indexOf(BASMALA_TEXT) === 0){
-    return t.slice(BASMALA_TEXT.length).trim();
+  const t=(text||'').trim();
+  const norm=x=>String(x||'').replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,'').replace(/[إأآٱ]/g,'ا').replace(/\s+/g,' ').trim();
+  const target=norm(BASMALA_TEXT), normalized=norm(t);
+  if(!normalized.startsWith(target)) return t;
+  let oi=0,ni=0;
+  while(oi<t.length && ni<target.length){
+    const c=t[oi], n=norm(c);
+    if(!n){oi++;continue;}
+    if(normalized[ni]===n){oi++;ni++;}else break;
   }
-  return t;
+  return ni===target.length ? t.slice(oi).trim() : t;
 }
 // Highlight waqf al-mu'anaqah (تعانق الوقف) marks - U+06DB ARABIC SMALL HIGH SEEN - so the
 // paired stop-here-or-there mark stands out clearly inside the mushaf text.
@@ -1769,9 +1891,7 @@ async function loadSurah(num, jumpToAyah){
       <button class="btn outline sm" id="surahFavAudioBtn">⭐ إضافة للاستماع المفضل</button>
     </div>`;
     html += `<div class="basmala">${ISTIADHAH_TEXT}</div>`;
-    if(num != 1 && num != 9){
-      html += `<div class="basmala basmala-sub">${BASMALA_TEXT}</div>`;
-    }
+    // The imported first ayah supplies the basmala for all surahs except Al-Fatihah and At-Tawbah; do not render it separately.
     html += `<div class="small-note" style="text-align:center;">اللون البرتقالي المميز داخل الآيات يشير إلى تعانق الوقف: قف عند أحد الموضعين المتقابلين فقط.</div>`;
     html += `<div class="mushaf-text" id="mushafText">`;
     ayahs.forEach((a, idx)=>{
@@ -2269,7 +2389,9 @@ function renderFavorites(){
       const desc = p.kind==='wird'
         ? `خطة ورد يومي: ${p.pages} صفحة خلال ${p.days} يوماً (${p.perDay} صفحة/يوم تقريباً) — أُنشئت في ${dateStr}`
         : `خطة حفظ: بداية من صفحة ${p.startPage}، اتجاه ${p.direction==='forward'?'تصاعدي':'تنازلي'}، ${p.days} يوماً (${p.hifzDaysCount} يوم حفظ فعلي) — أُنشئت في ${dateStr}`;
+      const planName = p.name ? `<div style="font-weight:800;color:var(--accent);margin-bottom:4px;">${escapeHtml(p.name)}</div>` : '';
       return `<div class="dhikr-item plan-item" data-plan-kind="${p.kind}" data-plan-idx="${idx}">
+        ${planName}
         <div class="txt" style="font-size:14.5px; font-family:'Tajawal',sans-serif;">${desc}</div>
         <div class="small-note" style="margin-top:4px;">اضغط لعرض تفاصيل الخطة في قسم "الورد والحفظ"</div>
         <button class="btn sm outline" data-rm-plan="${p.kind}:${idx}" style="margin-top:6px;">حذف من المحفوظات</button>
@@ -3393,7 +3515,7 @@ const notifListWrap = document.getElementById('notifListWrap');
 function notifSettings(){
   return loadJSON('mc-notif-settings', {
     master:true, prayerTimes:true, friday:true, ramadan:true,
-    sacredMonths:true, nawafilFasting:true, tasbih:true, salawat:true
+    sacredMonths:true, nawafilFasting:true, tasbih:true, salawat:true, planReminders:true
   });
 }
 function saveNotifSettings(s){ saveJSON('mc-notif-settings', s); }
@@ -3690,6 +3812,7 @@ document.getElementById('wirdCalcBtn').addEventListener('click', ()=>{
   const doneArr = new Array(days).fill(false);
 
   document.getElementById('wirdProgressWrap').style.display='block';
+  document.getElementById('wirdPlanNameWrap').style.display='';
   const saveBtn = document.getElementById('wirdSaveBtn');
   saveBtn.style.display = '';
   const savedWird=loadJSON('mc-saved-wird-plans',[]);
@@ -3713,7 +3836,7 @@ document.getElementById('wirdCalcBtn').addEventListener('click', ()=>{
 
   saveBtn.onclick = ()=>{
     const plans = loadJSON('mc-saved-wird-plans', []);
-    const savedPlan={type:'wird', pages, days, perDay, createdAt:Date.now()};
+    const savedPlan={type:'wird', name:(document.getElementById('wirdPlanName')?.value||'').trim() || `ورد ${pages} صفحة خلال ${days} يوماً`, pages, days, perDay, createdAt:Date.now()};
     plans.push(savedPlan);
     saveJSON('mc-saved-wird-plans', plans);
     saveJSON('mc-current-wird-plan-id', savedPlan.createdAt);
@@ -3838,6 +3961,7 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
 
   const doneArr = new Array(days).fill(false);
   document.getElementById('hifzTableWrap').style.display='block';
+  document.getElementById('hifzPlanNameWrap').style.display='';
   const saveBtn = document.getElementById('hifzSaveBtn');
   saveBtn.style.display = '';
   const savedHifz=loadJSON('mc-saved-hifz-plans',[]);
@@ -3881,7 +4005,7 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
 
   saveBtn.onclick = ()=>{
     const plans = loadJSON('mc-saved-hifz-plans', []);
-    const savedPlan={type:'hifz', startPage, direction, prevPages, perDay, days, hifzDaysCount, createdAt:Date.now()};
+    const savedPlan={type:'hifz', name:(document.getElementById('hifzPlanName')?.value||'').trim() || `حفظ من صفحة ${startPage}`, startPage, direction, prevPages, perDay, days, hifzDaysCount, createdAt:Date.now()};
     plans.push(savedPlan);
     saveJSON('mc-saved-hifz-plans', plans);
     saveJSON('mc-current-hifz-plan-id', savedPlan.createdAt);
@@ -4207,6 +4331,417 @@ Object.values(ADHKAR_DATA).forEach(arr=>arr.forEach(d=>{if(vocalMap[d.t])d.t=voc
 // Sound on completion of a dhikr/day: hook the existing celebration function without altering it.
 const __celebrateOriginal=celebrate;
 celebrate=function(title,text){if(loadJSON('mc-sound-effects',false))playUiSound('success');return __celebrateOriginal(title,text);};
+
+
+/* ============================================================
+   USER UPDATE v3
+   ============================================================ */
+// 1) Load the full 44-reciter catalog from Al Furqan and use its unified audio endpoint.
+// There is no universal "all reciters on the internet" list; this source currently exposes 44 reciters.
+async function loadAllRecitersV3(){
+  try{
+    const res=await fetch('https://alfurqan.online/api/v1/reciters');
+    if(!res.ok) throw new Error('reciters');
+    const data=await res.json();
+    if(Array.isArray(data.reciters)&&data.reciters.length){
+      RECITERS.length=0;
+      data.reciters.forEach(r=>RECITERS.push({id:r.id,name:r.arabicName||r.name||r.id}));
+      populateReciterSelect();
+    }
+  }catch(e){ /* keep existing fallback list */ }
+}
+loadAllRecitersV3();
+const originalResolveAyahAudioUrlV3=resolveAyahAudioUrl;
+resolveAyahAudioUrl=async function(globalNum,reciter){
+  const r=RECITERS.find(x=>x.id===reciter);
+  if(r && !r.legacy) return `https://alfurqan.online/api/v1/audio/${encodeURIComponent(r.id)}/${globalNum}`;
+  return originalResolveAyahAudioUrlV3(globalNum,reciter);
+};
+
+// 2) Confirmation before section-order reset and tasbih reset. Capture phase prevents the old handlers from firing on Cancel.
+const resetOrderBtnV3=document.getElementById('resetOrderBtn');
+if(resetOrderBtnV3) resetOrderBtnV3.addEventListener('click',e=>{
+  if(!confirm('هل أنت متأكد من إعادة ترتيب الأقسام إلى الوضع الافتراضي؟')){e.preventDefault();e.stopImmediatePropagation();}
+},true);
+const resetTasbihBtnV3=document.getElementById('resetTasbih');
+if(resetTasbihBtnV3) resetTasbihBtnV3.addEventListener('click',e=>{
+  if(!confirm('هل أنت متأكد من إعادة عداد التسبيح إلى الصفر؟')){e.preventDefault();e.stopImmediatePropagation();}
+},true);
+
+// 3) Reset all settings (content saved by the user is preserved).
+const resetAllSettingsBtnV3=document.getElementById('resetAllSettingsBtn');
+if(resetAllSettingsBtnV3) resetAllSettingsBtnV3.addEventListener('click',()=>{
+  if(!confirm('هل أنت متأكد من إعادة جميع الإعدادات إلى الوضع الافتراضي؟\nسيتم أيضاً إعادة ترتيب الأقسام، القارئ، التكرار، الإشعارات، الفوارق اليدوية وعداد التسبيح.')) return;
+  const preserve=['mc-saved-wird-plans','mc-saved-hifz-plans','mc-audio-favorites','mc-last-read','mc-tutorial-seen'];
+  Object.keys(localStorage).filter(k=>k.startsWith('mc-')&&!preserve.includes(k)).forEach(k=>localStorage.removeItem(k));
+  location.reload();
+});
+
+// 4) Dhikr -> Tasbih workflow.
+const dhikrStateV3=loadJSON('mc-dhikr-state',{});
+const dhikrDoneV3=loadJSON('mc-dhikr-completed',{});
+let selectedDhikrKeyV3=loadJSON('mc-selected-dhikr-key',null);
+function saveDhikrV3(){saveJSON('mc-dhikr-state',dhikrStateV3);saveJSON('mc-dhikr-completed',dhikrDoneV3);}
+function selectedDhikrObjV3(){
+  if(!selectedDhikrKeyV3)return null;
+  const parts=String(selectedDhikrKeyV3).split('::');
+  const cat=parts[0],idx=parseInt(parts[1]); const d=ADHKAR_DATA[cat]?.[idx];
+  return d?{cat,idx,d,key:selectedDhikrKeyV3}:null;
+}
+function syncSelectedDhikrV3(){
+  const box=document.getElementById('tasbihSelectedDhikr'); if(!box)return;
+  const s=selectedDhikrObjV3();
+  box.innerHTML=s?`<strong>الذكر المختار:</strong> ${escapeHtml(s.d.t)}<br><span class="small-note">المتبقي: ${dhikrStateV3[s.key]??s.d.c} مرة</span>`:'<span class="small-note">اختر أي ذكر من القائمة ليظهر هنا مع عدد مرات قوله.</span>';
+}
+function orderedDhikrV3(cat){
+  return (ADHKAR_DATA[cat]||[]).map((d,i)=>({d,i})).sort((a,b)=>Number(!!dhikrDoneV3[cat+'::'+a.i])-Number(!!dhikrDoneV3[cat+'::'+b.i]));
+}
+function renderDhikrCardV3(cat,i,d){
+  const key=cat+'::'+i;
+  if(!(key in dhikrStateV3))dhikrStateV3[key]=d.c;
+  const remaining=Math.max(0,dhikrStateV3[key]);
+  const done=dhikrDoneV3[key]===true;
+  const selected=selectedDhikrKeyV3===key;
+  return `<div class="dhikr-item ${done?'dhikr-done':''}">
+    <div class="txt">${escapeHtml(d.t)}</div>
+    <div class="meta"><span class="src">المصدر: ${escapeHtml(d.src||'')}</span><span class="small-note">المتبقي: <strong>${remaining}</strong></span></div>
+    ${d.v?`<div class="virtue">${escapeHtml(d.v)}</div>`:''}
+    <div class="dhikr-actions">
+      <button class="btn sm outline" data-select-dhikr-v3="${escapeHtml(key)}">${selected?'✓ مختار للسبحة':'اختيار للسبحة'}</button>
+      <button class="btn sm outline" data-copy-dhikr-v3="${escapeHtml(d.t)}">نسخ</button>
+      <button class="dhikr-check ${done?'checked':''}" type="button" data-check-dhikr-v3="${escapeHtml(key)}">${done?'✓':''}</button>
+    </div>
+  </div>`;
+}
+function renderAdhkarListV3(cat){
+  const list=document.getElementById('adhkarList'); if(!list)return;
+  list.innerHTML=orderedDhikrV3(cat).map(x=>renderDhikrCardV3(cat,x.i,x.d)).join(''); bindDhikrV3(); saveDhikrV3(); syncSelectedDhikrV3();
+}
+function renderAdhkarSearchV3(q){
+  const list=document.getElementById('adhkarList'); if(!list)return; let html='';
+  Object.keys(ADHKAR_DATA).forEach(cat=>orderedDhikrV3(cat).forEach(x=>{if(x.d.t.includes(q)||(x.d.src&&x.d.src.includes(q)))html+=`<div class="small-note" style="margin-top:10px;">${escapeHtml(cat)}</div>`+renderDhikrCardV3(cat,x.i,x.d);}));
+  list.innerHTML=html||'<div class="small-note">لا توجد نتائج.</div>'; bindDhikrV3(); saveDhikrV3(); syncSelectedDhikrV3();
+}
+function bindDhikrV3(){
+  document.querySelectorAll('[data-select-dhikr-v3]').forEach(btn=>btn.addEventListener('click',()=>{
+    const key=btn.dataset.selectDhikrV3, parts=key.split('::'), cat=parts[0], idx=parseInt(parts[1]), d=ADHKAR_DATA[cat]?.[idx]; if(!d)return;
+    selectedDhikrKeyV3=key; saveJSON('mc-selected-dhikr-key',key); const autoSel=document.getElementById('tasbihSelect'); if(autoSel&&autoSel.value==='__auto__')autoSel.value=key; if(!(key in dhikrStateV3))dhikrStateV3[key]=d.c;
+    document.getElementById('tasbihCount').textContent=Math.max(0,dhikrStateV3[key]); document.getElementById('tasbihTarget').value=d.c; saveDhikrV3(); syncSelectedDhikrV3(); showToast(`تم اختيار الذكر للسبحة — المتبقي ${dhikrStateV3[key]} مرة.`);
+    renderAdhkarListV3(cat);
+  }));
+  document.querySelectorAll('[data-check-dhikr-v3]').forEach(btn=>btn.addEventListener('click',()=>{const key=btn.dataset.checkDhikrV3;dhikrDoneV3[key]=!dhikrDoneV3[key];saveDhikrV3();const cat=key.split('::')[0];renderAdhkarListV3(cat);}));
+  document.querySelectorAll('[data-copy-dhikr-v3]').forEach(btn=>btn.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(btn.dataset.copyDhikrV3);btn.textContent='تم النسخ ✓';setTimeout(()=>btn.textContent='نسخ',1200);}catch(e){}}));
+}
+// Replace the functions used by the existing category/search listeners.
+renderAdhkarList=renderAdhkarListV3; renderAdhkarSearch=renderAdhkarSearchV3;
+renderAdhkarList(document.getElementById('adhkarCategory')?.value||Object.keys(ADHKAR_DATA)[0]);
+
+// Selecting an adhkar item makes the main tasbih button count DOWN from its required repetitions.
+const tapCircleV3=document.getElementById('tapCircle');
+if(tapCircleV3)tapCircleV3.addEventListener('click',e=>{
+  const autoMode=document.getElementById('tasbihSelect')?.value==='__auto__';
+  const s=selectedDhikrObjV3(); if(!s)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  dhikrStateV3[s.key]=Math.max(0,(dhikrStateV3[s.key]??s.d.c)-1);
+  document.getElementById('tasbihCount').textContent=dhikrStateV3[s.key]; saveDhikrV3(); syncSelectedDhikrV3();
+  if(navigator.vibrate)navigator.vibrate(15); if(loadJSON('mc-sound-effects',false))playUiSound('tap');
+  if(dhikrStateV3[s.key]===0){
+    dhikrDoneV3[s.key]=true;saveDhikrV3();celebrate('أحسنت! 🎉','أتممت عدد مرات هذا الذكر.');renderAdhkarListV3(s.cat);
+    if(autoMode){
+      const list=loadJSON('mc-auto-dhikr-list',[]), pos=list.indexOf(s.key), next=list[pos+1];
+      if(next){
+        const [cat,idx]=next.split('::'), d=ADHKAR_DATA[cat]?.[parseInt(idx)];
+        if(d){selectedDhikrKeyV3=next;saveJSON('mc-selected-dhikr-key',next);if(!(next in dhikrStateV3))dhikrStateV3[next]=d.c;document.getElementById('tasbihTarget').value=d.c;document.getElementById('tasbihCount').textContent=dhikrStateV3[next];syncSelectedDhikrV3();showToast(`أحسنت! انتقلت إلى: ${d.t}`);}
+      }else if(list.length){showToast('أحسنت! أتممت قائمة الأذكار التلقائية كاملة.');}
+    }
+  }
+},true);
+
+// Initialize selected dhikr state on reload.
+const selDhikrAtLoadV3=selectedDhikrObjV3();
+if(selDhikrAtLoadV3)document.getElementById('tasbihCount').textContent=Math.max(0,dhikrStateV3[selDhikrAtLoadV3.key]??selDhikrAtLoadV3.d.c);
+syncSelectedDhikrV3();
+
+
+
+/* ===================== USER UPDATE v4 ===================== */
+/* Tajwid search */
+(function initTajwidSearchV4(){
+  const input=document.getElementById('tajwidSearchInput');
+  const clear=document.getElementById('tajwidSearchClear');
+  const section=document.getElementById('sec-tajwid');
+  if(!input||!section)return;
+  const cards=[...section.querySelectorAll('.card')].filter(c=>c!==input.closest('.card'));
+  function filter(){
+    const q=input.value.trim().toLowerCase();
+    cards.forEach(card=>{
+      if(!q){card.style.display='';return;}
+      const match=card.textContent.toLowerCase().includes(q);
+      card.style.display=match?'':'none';
+    });
+  }
+  input.addEventListener('input',filter);
+  clear.addEventListener('click',()=>{input.value='';filter();input.focus();});
+})();
+
+/* Multi-source reciter catalog:
+   Al Furqan is the primary catalog; Al Quran Cloud is a fallback/secondary catalog.
+   Audio URLs are resolved per source, with the official published bitrate information. */
+(function enhanceRecitersMultiApiV4(){
+  const primary='https://alfurqan.online/api/v1/reciters';
+  const secondary='https://api.alquran.cloud/v1/edition/format/audio';
+  function unique(list){
+    const seen=new Set(), out=[];
+    for(const r of list){
+      const key=`${(r.arabicName||r.name||r.id||'').trim().replace(/\s+/g,' ')}|${r.type||''}|${r.style||''}`;
+      if(!key||seen.has(key))continue;
+      seen.add(key); out.push(r);
+    }
+    return out;
+  }
+  async function loadSecondary(){
+    try{
+      const res=await fetch(secondary);
+      if(!res.ok)throw new Error('secondary');
+      const data=await res.json();
+      const arr=(data.data||[]).filter(x=>x.format==='audio'&&x.language==='ar'&&x.type==='versebyverse');
+      return arr.map(x=>({id:x.identifier,name:x.englishName||x.name||x.identifier,arabicName:x.name||x.englishName||x.identifier,source:'alquran',bitrate:(x.bitrate||128),type:x.type||'',style:x.type||''}));
+    }catch(e){return [];}
+  }
+  async function loadPrimary(){
+    try{
+      const res=await fetch(primary);
+      if(!res.ok)throw new Error('primary');
+      const data=await res.json();
+      return (data.reciters||[]).map(r=>({id:r.id,name:r.arabicName||r.name||r.id,arabicName:r.arabicName||r.name||r.id,source:'alfurqan'}));
+    }catch(e){return [];}
+  }
+  (async()=>{
+    const [a,b]=await Promise.all([loadPrimary(),loadSecondary()]);
+    const merged=unique([...a,...b]);
+    if(!merged.length)return;
+    // Prefer Al Furqan when the same Arabic name occurs in both sources.
+    const byName=new Map();
+    for(const r of merged){const k=r.arabicName||r.name;if(!byName.has(k)||r.source==='alfurqan')byName.set(k,r);}
+    RECITERS.length=0;
+    byName.forEach(r=>RECITERS.push(r));
+    // Explicitly remove duplicate Maher entries if a provider exposes variants with the same name.
+    const seenMaher=new Set();
+    for(let i=RECITERS.length-1;i>=0;i--){
+      if(/ماهر\s+المعيقلي/.test(RECITERS[i].name||RECITERS[i].arabicName||'')){
+        if(seenMaher.size){RECITERS.splice(i,1);} else seenMaher.add('maher');
+      }
+    }
+    populateReciterSelect();
+  })();
+
+  const old=resolveAyahAudioUrl;
+  resolveAyahAudioUrl=async function(globalNum,reciter){
+    const r=RECITERS.find(x=>x.id===reciter);
+    if(r?.source==='alfurqan') return `https://alfurqan.online/api/v1/audio/${encodeURIComponent(r.id)}/${globalNum}`;
+    if(r?.source==='alquran'){
+      const bitrate=[192,128,64,48,40,32].includes(Number(r.bitrate))?Number(r.bitrate):128;
+      return `https://cdn.islamic.network/quran/audio/${bitrate}/${encodeURIComponent(r.id)}/${globalNum}.mp3`;
+    }
+    return old(globalNum,reciter);
+  };
+})();
+
+/* Custom names for saved plans + daily plan reminders */
+(function enhancePlanNamesAndRemindersV4(){
+  // Make plan-name inputs visible whenever a plan has been generated.
+  ['wirdCalcBtn','hifzCalcBtn'].forEach(id=>{
+    const b=document.getElementById(id); if(!b)return;
+    b.addEventListener('click',()=>{},false);
+  });
+})();
+
+/* Notification action buttons in the in-site panel and OS-level service-worker notifications. */
+function notificationActionMeta(n){
+  if(n.category==='tasbih') return {label:'📿 تسبيح',section:'adhkar'};
+  if(n.category==='salawat') return {label:'💚 الصلاة على النبي ﷺ',section:'adhkar'};
+  if(n.category==='prayerTimes') return {label:'🕌 الصلاة',section:'prayer'};
+  if(n.category==='planReminders') return {label:'📚 فتح الخطة',section:'wird'};
+  return null;
+}
+function showActionableWebNotification(n){
+  if(!browserNotificationsAllowed()||!('serviceWorker' in navigator))return;
+  navigator.serviceWorker.ready.then(reg=>{
+    if(!reg?.showNotification)return;
+    const meta=notificationActionMeta(n);
+    reg.showNotification(n.title,{body:n.body,tag:n.id,dir:'rtl',lang:'ar',
+      data:{url:`./?section=${encodeURIComponent(meta?.section||'adhkar')}`},
+      actions:meta?[{action:'open-section',title:meta.label}]:[]});
+  }).catch(()=>{});
+}
+
+/* Plan reminders are generated once per day for saved plans. */
+const __buildNotificationsBeforePlans=buildNotifications;
+buildNotifications=function(){
+  const list=__buildNotificationsBeforePlans();
+  const s=notifSettings();
+  if(s.master&&s.planReminders){
+    const now=new Date();
+    const wp=loadJSON('mc-saved-wird-plans',[]);
+    const hp=loadJSON('mc-saved-hifz-plans',[]);
+    const plans=[...wp,...hp].sort((a,b)=>b.createdAt-a.createdAt);
+    if(plans.length){
+      const p=plans[0];
+      const name=p.name|| (p.type==='wird'?'خطة الورد اليومية':'خطة الحفظ والمراجعة');
+      list.push({id:`plan-reminder-${todayDateKey(now)}`,category:'planReminders',emoji:'📚',
+        title:'تذكير بخطتك',snippet:truncate(`لا تنس متابعة ${name}`,42),
+        body:`لا تنس متابعة ${name} اليوم. افتح الخطة وأكمل ما عليك من الورد أو الحفظ.`,ts:now.getTime()-4});
+    }
+  }
+  return list.sort((a,b)=>b.ts-a.ts);
+}
+
+/* Render action buttons in the in-site notification panel. */
+const __refreshNotificationsV3=refreshNotifications;
+refreshNotifications=function(){
+  __refreshNotificationsV3();
+  notifListWrap.querySelectorAll('.notif-item').forEach(el=>{
+    const id=el.dataset.id;
+    const n=buildNotifications().find(x=>x.id===id);
+    if(!n)return;
+    const meta=notificationActionMeta(n);
+    if(!meta||el.querySelector('[data-notif-action]'))return;
+    const body=el.querySelector('.ni-body');
+    if(body){
+      const b=document.createElement('button');
+      b.className='btn sm outline';
+      b.dataset.notifAction=meta.section;
+      b.style.marginTop='8px';
+      b.textContent=meta.label;
+      body.appendChild(b);
+      b.addEventListener('click',e=>{e.stopPropagation();goSection(meta.section);notifPanelEl.classList.remove('show');});
+    }
+  });
+};
+
+/* Receive service-worker clicks and route to the relevant section. */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('message',e=>{
+    if(e.data?.type==='open-section'&&e.data.section)goSection(e.data.section);
+  });
+}
+
+/* Deep-link section from a notification click. */
+(function handleNotificationSectionLink(){
+  try{
+    const sec=new URLSearchParams(location.search).get('section');
+    if(sec&&document.getElementById('sec-'+sec)) setTimeout(()=>goSection(sec),50);
+  }catch(e){}
+})();
+
+/* Add plan-reminder setting to existing sync logic safely. */
+const __syncNotifSettingsUIV4=syncNotifSettingsUI;
+syncNotifSettingsUI=function(){
+  const s=notifSettings();
+  const masterEl=document.getElementById('notifMasterSwitch');
+  if(masterEl)masterEl.checked=s.master;
+  document.querySelectorAll('.notif-type-toggle').forEach(cb=>{
+    cb.checked=s[cb.dataset.type]!==false;
+    cb.closest('.settings-row').style.opacity=s.master?'1':'.5';
+    cb.disabled=!s.master;
+  });
+};
+
+/* Automatic sequential dhikr mode */
+(function automaticDhikrModeV4(){
+  const select=document.getElementById('tasbihSelect');
+  const box=document.getElementById('autoDhikrOptions');
+  if(!select||!box)return;
+  const AUTO='__auto__';
+  // Replace the select options with manual choices + automatic mode.
+  const manual=[...select.options].filter(o=>o.value!=='__custom__');
+  select.innerHTML=manual.map(o=>o.outerHTML).join('')+
+    '<option value="__auto__">تلقائي (قائمة أذكار يختارها المستخدم)</option>'+
+    '<option value="__custom__">مخصص (اكتب ذكرك)</option>';
+  let autoList=loadJSON('mc-auto-dhikr-list',[]);
+  function keyOf(cat,i){return `${cat}::${i}`;}
+  function allItems(){
+    const out=[];
+    Object.keys(ADHKAR_DATA).forEach(cat=>ADHKAR_DATA[cat].forEach((d,i)=>out.push({cat,i,d,key:keyOf(cat,i)})));
+    return out;
+  }
+  function renderPicker(){
+    if(select.value!==AUTO){box.style.display='none';return;}
+    box.style.display='';
+    const items=allItems();
+    box.innerHTML='<div class="auto-dhikr-picker"><strong>اختر الأذكار التي تريد تكرارها بالتسلسل:</strong>'+
+      items.map(x=>`<label><input type="checkbox" data-auto-key="${escapeHtml(x.key)}" ${autoList.includes(x.key)?'checked':''}> ${escapeHtml(x.d.t)} <span class="small-note">(${x.d.c})</span></label>`).join('')+
+      '<div class="small-note" style="margin-top:8px;">سيُتبع ترتيب اختيارك، ويمكن تغييره بإلغاء الاختيار ثم إعادة اختياره.</div></div>';
+    box.querySelectorAll('[data-auto-key]').forEach(cb=>cb.addEventListener('change',()=>{
+      const k=cb.dataset.autoKey;
+      if(cb.checked){if(!autoList.includes(k))autoList.push(k);}else autoList=autoList.filter(x=>x!==k);
+      saveJSON('mc-auto-dhikr-list',autoList); syncAutoCurrent();
+    }));
+  }
+  function syncAutoCurrent(){
+    if(select.value!==AUTO){box.style.display='none';return;}
+    if(!autoList.length){box.style.display='';box.innerHTML='<div class="small-note">اختر ذكراً واحداً على الأقل من القائمة التلقائية.</div>';return;}
+    const k=autoList[0], parts=k.split('::'), d=ADHKAR_DATA[parts[0]]?.[parseInt(parts[1])];
+    if(d){selectedDhikrKeyV3=k;if(!(k in dhikrStateV3))dhikrStateV3[k]=d.c;document.getElementById('tasbihTarget').value=d.c;document.getElementById('tasbihCount').textContent=dhikrStateV3[k];syncSelectedDhikrV3();}
+  }
+  select.addEventListener('change',()=>{if(select.value===AUTO){renderPicker();syncAutoCurrent();}else box.style.display='none';});
+  // Allow each dhikr card to add/remove itself from the automatic sequence.
+  const oldRender=renderDhikrCardV3;
+  renderDhikrCardV3=function(cat,i,d){
+    const html=oldRender(cat,i,d);
+    const k=keyOf(cat,i);
+    const add=`<button class="btn sm outline" data-auto-add="${escapeHtml(k)}">${autoList.includes(k)?'✓ ضمن التلقائي':'إضافة للتلقائي'}</button>`;
+    return html.replace('</div></div>','</div>'+add+'</div>');
+  };
+  const oldBind=bindDhikrV3;
+  bindDhikrV3=function(){
+    oldBind();
+    document.querySelectorAll('[data-auto-add]').forEach(btn=>btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const k=btn.dataset.autoAdd;
+      if(autoList.includes(k))autoList=autoList.filter(x=>x!==k);else autoList.push(k);
+      saveJSON('mc-auto-dhikr-list',autoList);
+      renderAdhkarListV3(k.split('::')[0]);
+      if(select.value===AUTO)renderPicker();
+    }));
+  };
+  // Extend the existing tap behavior by changing the mode before the original handler resolves the selected key.
+  const tap=document.getElementById('tapCircle');
+  if(tap){
+    tap.addEventListener('click',()=>{
+      if(select.value!==AUTO)return;
+      if(!autoList.length){showToast('اختر أذكاراً أولاً للقائمة التلقائية.');return;}
+      const s=selectedDhikrObjV3();
+      if(s&&dhikrStateV3[s.key]===0){
+        const pos=autoList.indexOf(s.key), next=autoList[pos+1];
+        if(next){
+          const [cat,idx]=next.split('::'); const d=ADHKAR_DATA[cat]?.[parseInt(idx)];
+          selectedDhikrKeyV3=next; if(!(next in dhikrStateV3))dhikrStateV3[next]=d.c;
+          saveJSON('mc-selected-dhikr-key',next); document.getElementById('tasbihTarget').value=d.c; document.getElementById('tasbihCount').textContent=dhikrStateV3[next]; syncSelectedDhikrV3();
+          showToast(`أحسنت! اكتمل الذكر، والآن: ${d.t}`);
+        }else{
+          showToast('أحسنت! أتممت قائمة الأذكار التلقائية كاملة.');
+        }
+      }
+    },true);
+  }
+  if(select.value===AUTO){renderPicker();syncAutoCurrent();}
+})();
+
+/* Daily reminder Web notifications while the page is open; background Push still requires a server/VAPID subscription. */
+let __lastReminderNotificationId=loadJSON('mc-last-reminder-notification',null);
+const __oldRefreshV4=refreshNotifications;
+refreshNotifications=function(){
+  __oldRefreshV4();
+  const list=buildNotifications();
+  const candidates=list.filter(n=>['tasbih','salawat','planReminders'].includes(n.category));
+  const candidate=candidates[0];
+  if(candidate&&candidate.id!==__lastReminderNotificationId){
+    showActionableWebNotification(candidate);
+    __lastReminderNotificationId=candidate.id;
+    saveJSON('mc-last-reminder-notification',candidate.id);
+  }
+};
 
 })();
 </script>
