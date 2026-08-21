@@ -260,6 +260,8 @@ html[data-theme="dark"] .badge.daif{background:#3b1414; color:#e08a8a;}
 .hero .tafsir-toggle{position:relative; z-index:1; margin-top:10px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); color:#fff; padding:6px 14px; border-radius:999px; font-size:12.5px;}
 .hero .mini-tafsir{display:none; position:relative; z-index:1; margin-top:10px; background:#2e8c7b; border-radius:10px; padding:12px; font-size:13.5px; line-height:1.9; color:#fff;}
 .hero .mini-tafsir.show{display:block;}
+/* مسافة واضحة بين زر تفسير آية اليوم وعنوان حديث اليوم */
+.hero .home-hadith-title{margin-top:28px !important;}
 .hero .hadith-box{
   background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); border-radius:14px;
   margin-top:14px; padding:20px; font-size:15px; line-height:2; position:relative; z-index:1;
@@ -731,7 +733,7 @@ footer.site{
       <button class="tafsir-toggle" id="ayahTafsirToggle">عرض التفسير</button>
       <div class="mini-tafsir" id="ayahTafsirBox"></div>
 
-      <div class="badge" style="background:rgba(255,255,255,.2); color:#fff; margin-top:0; display:block; width:fit-content;">حديث اليوم</div>
+      <div class="badge home-hadith-title" style="background:rgba(255,255,255,.2); color:#fff; display:block; width:fit-content;">حديث اليوم</div>
       <div class="hadith-box" id="hadithOfDay">جاري التحميل...</div>
       <button class="tafsir-toggle" id="hadithExplainToggle">عرض الشرح</button>
       <div class="hadith-explain" id="hadithExplainBox"></div>
