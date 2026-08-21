@@ -409,14 +409,70 @@ html[data-theme="dark"] .time-card .t{color:var(--accent);}
 
 .qibla-wrap{display:flex; flex-direction:column; align-items:center; gap:12px;}
 .qibla-dial{
-  width:220px; height:220px; border-radius:50%; border:3px solid var(--border); position:relative;
-  background:var(--bg); display:flex; align-items:center; justify-content:center;
+  --dial-bg:var(--bg); --dial-border:var(--border); --dial-ring:var(--primary);
+  --needle-top:var(--accent); --needle-bottom:var(--primary); --kaaba-bg:var(--text); --pointer-color:var(--danger);
+  width:220px; height:220px; border-radius:50%; border:3px solid var(--dial-border); position:relative;
+  background:var(--dial-bg); box-shadow:0 8px 22px var(--shadow);
+  transition:background .3s ease, border-color .3s ease;
 }
-.qibla-dial .n-label{position:absolute; top:8px; font-size:12px; color:var(--text-soft); font-weight:700;}
-.qibla-needle{width:6px; height:90px; background:linear-gradient(var(--accent), var(--primary)); border-radius:6px; transform-origin:bottom center; position:absolute; bottom:50%;}
-.qibla-needle::before{content:"◆"; position:absolute; top:-14px; right:-8px; color:var(--accent); font-size:16px;}
-.qibla-kaaba{width:16px;height:16px; background:var(--text); border-radius:3px;}
-html[data-theme="dark"] .qibla-kaaba{background:var(--accent);}
+html[data-theme="dark"] .qibla-dial{--kaaba-bg:var(--accent);}
+.qibla-dial::before{ /* faint tick ring so rotation is visible even without labels */
+  content:""; position:absolute; inset:9px; border-radius:50%; pointer-events:none;
+  background-image:repeating-conic-gradient(var(--dial-ring) 0deg 1.4deg, transparent 1.4deg 30deg);
+  opacity:.3;
+  -webkit-mask:radial-gradient(circle, transparent 60%, #000 61%, #000 67%, transparent 68%);
+          mask:radial-gradient(circle, transparent 60%, #000 61%, #000 67%, transparent 68%);
+}
+.qibla-dial.aligned{--pointer-color:var(--success);}
+/* Fixed pointer: marks "the top of your phone" — does NOT rotate. Align the needle to it. */
+.qibla-pointer{
+  position:absolute; top:-3px; left:50%; transform:translateX(-50%); z-index:3;
+  width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent;
+  border-bottom:13px solid var(--pointer-color); transition:border-bottom-color .2s ease;
+  filter:drop-shadow(0 2px 3px var(--shadow));
+}
+/* Rotating rose: holds the cardinal letters + the needle, so N/E/S/W stay geographically correct */
+.qibla-rose{position:absolute; inset:0; transition:transform .05s linear;}
+.qibla-rose .dir-label{position:absolute; font-size:12px; font-weight:800; color:var(--text-soft);}
+.qibla-rose .dir-n{top:9px; left:50%; transform:translateX(-50%); color:var(--primary);}
+html[data-theme="dark"] .qibla-rose .dir-n{color:var(--accent);}
+.qibla-rose .dir-e{top:50%; right:9px; transform:translateY(-50%);}
+.qibla-rose .dir-s{bottom:9px; left:50%; transform:translateX(-50%);}
+.qibla-rose .dir-w{top:50%; left:9px; transform:translateY(-50%);}
+.qibla-needle{
+  position:absolute; bottom:50%; left:50%; width:6px; height:88px; margin-left:-3px;
+  background:linear-gradient(var(--needle-top), var(--needle-bottom)); border-radius:6px;
+  transform-origin:bottom center; z-index:2; transition:background .2s ease;
+}
+.qibla-needle::before{content:"◆"; position:absolute; top:-14px; right:-8px; color:var(--needle-top); font-size:16px;}
+.qibla-kaaba{
+  position:absolute; top:-24px; left:50%; transform:translateX(-50%);
+  width:16px; height:16px; background:var(--kaaba-bg); border-radius:3px;
+  display:flex; align-items:center; justify-content:center; font-size:10px;
+}
+.qibla-accuracy-note{font-size:12px; color:var(--accent-dark); display:none;}
+html[data-theme="dark"] .qibla-accuracy-note{color:var(--accent);}
+.qibla-accuracy-note.show{display:block;}
+
+/* ---- Compass skins (chosen from Settings, applied only to the qibla dial) ---- */
+.qibla-dial[data-skin="modern"]{
+  --dial-bg:var(--card); --dial-ring:var(--text-soft); --needle-top:#1e90ff; --needle-bottom:var(--text-soft);
+  border-width:1px;
+}
+.qibla-dial[data-skin="modern"]::before{opacity:.16;}
+.qibla-dial[data-skin="gold"]{
+  --dial-bg:#241a06; --dial-border:var(--accent); --dial-ring:var(--accent);
+  --needle-top:#ffe08a; --needle-bottom:var(--accent-dark); --kaaba-bg:#161005; border-width:4px;
+}
+.qibla-dial[data-skin="gold"] .dir-label{color:#f3d789;}
+.qibla-dial[data-skin="gold"] .dir-n{color:#ffe08a;}
+.qibla-dial[data-skin="night"]{
+  --dial-bg:#03070c; --dial-border:#123047; --dial-ring:#1c3b52;
+  --needle-top:#79f2ff; --needle-bottom:#0d6a86; --kaaba-bg:#79f2ff;
+}
+.qibla-dial[data-skin="night"] .dir-label{color:#7fb8d6;}
+.qibla-dial[data-skin="night"] .dir-n{color:#79f2ff;}
+.qibla-dial[data-skin="night"] .qibla-needle::before{color:#79f2ff;}
 
 .cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
 .cal-months{display:grid;grid-template-columns:1fr;gap:12px;width:100%;min-width:0;}
@@ -1041,10 +1097,17 @@ footer.site{
       <h3>بوصلة اتجاه القبلة</h3>
       <div class="qibla-wrap">
         <div class="qibla-dial" id="qiblaDial">
-          <span class="n-label">N</span>
-          <div class="qibla-needle" id="qiblaNeedle"><div class="qibla-kaaba"></div></div>
+          <div class="qibla-pointer"></div>
+          <div class="qibla-rose" id="qiblaRose">
+            <span class="dir-label dir-n">N</span>
+            <span class="dir-label dir-e">E</span>
+            <span class="dir-label dir-s">S</span>
+            <span class="dir-label dir-w">W</span>
+            <div class="qibla-needle" id="qiblaNeedle"><div class="qibla-kaaba">🕋</div></div>
+          </div>
         </div>
         <div id="qiblaInfo" class="small-note">فعّل الموقع وحساس الاتجاه لعرض البوصلة.</div>
+        <div id="qiblaAccuracyNote" class="qibla-accuracy-note">دقة البوصلة منخفضة، حرّك هاتفك على شكل رقم 8 للمعايرة.</div>
         <button class="btn outline" id="enableCompassBtn">تفعيل البوصلة</button>
       </div>
     </div>
@@ -1305,6 +1368,23 @@ footer.site{
       </div>
     </div>
 
+    <div class="card" style="margin-top:18px;">
+      <h3>تخصيص مظهر البوصلة</h3>
+      <div class="settings-row">
+        <div>
+          <div class="lbl">مظهر بوصلة القبلة</div>
+          <div class="desc">اختر شكل بوصلة اتجاه القبلة الظاهرة في قسم "الصلاة والقبلة والتقويم". يُحفظ اختيارك تلقائياً.</div>
+        </div>
+        <select id="compassSkinSelect" class="btn outline sm" style="width:auto; min-width:170px; flex:0 0 auto;">
+          <option value="classic">كلاسيكي</option>
+          <option value="modern">عصري</option>
+          <option value="gold">ذهبي فاخر</option>
+          <option value="night">ليلي متوهج</option>
+        </select>
+      </div>
+      <button class="btn outline sm" id="resetCompassSkinBtn" style="margin-top:6px;">إعادة تعيين مظهر البوصلة للوضع الافتراضي</button>
+    </div>
+
     <div class="card settings-danger-card" style="margin-top:18px;">
       <h3>إعادة ضبط الإعدادات</h3>
       <p class="small-note">يعيد إعدادات الموقع وعداد التسبيح وترتيب الأقسام والتفضيلات إلى القيم الافتراضية. لا يحذف الخطط أو الآيات أو الأحاديث المحفوظة.</p>
@@ -1448,9 +1528,10 @@ footer.site{
         <h4><span class="ic">🛠️</span> إعدادات الإشعارات</h4>
         <p>من قسم "الإعدادات" ← "الإشعارات" يمكنك تشغيل أو إيقاف كل الإشعارات دفعة واحدة بمفتاح رئيسي، أو التحكم بكل نوع على حدة (أوقات الصلاة، بريد الجمعة، بريد رمضان، بريد الأشهر الحرم، صيام النوافل، تذكير التسبيح، وتذكير الصلاة على النبي ﷺ).</p>
       </div>
-      <div class="help-item" data-kw="بوصلة قبلة اتجاه">
+      <div class="help-item" data-kw="بوصلة قبلة اتجاه معايرة مظهر تخصيص">
         <h4><span class="ic">🧭</span> البوصلة</h4>
-        <p>من قسم "الصلاة والقبلة والتقويم" فعّل البوصلة ليعرض الموقع اتجاه القبلة مباشرة بالاعتماد على حساس الاتجاه في جهازك وموقعك الجغرافي.</p>
+        <p>من قسم "الصلاة والقبلة والتقويم" اضغط "تفعيل البوصلة" للسماح بالوصول إلى الموقع وحساس الاتجاه؛ يظهر سهم داخل دائرة تدور معه حروف الجهات (N/E/S/W) لتبقى مطابقة للواقع، ودُر بجهازك حتى يتطابق السهم مع المؤشر الثابت أعلى الدائرة — عندها يتحول لونه إلى الأخضر إشارةً إلى أنك متجه نحو القبلة. إن ظهرت رسالة عن ضعف الدقة، حرّك هاتفك على شكل رقم 8 في الهواء لمعايرة الحساس ثم أعد المحاولة.</p>
+        <p style="margin-top:8px;">لتغيير شكل البوصلة، اذهب إلى "الإعدادات" ← "تخصيص مظهر البوصلة" واختر من القائمة المنسدلة أحد المظاهر (كلاسيكي، عصري، ذهبي فاخر، ليلي متوهج)، ويُطبَّق فوراً ويُحفظ لزياراتك القادمة. ولإرجاع مظهر البوصلة وحده إلى الوضع الافتراضي دون التأثير على بقية الإعدادات، استخدم زر "إعادة تعيين مظهر البوصلة للوضع الافتراضي" أسفل قائمة الاختيار مباشرة.</p>
       </div>
       <div class="help-item" data-kw="فارق تعديل مواقيت الصلاة تقديم تأخير">
         <h4><span class="ic">⏱️</span> فارق يدوي لمواقيت الصلاة</h4>
@@ -3266,7 +3347,12 @@ async function loadPrayerTimes(){
   navigator.geolocation.getCurrentPosition(async pos=>{
     userCoords = {lat:pos.coords.latitude, lng:pos.coords.longitude};
     label.textContent = `الموقع: ${userCoords.lat.toFixed(2)}, ${userCoords.lng.toFixed(2)}`;
-    document.getElementById('qiblaInfo').textContent = 'الموقع جاهز، اضغط "تفعيل البوصلة" للسماح بالوصول لحساس الاتجاه.';
+    // Keep the qibla bearing correct if the location is refreshed while the compass is already running.
+    if(typeof compassActive!=='undefined' && compassActive && typeof updateQiblaBearing==='function'){
+      updateQiblaBearing();
+    } else {
+      document.getElementById('qiblaInfo').textContent = 'الموقع جاهز، اضغط "تفعيل البوصلة" للسماح بالوصول لحساس الاتجاه.';
+    }
     try{
       const ts = Math.floor(Date.now()/1000);
       const res = await fetch(`https://api.aladhan.com/v1/timings/${ts}?latitude=${userCoords.lat}&longitude=${userCoords.lng}&method=3`);
@@ -3300,15 +3386,34 @@ function computeQiblaBearing(lat,lng){
   let brng = toDeg(Math.atan2(y,x));
   return (brng+360)%360;
 }
+function compassDirectionLabel(deg){
+  const dirs=['الشمال','الشمال الشرقي','الشرق','الجنوب الشرقي','الجنوب','الجنوب الغربي','الغرب','الشمال الغربي'];
+  return dirs[Math.round(((deg%360)+360)%360/45)%8];
+}
 let qiblaBearing = null;
 let compassActive = false;
 let usingAbsoluteEvent = false; // once 'deviceorientationabsolute' fires, stop trusting plain 'deviceorientation'
                                   // to avoid Android firing both and causing jittery double-updates
 let smoothedHeading = null;
-let needleRotationAccum = 0; // continuously-increasing rotation value so the CSS transform never "spins the long way"
+let roseRotationAccum = 0; // continuously-increasing rotation value so the CSS transform never "spins the long way"
 
 function shortestAngleDelta(from, to){
   return ((to - from + 540) % 360) - 180;
+}
+function getScreenAngle(){
+  // Compensates for the device being locked into landscape, which otherwise
+  // offsets the raw compass reading on most non-iOS browsers.
+  if(screen.orientation && typeof screen.orientation.angle === 'number') return screen.orientation.angle;
+  if(typeof window.orientation === 'number') return window.orientation;
+  return 0;
+}
+function updateQiblaBearing(){
+  if(!userCoords) return;
+  qiblaBearing = computeQiblaBearing(userCoords.lat, userCoords.lng);
+  const needle = document.getElementById('qiblaNeedle');
+  // The needle's own rotation is fixed at the qibla bearing; the rose around it
+  // rotates with the device so the needle always ends up pointing at the Kaaba.
+  if(needle) needle.style.transform = `rotate(${qiblaBearing}deg)`;
 }
 function updateNeedle(heading){
   if(qiblaBearing===null) return;
@@ -3316,50 +3421,99 @@ function updateNeedle(heading){
   // without slowing down iOS, which was already stable).
   smoothedHeading = smoothedHeading===null ? heading : smoothedHeading + shortestAngleDelta(smoothedHeading, heading) * 0.18;
   smoothedHeading = (smoothedHeading + 360) % 360;
-  const target = (qiblaBearing - smoothedHeading + 360) % 360;
-  needleRotationAccum += shortestAngleDelta(needleRotationAccum % 360, target);
-  const needle = document.getElementById('qiblaNeedle');
-  needle.style.transform = `rotate(${needleRotationAccum}deg)`;
+  // Rotate the whole rose (N/E/S/W labels + needle together) opposite to the
+  // device heading, so the cardinal letters stay geographically correct — a
+  // real compass rose — while the needle (fixed inside the rose at qiblaBearing)
+  // always ends up pointing at the actual Kaaba direction.
+  const target = (360 - smoothedHeading) % 360;
+  roseRotationAccum += shortestAngleDelta(roseRotationAccum % 360, target);
+  const rose = document.getElementById('qiblaRose');
+  if(rose) rose.style.transform = `rotate(${roseRotationAccum}deg)`;
+
+  const dial = document.getElementById('qiblaDial');
+  const delta = Math.abs(shortestAngleDelta(smoothedHeading, qiblaBearing));
+  const aligned = delta <= 5;
+  if(dial) dial.classList.toggle('aligned', aligned);
+  const info = document.getElementById('qiblaInfo');
+  if(info){
+    info.textContent = aligned
+      ? `أنت الآن متجه نحو القبلة تقريباً ✅ (${Math.round(qiblaBearing)}° من الشمال)`
+      : `اتجاه القبلة: ${Math.round(qiblaBearing)}° من الشمال، نحو ${compassDirectionLabel(qiblaBearing)} — دُر بجهازك حتى يتطابق السهم مع المؤشر أعلى الدائرة.`;
+  }
 }
+let lastAccuracyWarnAt = 0;
 function handleOrientation(e, isAbsolute){
   let heading;
+  const accNote = document.getElementById('qiblaAccuracyNote');
   if(typeof e.webkitCompassHeading === 'number'){
     heading = e.webkitCompassHeading; // iOS: already clockwise from North, no inversion needed
+    const lowAccuracy = typeof e.webkitCompassAccuracy === 'number' && (e.webkitCompassAccuracy < 0 || e.webkitCompassAccuracy > 20);
+    if(accNote) accNote.classList.toggle('show', lowAccuracy);
   } else if(e.alpha !== null){
-    if(isAbsolute) usingAbsoluteEvent = true;
-    if(!isAbsolute && usingAbsoluteEvent) return; // an absolute reading is available elsewhere; ignore the relative one
-    heading = (360 - e.alpha) % 360; // absolute alpha is counter-clockwise from North
+    if(isAbsolute || e.absolute === true) usingAbsoluteEvent = true;
+    if(!(isAbsolute || e.absolute === true) && usingAbsoluteEvent) return; // an absolute reading is available elsewhere; ignore the relative one
+    heading = (360 - e.alpha + getScreenAngle()) % 360; // absolute alpha is counter-clockwise from North, plus screen-rotation compensation
   } else {
     return;
   }
   updateNeedle(heading);
-  document.getElementById('qiblaInfo').textContent = `اتجاه القبلة: ${Math.round(qiblaBearing)}° من الشمال — وجّه الجزء العلوي من هاتفك ليتطابق مع السهم.`;
 }
 document.getElementById('enableCompassBtn').addEventListener('click', async ()=>{
   if(!userCoords){
     document.getElementById('qiblaInfo').textContent = 'يرجى السماح بتحديد الموقع أولاً.';
     return;
   }
-  qiblaBearing = computeQiblaBearing(userCoords.lat, userCoords.lng);
+  updateQiblaBearing();
   if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
     try{
       const perm = await DeviceOrientationEvent.requestPermission();
       if(perm !== 'granted'){
-        document.getElementById('qiblaInfo').textContent = 'تم رفض إذن الوصول لحساس الاتجاه.';
+        document.getElementById('qiblaInfo').textContent = 'تم رفض إذن الوصول لحساس الاتجاه. يمكنك السماح به لاحقاً من إعدادات المتصفح.';
         return;
       }
     }catch(e){
       document.getElementById('qiblaInfo').textContent = 'تعذر طلب إذن حساس الاتجاه على هذا الجهاز.';
       return;
     }
+  } else if(!('DeviceOrientationEvent' in window)){
+    document.getElementById('qiblaInfo').textContent = `هذا الجهاز/المتصفح لا يدعم حساس الاتجاه. اتجاه القبلة المحسوب: ${Math.round(qiblaBearing)}° من الشمال، نحو ${compassDirectionLabel(qiblaBearing)}.`;
+    return;
   }
   if(!compassActive){
     window.addEventListener('deviceorientationabsolute', e=>handleOrientation(e, true), true);
     window.addEventListener('deviceorientation', e=>handleOrientation(e, false), true);
+    window.addEventListener('orientationchange', ()=>{ if(smoothedHeading!==null) updateNeedle(smoothedHeading); });
     compassActive = true;
   }
-  document.getElementById('qiblaInfo').textContent = `اتجاه القبلة: ${Math.round(qiblaBearing)}° من الشمال. حرّك هاتفك أفقياً لمعايرة البوصلة.`;
+  document.getElementById('qiblaInfo').textContent = `اتجاه القبلة: ${Math.round(qiblaBearing)}° من الشمال. حرّك هاتفك على شكل رقم 8 لمعايرة البوصلة، ثم دُر به حتى يتطابق السهم مع المؤشر العلوي.`;
 });
+
+/* ---------- Compass skins (visual presets for the qibla dial only) ---------- */
+const COMPASS_SKIN_DEFAULT = 'classic';
+function applyCompassSkin(skin){
+  const dial = document.getElementById('qiblaDial');
+  if(dial) dial.dataset.skin = skin;
+  const sel = document.getElementById('compassSkinSelect');
+  if(sel) sel.value = skin;
+}
+let compassSkin = loadJSON('mc-compass-skin', COMPASS_SKIN_DEFAULT);
+applyCompassSkin(compassSkin);
+const compassSkinSelectV1 = document.getElementById('compassSkinSelect');
+if(compassSkinSelectV1){
+  compassSkinSelectV1.addEventListener('change', ()=>{
+    compassSkin = compassSkinSelectV1.value;
+    saveJSON('mc-compass-skin', compassSkin);
+    applyCompassSkin(compassSkin);
+  });
+}
+const resetCompassSkinBtnV1 = document.getElementById('resetCompassSkinBtn');
+if(resetCompassSkinBtnV1){
+  resetCompassSkinBtnV1.addEventListener('click', ()=>{
+    compassSkin = COMPASS_SKIN_DEFAULT;
+    saveJSON('mc-compass-skin', compassSkin);
+    applyCompassSkin(compassSkin);
+  });
+}
 
 /* ============================================================
    HIJRI CALENDAR - computed locally (no external dependency)
