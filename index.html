@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>المسلم الشامل</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
 /* ===================== Design Tokens ===================== */
 :root{
@@ -79,6 +79,7 @@ button{font-family:'Tajawal',sans-serif; cursor:pointer;}
 .star-divider{display:flex; align-items:center; justify-content:center; gap:14px; margin:34px 0;}
 .star-divider svg{width:22px; height:22px; fill:var(--accent);}
 .star-divider .line{flex:1; max-width:180px; height:1px; background:linear-gradient(90deg, transparent, var(--border), transparent);}
+.home-day-divider{margin:26px 0 18px;} .home-day-divider svg{width:18px;height:18px;flex:0 0 auto;}
 
 /* ===================== Back-to-encyclopedia button (static, footer, under the copyright line) ===================== */
 #backHome{
@@ -174,14 +175,14 @@ header.site{
 .brand small{display:block; color:var(--text-soft); font-size:11px; font-weight:400;}
 
 .tabs-wrap{position:relative; max-width:var(--container-max); margin:0 auto;}
-.tabs-wrap::before,.tabs-wrap::after{
-  content:""; position:absolute; top:0; bottom:10px; width:34px; pointer-events:none; z-index:2;
+/* RTL horizontal-scroll hint: the fade lives on the LEFT edge only, indicating more tabs are hidden there. */
+.tabs-wrap::after{
+  content:""; position:absolute; top:0; bottom:10px; left:0; width:58px; pointer-events:none; z-index:3;
+  background:linear-gradient(to right, var(--bg-alt) 0%, rgba(15,29,26,.72) 35%, transparent 100%);
   transition:opacity .2s ease;
 }
-.tabs-wrap::before{right:0; background:linear-gradient(to left, var(--bg-alt), transparent);}
-.tabs-wrap::after{left:0; background:linear-gradient(to right, var(--bg-alt), transparent);}
-.tabs-wrap.at-start::before{opacity:0;}
-.tabs-wrap.at-end::after{opacity:0;}
+.tabs-wrap.at-left::after{opacity:0;}
+.tabs-wrap.no-overflow::after{opacity:0;}
 nav.tabs{
   max-width:var(--container-max); margin:0 auto;
   display:flex; gap:6px; overflow-x:auto; padding-bottom:10px;
@@ -195,7 +196,6 @@ nav.tabs button{
   transition:all .2s ease;
 }
 nav.tabs button.active{background:var(--primary); color:#fff; box-shadow:-4px 3px 10px var(--shadow); position:relative;}
-nav.tabs button.active::after{content:"";position:absolute;left:8px;bottom:4px;width:18px;height:2px;border-radius:2px;background:var(--accent);opacity:.9;}
 .auto-dhikr-picker{margin-top:8px;padding:10px;border:1px dashed var(--border);border-radius:12px;background:var(--bg);}
 .auto-dhikr-picker label{display:flex;align-items:center;gap:8px;margin:6px 0;color:var(--text);}
 .auto-dhikr-picker input{width:auto;}
@@ -264,10 +264,6 @@ html[data-theme="dark"] .badge.daif{background:#3b1414; color:#e08a8a;}
 }
 .hero .hadith-explain{display:none; position:relative; z-index:1; margin-top:10px; background:#2e8c7b; border-radius:10px; padding:12px; font-size:13.5px; line-height:1.9; color:#fff;}
 .hero .hadith-explain.show{display:block;}
-.quick-links{margin-top:24px;}
-.quick-links .grid{grid-template-columns:repeat(5,1fr);}
-@media(max-width:1000px){.quick-links .grid{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:640px){.quick-links .grid{grid-template-columns:repeat(2,1fr);}}
 .ql-card{
   display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;
   padding:22px 12px; cursor:pointer;
@@ -299,7 +295,8 @@ html[data-theme="dark"] .ql-card svg{fill:var(--accent);}
   max-width:760px; margin:0 auto; padding:22px 26px; border:1px solid var(--border);
   border-radius:14px; background:var(--bg);
 }
-.basmala{font-family:'Amiri',serif; text-align:center; font-size:22px; padding:6px 0 10px; color:var(--accent); font-weight:700;}
+.basmala{font-family:'Amiri Quran','Amiri',serif; text-align:center; font-size:22px; padding:6px 0 10px; color:#fff; font-weight:700;}
+.ayah-divine-name{font-family:'Amiri Quran','Amiri',serif;}
 .basmala.basmala-sub{font-size:22px; padding:0 0 18px; color:var(--primary); font-weight:400;}
 html[data-theme="dark"] .basmala.basmala-sub{color:var(--text);}
 .waqf-muanaqah{color:var(--danger); background:rgba(179,69,47,.14); border-radius:4px; padding:0 2px; cursor:help; font-weight:700;}
@@ -636,7 +633,7 @@ footer.site{
       </div>
     </div>
   </div>
-  <div class="tabs-wrap at-start" id="tabsWrap">
+  <div class="tabs-wrap" id="tabsWrap">
   <nav class="tabs" id="tabs">
     <button data-sec="home" class="active">الرئيسية</button>
     <button data-sec="quran">القرآن الكريم</button>
@@ -665,25 +662,17 @@ footer.site{
       <button class="tafsir-toggle" id="ayahTafsirToggle">عرض التفسير</button>
       <div class="mini-tafsir" id="ayahTafsirBox"></div>
 
-      <div class="badge" style="background:rgba(255,255,255,.2); color:#fff; margin-top:16px; display:block; width:fit-content;">حديث اليوم</div>
+      <div class="badge" style="background:rgba(255,255,255,.2); color:#fff; margin-top:0; display:block; width:fit-content;">حديث اليوم</div>
       <div class="hadith-box" id="hadithOfDay">جاري التحميل...</div>
       <button class="tafsir-toggle" id="hadithExplainToggle">عرض الشرح</button>
       <div class="hadith-explain" id="hadithExplainBox"></div>
     </div>
 
-    <div class="quick-links">
-      <div class="star-divider"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
-      <div class="grid">
-        <div class="card ql-card" data-sec="quran"><svg viewBox="0 0 24 24"><path d="M4 4h9a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3z"/><path d="M20 4v13a3 3 0 0 1-3 3"/></svg><div>القرآن والتفسير</div></div>
-        <div class="card ql-card" data-sec="tajwid"><svg viewBox="0 0 24 24"><path d="M4 5a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1zm0 6a1 1 0 0 1 1-1h10a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1zm0 6a1 1 0 0 1 1-1h14a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1z"/></svg><div>أحكام التجويد</div></div>
-        <div class="card ql-card" data-sec="hadith"><svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg><div>الأحاديث النبوية</div></div>
-        <div class="card ql-card" data-sec="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.7 7.7 0 0 0 0-2l2-1.6-2-3.5-2.4 1a7.8 7.8 0 0 0-1.7-1L15 3h-4l-.3 2.9a7.8 7.8 0 0 0-1.7 1l-2.4-1-2 3.5L6.6 11a7.7 7.7 0 0 0 0 2l-2 1.6 2 3.5 2.4-1a7.8 7.8 0 0 0 1.7 1L11 21h4l.3-2.9a7.8 7.8 0 0 0 1.7-1l2.4 1 2-3.5z"/></svg><div>الإعدادات</div></div>
-        <div class="card ql-card" data-sec="help"><svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16z"/><path d="M9.8 9.2a2.4 2.4 0 1 1 3.4 2.2c-.9.5-1.2.9-1.2 1.9h-1.6c0-1.5.5-2.1 1.5-2.7a1 1 0 1 0-1.4-.9z"/><circle cx="12" cy="16.3" r="0.9"/></svg><div>المساعدة وكيفية الاستخدام</div></div>
-      </div>
-    </div>
+    <div class="star-divider home-day-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
+
     <div class="card quick-access">
       <h3 style="margin-bottom:6px;">الوصول السريع</h3>
-      <p class="small-note">اختصارات لأكثر الأقسام استخداماً، دون استبدال شريط التنقل العلوي.</p>
+      <p class="small-note">اختصارات سريعة لأكثر الأقسام استخداماً، بينما يبقى شريط التنقل العلوي مخصصاً للتنقل بين جميع الأقسام.</p>
       <div class="quick-access-grid">
         <div class="quick-access-item" data-sec="quran">📖<br>القرآن</div>
         <div class="quick-access-item" data-sec="adhkar">📿<br>الأذكار والتسبيح</div>
@@ -1361,6 +1350,14 @@ footer.site{
         <h4><span class="ic">📅</span> عرض عدة أشهر في التقويم</h4>
         <p>على الشاشات الكبيرة يعرض التقويم ثلاثة أشهر معاً لاستغلال المساحة، بينما يقل العدد تلقائياً على الشاشات الأصغر حتى تبقى القراءة مريحة.</p>
       </div>
+      <div class="help-item" data-kw="التلاشي الشريط العلوي تمرير الأقسام Scroll Fade">
+        <h4><span class="ic">↔️</span> تلاشي شريط الأقسام</h4>
+        <p>عند وجود أقسام مخفية في شريط التنقل الأفقي يظهر تلاشي لطيف عند الجهة اليسرى ليشير إلى إمكانية تمرير الشريط نحو اليسار.</p>
+      </div>
+      <div class="help-item" data-kw="خط عثماني أسماء الله الحسنى الآيات">
+        <h4><span class="ic">📖</span> الآيات التي ورد فيها اسم من أسماء الله الحسنى</h4>
+        <p>تُعرض هذه الآيات بخط قرآني مخصص (Amiri Quran) مع بقاء نص الآية وتشكيلها كما هو.</p>
+      </div>
       <div class="help-item" data-kw="بحث القرآن نطاق سطر واحد">
         <h4><span class="ic">🔎</span> بحث القرآن بشكل أسرع</h4>
         <p>حقل البحث ونطاق البحث وزر البحث تظهر معاً في صف واحد على الشاشات الواسعة لتوفير المساحة.</p>
@@ -1403,7 +1400,7 @@ footer.site{
       </div>
       <div class="help-item" data-kw="الأذكار السبحة اختيار الذكر عدد المرات إكمال علامة صح">
         <h4><span class="ic">📿</span> اختيار الذكر للسبحة</h4>
-        <p>من قائمة الأذكار اضغط «اختيار للسبحة» لنقل الذكر وعدد مرات قوله إلى عداد التسبيح. عند الضغط على زر التسبيح ينقص العدد المتبقي حتى يصل إلى الصفر، ثم يُنقل الذكر إلى نهاية قائمته ويُخفّف مظهره وتظهر بجانبه علامة صح. يمكنك وضع العلامة أو إزالتها يدوياً.</p>
+        <p>من قائمة الأذكار اضغط «اختيار للسبحة» لنقل الذكر وعدد مرات قوله إلى عداد التسبيح. عند الضغط على زر التسبيح ينقص العدد المتبقي حتى يصل إلى الصفر، ثم يُنقل الذكر إلى نهاية قائمته ويُخفّف مظهره وتظهر بجانبه علامة صح. إزالة علامة الصح تعيد العدد الافتراضي، ووضعها يجعل المتبقي صفراً. تُعاد أعداد الأذكار يومياً، وفي الوضع التلقائي ينتقل الموقع إلى الذكر التالي بعد انتهاء مؤثرات الاحتفال.</p>
       </div>
       <div class="help-item" data-kw="إعادة الإعدادات الافتراضي تأكيد">
         <h4><span class="ic">♻️</span> إعادة تعيين الإعدادات</h4>
@@ -1420,6 +1417,7 @@ footer.site{
       <div class="help-item" data-kw="بريد الجمعة سنن">
         <h4><span class="ic">🕌</span> بريد الجمعة</h4>
         <p>إشعار يظهر تلقائياً كل يوم جمعة يذكّرك بالسنن والأعمال المستحبة في هذا اليوم الفضيل، ويختفي تلقائياً عند دخول المغرب إيذاناً بانتهاء يوم الجمعة.</p>
+      <div class="help-item" data-kw="صيام النوافل السحور اليوم السابق الفجر"><h4><span class="ic">🌾</span> تذكير صيام النوافل</h4><p>يظهر تذكير صيام النافلة من اليوم السابق حتى أذان الفجر في يوم الصيام، حتى تتمكن من الاستعداد للسحور، ثم يختفي بعد دخول الفجر.</p></div>
       </div>
       <div class="help-item" data-kw="بريد رمضان دعاء يومي">
         <h4><span class="ic">🌙</span> بريد رمضان</h4>
@@ -1608,10 +1606,17 @@ document.querySelectorAll('[data-sec]').forEach(el=>{
 const tabsWrap = document.getElementById('tabsWrap');
 const tabsNav = document.getElementById('tabs');
 function updateTabsEdges(){
-  const atStart = tabsNav.scrollLeft >= tabsNav.scrollWidth - tabsNav.clientWidth - 2; // RTL: start = fully right
-  const atEnd = tabsNav.scrollLeft <= 1;
-  tabsWrap.classList.toggle('at-start', atStart);
-  tabsWrap.classList.toggle('at-end', atEnd);
+  const maxScroll = Math.max(0, tabsNav.scrollWidth - tabsNav.clientWidth);
+  if(maxScroll <= 2){
+    tabsWrap.classList.add('no-overflow');
+    tabsWrap.classList.add('at-left');
+    return;
+  }
+  tabsWrap.classList.remove('no-overflow');
+  // RTL scrollLeft differs between browser engines (0/-max/+max), so use absolute distance.
+  const x = Math.abs(tabsNav.scrollLeft);
+  const atLeft = Math.abs(x - maxScroll) <= 2;
+  tabsWrap.classList.toggle('at-left', atLeft);
 }
 tabsNav.addEventListener('scroll', updateTabsEdges);
 window.addEventListener('resize', updateTabsEdges);
@@ -1849,18 +1854,46 @@ initSurahSelect();
 const BASMALA_TEXT = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
 const ISTIADHAH_TEXT = "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ";
 function stripLeadingBasmala(text){
-  const t=(text||'').trim();
-  const norm=x=>String(x||'').replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,'').replace(/[إأآٱ]/g,'ا').replace(/\s+/g,' ').trim();
-  const target=norm(BASMALA_TEXT), normalized=norm(t);
-  if(!normalized.startsWith(target)) return t;
-  let oi=0,ni=0;
-  while(oi<t.length && ni<target.length){
-    const c=t[oi], n=norm(c);
-    if(!n){oi++;continue;}
-    if(normalized[ni]===n){oi++;ni++;}else break;
+  const t=String(text||'').trim();
+  const norm=x=>String(x||'')
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,'')
+    .replace(/[إأآٱ]/g,'ا')
+    .replace(/ٱ/g,'ا')
+    .replace(/\s+/g,' ')
+    .trim();
+  const target=norm(BASMALA_TEXT);
+  const chars=[...t];
+  let i=0, built='';
+  while(i<chars.length && norm(built).length<target.length){
+    built += chars[i++];
   }
-  return ni===target.length ? t.slice(oi).trim() : t;
+  if(norm(built).startsWith(target)) return t.slice(i).trim();
+  // Some editions put a decorative mark/extra whitespace before the basmala.
+  const n=norm(t);
+  if(n.startsWith(target)) {
+    let count=0, j=0;
+    while(j<t.length && count<target.length){
+      const c=norm(t[j]);
+      if(c) count++;
+      j++;
+    }
+    return t.slice(j).trim();
+  }
+  return t;
 }
+function ayahContainsDivineName(text){
+  try{
+    if(!Array.isArray(ASMA_UL_HUSNA)) return false;
+    const norm=x=>String(x||'')
+      .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,'')
+      .replace(/[إأآٱ]/g,'ا')
+      .replace(/[^\u0621-\u063A\u0641-\u064A\s]/g,' ')
+      .replace(/\s+/g,' ').trim();
+    const words=new Set(norm(text).split(' ').filter(Boolean));
+    return ASMA_UL_HUSNA.some(row=>words.has(norm(row[0])));
+  }catch(e){ return false; }
+}
+
 // Highlight waqf al-mu'anaqah (تعانق الوقف) marks - U+06DB ARABIC SMALL HIGH SEEN - so the
 // paired stop-here-or-there mark stands out clearly inside the mushaf text.
 function highlightMuanaqah(text){
@@ -1878,7 +1911,7 @@ async function loadSurah(num, jumpToAyah){
 
     // Normalize ayah 1 text: remove an embedded leading Basmala if present (except Fatiha & Tawbah)
     const ayahs = arabicEd.ayahs.map((a,idx)=>{
-      if(idx===0 && num!=1 && num!=9){
+      if(idx===0 && num!=9){
         return Object.assign({}, a, {text: stripLeadingBasmala(a.text)});
       }
       return a;
@@ -1890,12 +1923,16 @@ async function loadSurah(num, jumpToAyah){
       <button class="btn outline sm" id="surahAudioBtn">🔊 الاستماع</button>
       <button class="btn outline sm" id="surahFavAudioBtn">⭐ إضافة للاستماع المفضل</button>
     </div>`;
-    html += `<div class="basmala">${ISTIADHAH_TEXT}</div>`;
-    // The imported first ayah supplies the basmala for all surahs except Al-Fatihah and At-Tawbah; do not render it separately.
+    if(num!==9){
+      html += `<div class="basmala">${ISTIADHAH_TEXT}</div>`;
+      html += `<div class="basmala" aria-label="البسملة">${BASMALA_TEXT}</div>`;
+    }
+    // The imported leading basmala is stripped from every surah where it exists, including Al-Fatihah, so it appears exactly once here. At-Tawbah has no basmala.
     html += `<div class="small-note" style="text-align:center;">اللون البرتقالي المميز داخل الآيات يشير إلى تعانق الوقف: قف عند أحد الموضعين المتقابلين فقط.</div>`;
     html += `<div class="mushaf-text" id="mushafText">`;
     ayahs.forEach((a, idx)=>{
-      html += `<span class="ayah-span" data-idx="${idx}">${highlightMuanaqah(a.text)}<span class="ayah-num-marker">${a.numberInSurah}</span></span> `;
+      const hasDivineName = ayahContainsDivineName(a.text);
+      html += `<span class="ayah-span${hasDivineName ? " ayah-divine-name" : ""}" data-idx="${idx}">${highlightMuanaqah(a.text)}<span class="ayah-num-marker">${a.numberInSurah}</span></span> `;
     });
     html += `</div>`;
     container.innerHTML = html;
@@ -3623,14 +3660,40 @@ function buildNotifications(){
 
   if(s.nawafilFasting){
     try{
-      const day = now.getDay();
-      const h = gregorianToHijri(now.getFullYear(), now.getMonth()+1, now.getDate());
-      const isWhiteDays = [13,14,15].includes(h.day);
-      if(day===1 || day===4 || isWhiteDays){
-        const reason = isWhiteDays ? 'الأيام البيض (13، 14، 15 من الشهر الهجري)' : (day===1?'يوم الاثنين':'يوم الخميس');
-        const body = `اليوم ${reason}، وهو من أيام السنن المستحبة لصيام النافلة.`;
-        list.push({id:`fasting-${todayDateKey(now)}`, category:'nawafilFasting', emoji:'🌾',
-          title:'تذكير بصيام النافلة', snippet:truncate(body,42), body, ts: now.getTime()-1});
+      // The fasting reminder starts on the PREVIOUS day and remains visible
+      // until Fajr of the fasting day, so the user can plan for suhoor.
+      const dayKey = d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const isFastingDay = d=>{
+        const wd=d.getDay();
+        const h=gregorianToHijri(d.getFullYear(), d.getMonth()+1, d.getDate());
+        return wd===1 || wd===4 || [13,14,15].includes(h.day);
+      };
+      const todayIsFasting=isFastingDay(now);
+      const tomorrow=new Date(now); tomorrow.setDate(tomorrow.getDate()+1);
+      const tomorrowIsFasting=isFastingDay(tomorrow);
+      let target=null, isTomorrow=true;
+      if(tomorrowIsFasting){
+        target=tomorrow;
+      }else if(todayIsFasting){
+        // On the fasting day itself, keep the reminder only until Fajr.
+        let fajrPassed=true;
+        if(window.__prayerTimings?.Fajr){
+          const [fh,fm]=window.__prayerTimings.Fajr.split(':').map(Number);
+          const fajr=new Date(now); fajr.setHours(fh,fm,0,0);
+          fajrPassed=now>=fajr;
+        }
+        if(!fajrPassed){ target=now; isTomorrow=false; }
+      }
+      if(target){
+        const h=gregorianToHijri(target.getFullYear(), target.getMonth()+1, target.getDate());
+        const wd=target.getDay();
+        const isWhite=[13,14,15].includes(h.day);
+        const reason=isWhite ? 'الأيام البيض' : (wd===1 ? 'يوم الاثنين' : 'يوم الخميس');
+        const body=isTomorrow
+          ? `غداً ${wd===1?'يوم الاثنين':'يوم الخميس'}${isWhite?'، وهو من الأيام البيض (13، 14، 15 من الشهر الهجري)':''}، وهو من السنن المستحبة لصيام النافلة.`
+          : `اليوم ${reason}، وهو من السنن المستحبة لصيام النافلة.`;
+        list.push({id:`fasting-${dayKey(target)}`, category:'nawafilFasting', emoji:'🌾',
+          title:'تذكير بصيام النافلة', snippet:truncate(body,42), body, ts:now.getTime()-1});
       }
     }catch(e){}
   }
@@ -4381,6 +4444,16 @@ if(resetAllSettingsBtnV3) resetAllSettingsBtnV3.addEventListener('click',()=>{
 const dhikrStateV3=loadJSON('mc-dhikr-state',{});
 const dhikrDoneV3=loadJSON('mc-dhikr-completed',{});
 let selectedDhikrKeyV3=loadJSON('mc-selected-dhikr-key',null);
+// Reset every dhikr's remaining count once per local calendar day.
+const __dhikrTodayKey=new Date().toLocaleDateString('en-CA');
+const __dhikrLastReset=loadJSON('mc-dhikr-last-reset',null);
+if(__dhikrLastReset!==__dhikrTodayKey){
+  Object.keys(dhikrStateV3).forEach(k=>delete dhikrStateV3[k]);
+  Object.keys(dhikrDoneV3).forEach(k=>delete dhikrDoneV3[k]);
+  saveJSON('mc-dhikr-last-reset',__dhikrTodayKey);
+  saveJSON('mc-dhikr-state',dhikrStateV3);
+  saveJSON('mc-dhikr-completed',dhikrDoneV3);
+}
 function saveDhikrV3(){saveJSON('mc-dhikr-state',dhikrStateV3);saveJSON('mc-dhikr-completed',dhikrDoneV3);}
 function selectedDhikrObjV3(){
   if(!selectedDhikrKeyV3)return null;
@@ -4429,8 +4502,29 @@ function bindDhikrV3(){
     document.getElementById('tasbihCount').textContent=Math.max(0,dhikrStateV3[key]); document.getElementById('tasbihTarget').value=d.c; saveDhikrV3(); syncSelectedDhikrV3(); showToast(`تم اختيار الذكر للسبحة — المتبقي ${dhikrStateV3[key]} مرة.`);
     renderAdhkarListV3(cat);
   }));
-  document.querySelectorAll('[data-check-dhikr-v3]').forEach(btn=>btn.addEventListener('click',()=>{const key=btn.dataset.checkDhikrV3;dhikrDoneV3[key]=!dhikrDoneV3[key];saveDhikrV3();const cat=key.split('::')[0];renderAdhkarListV3(cat);}));
-  document.querySelectorAll('[data-copy-dhikr-v3]').forEach(btn=>btn.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(btn.dataset.copyDhikrV3);btn.textContent='تم النسخ ✓';setTimeout(()=>btn.textContent='نسخ',1200);}catch(e){}}));
+  document.querySelectorAll('[data-check-dhikr-v3]').forEach(btn=>btn.addEventListener('click',()=>{
+    const key=btn.dataset.checkDhikrV3; const [cat,idx]=key.split('::'); const d=ADHKAR_DATA[cat]?.[parseInt(idx)]; if(!d)return;
+    const willComplete=!dhikrDoneV3[key];
+    dhikrDoneV3[key]=willComplete;
+    // Checking means completed => remaining 0. Removing the check restores the default target.
+    dhikrStateV3[key]=willComplete ? 0 : d.c;
+    saveDhikrV3();
+    if(selectedDhikrKeyV3===key){
+      document.getElementById('tasbihCount').textContent=dhikrStateV3[key];
+      document.getElementById('tasbihTarget').value=d.c;
+      syncSelectedDhikrV3();
+    }
+    renderAdhkarListV3(cat);
+  }));
+  document.querySelectorAll('[data-copy-dhikr-v3]').forEach(btn=>btn.addEventListener('click',async()=>{
+    const text=btn.dataset.copyDhikrV3||'';
+    let ok=false;
+    try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(text);ok=true;}}catch(e){}
+    if(!ok){
+      try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();ok=document.execCommand('copy');ta.remove();}catch(e){}
+    }
+    if(ok){btn.textContent='تم النسخ ✓';setTimeout(()=>btn.textContent='نسخ',1200);}else showToast('تعذر النسخ. اسمح للموقع بالوصول إلى الحافظة أو انسخ النص يدوياً.');
+  }));
 }
 // Replace the functions used by the existing category/search listeners.
 renderAdhkarList=renderAdhkarListV3; renderAdhkarSearch=renderAdhkarSearchV3;
@@ -4446,13 +4540,25 @@ if(tapCircleV3)tapCircleV3.addEventListener('click',e=>{
   document.getElementById('tasbihCount').textContent=dhikrStateV3[s.key]; saveDhikrV3(); syncSelectedDhikrV3();
   if(navigator.vibrate)navigator.vibrate(15); if(loadJSON('mc-sound-effects',false))playUiSound('tap');
   if(dhikrStateV3[s.key]===0){
-    dhikrDoneV3[s.key]=true;saveDhikrV3();celebrate('أحسنت! 🎉','أتممت عدد مرات هذا الذكر.');renderAdhkarListV3(s.cat);
+    dhikrDoneV3[s.key]=true;dhikrStateV3[s.key]=0;saveDhikrV3();celebrate('أحسنت! 🎉','أتممت عدد مرات هذا الذكر.');renderAdhkarListV3(s.cat);
     if(autoMode){
-      const list=loadJSON('mc-auto-dhikr-list',[]), pos=list.indexOf(s.key), next=list[pos+1];
+      const completedKey=s.key;
+      const list=loadJSON('mc-auto-dhikr-list',[]), pos=list.indexOf(completedKey), next=list[pos+1];
       if(next){
         const [cat,idx]=next.split('::'), d=ADHKAR_DATA[cat]?.[parseInt(idx)];
-        if(d){selectedDhikrKeyV3=next;saveJSON('mc-selected-dhikr-key',next);if(!(next in dhikrStateV3))dhikrStateV3[next]=d.c;document.getElementById('tasbihTarget').value=d.c;document.getElementById('tasbihCount').textContent=dhikrStateV3[next];syncSelectedDhikrV3();showToast(`أحسنت! انتقلت إلى: ${d.t}`);}
-      }else if(list.length){showToast('أحسنت! أتممت قائمة الأذكار التلقائية كاملة.');}
+        if(d){
+          // Let the celebration effects finish before moving to the next dhikr.
+          setTimeout(()=>{
+            if(document.getElementById('tasbihSelect')?.value!=='__auto__')return;
+            selectedDhikrKeyV3=next;saveJSON('mc-selected-dhikr-key',next);
+            if(!(next in dhikrStateV3))dhikrStateV3[next]=d.c;
+            document.getElementById('tasbihTarget').value=d.c;
+            document.getElementById('tasbihCount').textContent=dhikrStateV3[next];
+            syncSelectedDhikrV3(); renderAdhkarListV3(cat);
+            showToast(`أحسنت! انتقلت إلى: ${d.t}`);
+          },4000);
+        }
+      }else if(list.length){setTimeout(()=>showToast('أحسنت! أتممت قائمة الأذكار التلقائية كاملة.'),4000);}
     }
   }
 },true);
@@ -4684,7 +4790,17 @@ syncNotifSettingsUI=function(){
     const k=autoList[0], parts=k.split('::'), d=ADHKAR_DATA[parts[0]]?.[parseInt(parts[1])];
     if(d){selectedDhikrKeyV3=k;if(!(k in dhikrStateV3))dhikrStateV3[k]=d.c;document.getElementById('tasbihTarget').value=d.c;document.getElementById('tasbihCount').textContent=dhikrStateV3[k];syncSelectedDhikrV3();}
   }
-  select.addEventListener('change',()=>{if(select.value===AUTO){renderPicker();syncAutoCurrent();}else box.style.display='none';});
+  select.addEventListener('change',()=>{
+    if(select.value===AUTO){renderPicker();syncAutoCurrent();return;}
+    box.style.display='none';
+    // Leaving automatic mode must not erase the currently selected dhikr or reset its progress.
+    const current=selectedDhikrObjV3();
+    if(current){
+      document.getElementById('tasbihTarget').value=current.d.c;
+      document.getElementById('tasbihCount').textContent=Math.max(0,dhikrStateV3[current.key]??current.d.c);
+      syncSelectedDhikrV3();
+    }
+  });
   // Allow each dhikr card to add/remove itself from the automatic sequence.
   const oldRender=renderDhikrCardV3;
   renderDhikrCardV3=function(cat,i,d){
@@ -4705,26 +4821,7 @@ syncNotifSettingsUI=function(){
       if(select.value===AUTO)renderPicker();
     }));
   };
-  // Extend the existing tap behavior by changing the mode before the original handler resolves the selected key.
-  const tap=document.getElementById('tapCircle');
-  if(tap){
-    tap.addEventListener('click',()=>{
-      if(select.value!==AUTO)return;
-      if(!autoList.length){showToast('اختر أذكاراً أولاً للقائمة التلقائية.');return;}
-      const s=selectedDhikrObjV3();
-      if(s&&dhikrStateV3[s.key]===0){
-        const pos=autoList.indexOf(s.key), next=autoList[pos+1];
-        if(next){
-          const [cat,idx]=next.split('::'); const d=ADHKAR_DATA[cat]?.[parseInt(idx)];
-          selectedDhikrKeyV3=next; if(!(next in dhikrStateV3))dhikrStateV3[next]=d.c;
-          saveJSON('mc-selected-dhikr-key',next); document.getElementById('tasbihTarget').value=d.c; document.getElementById('tasbihCount').textContent=dhikrStateV3[next]; syncSelectedDhikrV3();
-          showToast(`أحسنت! اكتمل الذكر، والآن: ${d.t}`);
-        }else{
-          showToast('أحسنت! أتممت قائمة الأذكار التلقائية كاملة.');
-        }
-      }
-    },true);
-  }
+  // Automatic progression is handled by the main capture-phase tap handler above.
   if(select.value===AUTO){renderPicker();syncAutoCurrent();}
 })();
 
