@@ -29,6 +29,7 @@
   --ayah-font-size:26px;
   --tafsir-font-size:15px;
   --container-max:1600px;
+  --nav-fade-color:rgba(246,241,228,.92);
 }
 html[data-theme="dark"]{
   --bg:#0A1613;
@@ -45,6 +46,7 @@ html[data-theme="dark"]{
   --border:rgba(224,187,85,0.16);
   --shadow:rgba(0,0,0,0.45);
   --star-op:0.06;
+  --nav-fade-color:rgba(15,29,26,.92);
 }
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -178,7 +180,7 @@ header.site{
 /* RTL horizontal-scroll hint: the fade lives on the LEFT edge only, indicating more tabs are hidden there. */
 .tabs-wrap::after{
   content:""; position:absolute; top:0; bottom:10px; left:0; width:58px; pointer-events:none; z-index:3;
-  background:linear-gradient(to right, var(--bg-alt) 0%, rgba(15,29,26,.72) 35%, transparent 100%);
+  background:linear-gradient(to right, var(--nav-fade-color) 0%, var(--nav-fade-color) 35%, transparent 100%);
   transition:opacity .2s ease;
 }
 .tabs-wrap.at-left::after{opacity:0;}
@@ -275,10 +277,10 @@ html[data-theme="dark"] .ql-card svg{fill:var(--accent);}
 /* ===================== Quran - Mushaf mode ===================== */
 .quran-toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;}
 .quran-toolbar > div{flex:1; min-width:160px;}
-.quran-search-inline{display:flex;gap:10px;align-items:flex-end;flex-wrap:nowrap;width:100%;}
-.quran-search-inline .qsearch-main{flex:1;min-width:0;}
-.quran-search-inline .qsearch-scope{width:170px;flex:0 0 170px;}
-.quran-search-inline .qsearch-btn{flex:0 0 auto;}
+.quran-search-inline{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;width:100%;}
+.quran-search-inline .qsearch-main{grid-column:1/-1;min-width:0;}
+.quran-search-inline .qsearch-scope{grid-column:1;width:170px;}
+.quran-search-inline .qsearch-btn{grid-column:2;align-self:end;}
 .tajwid-search-wrap{display:flex;gap:10px;align-items:flex-end;margin-bottom:16px;}
 .tajwid-search-wrap>div:first-child{flex:1;min-width:0;}
 .quick-access{margin-top:18px;}
@@ -286,7 +288,7 @@ html[data-theme="dark"] .ql-card svg{fill:var(--accent);}
 .quick-access-item{border:1px solid var(--border);background:var(--bg);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease;font-weight:700;font-size:13px;}
 .quick-access-item:hover{transform:translateY(-2px);border-color:var(--primary);background:var(--accent-soft);}
 @media(max-width:900px){.quick-access-grid{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:600px){.quran-search-inline{flex-wrap:wrap}.quran-search-inline .qsearch-scope{flex:1 1 160px;width:auto}.quran-search-inline .qsearch-btn{flex:1 1 90px}.quick-access-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.quran-search-inline{grid-template-columns:minmax(0,1fr) auto}.quran-search-inline .qsearch-scope{grid-column:1;width:auto}.quran-search-inline .qsearch-btn{grid-column:2}.quick-access-grid{grid-template-columns:repeat(2,1fr);}}
 
 .font-controls{display:flex; gap:18px; flex-wrap:wrap; margin-top:14px;}
 .font-controls > div{flex:1; min-width:180px;}
@@ -417,11 +419,14 @@ html[data-theme="dark"] .time-card .t{color:var(--accent);}
 html[data-theme="dark"] .qibla-kaaba{background:var(--accent);}
 
 .cal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
-.cal-months{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;} 
+.cal-months{display:grid;grid-template-columns:1fr;gap:12px;width:100%;min-width:0;}
+/* The calendar adapts to the available width rather than assuming that every desktop is wide enough for 3 months. */
+@media(min-width:700px){.cal-months{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(min-width:1200px){.cal-months{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;}}
 @media(min-width:1400px){.cal-months{gap:10px}.cal-month{padding:8px}.cal-grid{gap:3px}.cal-day{font-size:12px}}
-.cal-month{min-width:0;border:1px solid var(--border);border-radius:14px;padding:10px;background:var(--bg);}
-.cal-month-title{text-align:center;font-weight:800;margin:2px 0 10px;font-size:14px;}
-.cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:5px; text-align:center;}
+.cal-month{min-width:0;max-width:100%;overflow:hidden;border:1px solid var(--border);border-radius:14px;padding:10px;background:var(--bg);}
+.cal-month-title{text-align:center;font-weight:800;margin:2px 0 10px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;text-align:center;min-width:0;}
 .cal-grid .dow{font-size:12px; color:var(--text-soft); padding:6px 0;}
 .cal-day{
   aspect-ratio:1; border-radius:10px; background:var(--bg); border:1px solid var(--border);
@@ -514,7 +519,7 @@ footer.site{
 @media(max-width:640px){
   .times-grid{grid-template-columns:repeat(3,1fr);}
   .mushaf-page{padding:16px 14px;}
-  .cal-months{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+  .cal-months{grid-template-columns:1fr;gap:10px;}
   .cal-grid{gap:4px;}
   .cal-day{font-size:11px; border-radius:8px;}
   .cal-day .g{font-size:12px;}
@@ -522,8 +527,16 @@ footer.site{
   .cal-head h3{font-size:15px;}
   .cal-head .btn.outline{padding:8px 10px; font-size:12.5px;}
 }
-@media(max-width:700px){
+@media(max-width:699px){
   .cal-months{grid-template-columns:1fr;}
+}
+@media(min-width:700px) and (max-width:1199px){
+  .cal-months{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .cal-month{padding:9px;}
+  .cal-grid{gap:4px;}
+}
+@media(min-width:1200px){
+  .cal-months{grid-template-columns:repeat(3,minmax(0,1fr));}
 }
 @media(max-width:380px){
   .cal-grid{grid-template-columns:repeat(7,minmax(0,1fr));}
@@ -699,7 +712,7 @@ footer.site{
 
       <div class="star-divider"><div class="line"></div><span style="font-size:12px;color:var(--text-soft)">محرك بحث الآيات</span><div class="line"></div></div>
       <div class="quran-search-inline">
-        <div class="qsearch-main"><label>ابحث عن كلمة داخل نص الآيات فقط</label><input type="text" id="quranSearchInput" placeholder="اكتب كلمة للبحث..."></div>
+        <div class="qsearch-main"><label id="quranSearchLabel">ابحث عن كلمة داخل نص الآيات فقط</label><input type="text" id="quranSearchInput" placeholder="اكتب كلمة للبحث..."></div>
         <div class="qsearch-scope"><label>نطاق البحث</label>
           <select id="searchScope"><option value="current">السورة الحالية</option><option value="all">كل المصحف</option></select>
         </div>
@@ -1205,12 +1218,6 @@ footer.site{
       </div>
     </div>
 
-    <div class="card settings-danger-card" style="margin-top:18px;">
-      <h3>إعادة ضبط الإعدادات</h3>
-      <p class="small-note">يعيد إعدادات الموقع وعداد التسبيح وترتيب الأقسام والتفضيلات إلى القيم الافتراضية. لا يحذف الخطط أو الآيات أو الأحاديث المحفوظة.</p>
-      <button class="btn outline sm" id="resetAllSettingsBtn">إعادة تعيين جميع الإعدادات</button>
-    </div>
-
     <div class="card" style="margin-top:18px;">
       <h3>ترتيب الأقسام</h3>
       <p class="small-note">اسحب العناصر لإعادة ترتيب ظهور الأقسام في الشريط العلوي حسب رغبتك.</p>
@@ -1297,6 +1304,12 @@ footer.site{
         <label class="switch"><input type="checkbox" class="notif-type-toggle" data-type="planReminders" checked><span class="slider"></span></label>
       </div>
     </div>
+
+    <div class="card settings-danger-card" style="margin-top:18px;">
+      <h3>إعادة ضبط الإعدادات</h3>
+      <p class="small-note">يعيد إعدادات الموقع وعداد التسبيح وترتيب الأقسام والتفضيلات إلى القيم الافتراضية. لا يحذف الخطط أو الآيات أو الأحاديث المحفوظة.</p>
+      <button class="btn outline sm" id="resetAllSettingsBtn">إعادة تعيين جميع الإعدادات</button>
+    </div>
   </section>
 
   <!-- ============ HELP / المساعدة ============ -->
@@ -1367,6 +1380,7 @@ footer.site{
         <p>عند دعم المتصفح لإجراءات إشعارات الويب، يظهر زر سريع داخل إشعار التسبيح أو الصلاة على النبي ﷺ، وينقلك مباشرة إلى القسم المناسب. وتظهر أيضاً أزرار سريعة داخل لوحة إشعارات الموقع.</p>
       </div>
 
+      <div class="help-item" data-kw="بحث القرآن كلمة نطاق سورة مصحف">
         <h4><span class="ic">🔎</span> البحث في القرآن</h4>
         <p>من قسم "القرآن الكريم" يمكنك البحث داخل السورة المفتوحة أو داخل المصحف كاملاً، مع تمييز الكلمة المطابقة والانتقال المباشر إلى موضعها.</p>
       </div>
@@ -1417,7 +1431,10 @@ footer.site{
       <div class="help-item" data-kw="بريد الجمعة سنن">
         <h4><span class="ic">🕌</span> بريد الجمعة</h4>
         <p>إشعار يظهر تلقائياً كل يوم جمعة يذكّرك بالسنن والأعمال المستحبة في هذا اليوم الفضيل، ويختفي تلقائياً عند دخول المغرب إيذاناً بانتهاء يوم الجمعة.</p>
-      <div class="help-item" data-kw="صيام النوافل السحور اليوم السابق الفجر"><h4><span class="ic">🌾</span> تذكير صيام النوافل</h4><p>يظهر تذكير صيام النافلة من اليوم السابق حتى أذان الفجر في يوم الصيام، حتى تتمكن من الاستعداد للسحور، ثم يختفي بعد دخول الفجر.</p></div>
+      </div>
+      <div class="help-item" data-kw="صيام النوافل السحور اليوم السابق الفجر">
+        <h4><span class="ic">🌾</span> تذكير صيام النوافل</h4>
+        <p>يظهر تذكير صيام النافلة من اليوم السابق حتى أذان الفجر في يوم الصيام، حتى تتمكن من الاستعداد للسحور، ثم يختفي بعد دخول الفجر.</p>
       </div>
       <div class="help-item" data-kw="بريد رمضان دعاء يومي">
         <h4><span class="ic">🌙</span> بريد رمضان</h4>
@@ -1854,30 +1871,27 @@ initSurahSelect();
 const BASMALA_TEXT = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
 const ISTIADHAH_TEXT = "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ";
 function stripLeadingBasmala(text){
+  // Remove an imported leading basmala by matching its four normalized words,
+  // then slicing the original text at the end of the fourth word. This avoids
+  // leaving a final combining mark/letter from "الرَّحِيمِ" visible at the start.
   const t=String(text||'').trim();
-  const norm=x=>String(x||'')
+  const normWord=x=>String(x||'')
     .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,'')
     .replace(/[إأآٱ]/g,'ا')
-    .replace(/ٱ/g,'ا')
-    .replace(/\s+/g,' ')
+    .replace(/[ۖۗۘۙۚۛۜ۝]/g,'')
+    .replace(/[،؛,:.!؟]/g,'')
     .trim();
-  const target=norm(BASMALA_TEXT);
-  const chars=[...t];
-  let i=0, built='';
-  while(i<chars.length && norm(built).length<target.length){
-    built += chars[i++];
-  }
-  if(norm(built).startsWith(target)) return t.slice(i).trim();
-  // Some editions put a decorative mark/extra whitespace before the basmala.
-  const n=norm(t);
-  if(n.startsWith(target)) {
-    let count=0, j=0;
-    while(j<t.length && count<target.length){
-      const c=norm(t[j]);
-      if(c) count++;
-      j++;
+  const target=['بسم','الله','الرحمن','الرحيم'].map(normWord);
+  const leading = [...t.matchAll(/\S+/gu)];
+  if(leading.length >= target.length){
+    let ok=true;
+    for(let k=0;k<target.length;k++){
+      if(normWord(leading[k][0])!==target[k]){ ok=false; break; }
     }
-    return t.slice(j).trim();
+    if(ok){
+      const end=leading[target.length-1].index + leading[target.length-1][0].length;
+      return t.slice(end).trim();
+    }
   }
   return t;
 }
@@ -3551,7 +3565,7 @@ const notifListWrap = document.getElementById('notifListWrap');
 
 function notifSettings(){
   return loadJSON('mc-notif-settings', {
-    master:true, prayerTimes:true, friday:true, ramadan:true,
+    master: ('Notification' in window ? Notification.permission !== 'denied' : false), prayerTimes:true, friday:true, ramadan:true,
     sacredMonths:true, nawafilFasting:true, tasbih:true, salawat:true, planReminders:true
   });
 }
@@ -4103,6 +4117,20 @@ document.getElementById('helpSearchInput').addEventListener('input', function(){
   }
 });
 
+// Keep the Quran search description synchronized with the selected search scope.
+(function initQuranSearchScopeLabel(){
+  const scopeEl=document.getElementById('searchScope');
+  const labelEl=document.getElementById('quranSearchLabel');
+  if(!scopeEl || !labelEl) return;
+  function sync(){
+    labelEl.textContent = scopeEl.value==='all'
+      ? 'ابحث عن كلمة في المصحف كاملاً'
+      : 'ابحث عن كلمة داخل نص الآيات فقط';
+  }
+  scopeEl.addEventListener('change',sync);
+  sync();
+})();
+
 /* ============================================================
    FIRST-VISIT NOTIFICATION PERMISSION POPUP
    Shown once, politely, with two clear options (سماح / حظر) before
@@ -4133,13 +4161,24 @@ document.getElementById('helpSearchInput').addEventListener('input', function(){
     try{
       const perm = await Notification.requestPermission();
       saveJSON(CHOICE_KEY, perm);
+      const ns = notifSettings();
+      ns.master = perm === 'granted';
+      saveNotifSettings(ns);
+      if(typeof syncNotifSettingsUI === 'function') syncNotifSettingsUI();
+      if(typeof syncPrayerNotifUI === 'function') syncPrayerNotifUI();
     }catch(e){
       saveJSON(CHOICE_KEY, 'denied');
     }
   });
   denyBtn.addEventListener('click', ()=>{
     saveJSON(CHOICE_KEY, 'denied');
+    const ns = notifSettings();
+    ns.master = false;
+    saveNotifSettings(ns);
     back.classList.remove('show');
+    if(typeof syncNotifSettingsUI === 'function') syncNotifSettingsUI();
+    if(typeof syncPrayerNotifUI === 'function') syncPrayerNotifUI();
+    if(typeof refreshNotifications === 'function') refreshNotifications();
   });
 })();
 
@@ -4289,6 +4328,19 @@ function reconcileNotificationMaster(){
   saveNotifSettings(s); syncNotifSettingsUI(); syncPrayerNotifUI();
 }
 reconcileNotificationMaster();
+// Final notification-permission synchronization: a browser-level denial always means the in-site master is OFF.
+(function enforceDeniedNotificationState(){
+  try{
+    if('Notification' in window && Notification.permission==='denied'){
+      const ns=notifSettings();
+      ns.master=false;
+      saveNotifSettings(ns);
+      const el=document.getElementById('notifMasterSwitch');
+      if(el) el.checked=false;
+    }
+  }catch(e){}
+})();
+
 const master=document.getElementById('notifMasterSwitch');
 if(master){
   master.addEventListener('change',async function(){
