@@ -2098,9 +2098,13 @@ async function loadSurah(num, jumpToAyah){
     const arabicEd = data.data.find(d=>d.edition.identifier==='quran-uthmani');
     const tafsirEd = data.data.find(d=>d.edition.identifier==='ar.muyassar');
 
-    // Normalize ayah 1 text: remove an embedded leading Basmala if present (except Fatiha & Tawbah)
+    // Normalize ayah 1 text: remove an embedded leading Basmala if present.
+    // Al-Fatihah (1) and At-Tawbah (9) are excluded: Al-Fatihah's first ayah IS the
+    // Basmala itself (it must stay intact and render inline with the surah's ayat,
+    // not as the generic standalone basmala banner used for other surahs), and
+    // At-Tawbah has no Basmala at all.
     const ayahs = arabicEd.ayahs.map((a,idx)=>{
-      if(idx===0 && num!=9){
+      if(idx===0 && num!=9 && Number(num)!==1){
         return Object.assign({}, a, {text: stripLeadingBasmala(a.text)});
       }
       return a;
@@ -2114,9 +2118,15 @@ async function loadSurah(num, jumpToAyah){
     </div>`;
     if(num!==9){
       html += `<div class="basmala">${ISTIADHAH_TEXT}</div>`;
-      html += `<div class="basmala" aria-label="البسملة">${BASMALA_TEXT}</div>`;
+      // For every surah except Al-Fatihah, the Basmala is shown as its own standalone
+      // banner (unchanged). Al-Fatihah's Basmala is ayah 1 and renders below, inline
+      // with the rest of the surah's ayat in the same Uthmani/tashkil mushaf styling.
+      if(Number(num)!==1){
+        html += `<div class="basmala" aria-label="البسملة">${BASMALA_TEXT}</div>`;
+      }
     }
-    // The imported leading basmala is stripped from every surah where it exists, including Al-Fatihah, so it appears exactly once here. At-Tawbah has no basmala.
+    // The imported leading basmala is stripped from every surah where it exists (except
+    // Al-Fatihah, kept intact above), so it appears exactly once here. At-Tawbah has none.
     html += `<div class="small-note" style="text-align:center;">اللون البرتقالي المميز داخل الآيات يشير إلى تعانق الوقف: قف عند أحد الموضعين المتقابلين فقط.</div>`;
     html += `<div class="mushaf-text" id="mushafText">`;
     ayahs.forEach((a, idx)=>{
@@ -2312,7 +2322,23 @@ function prefetchNextAyahUrl(idx){
   if(!currentSurahData)return;
   const ayahs=currentSurahData.arabic.ayahs;
   if(idx<0||idx>=ayahs.length)return;
-  resolveAyahAudioUrl(ayahs[idx].number,getSelectedReciter()).catch(()=>{});
+  resolveAyahAudioUrl(ayahs[idx].number,getSelectedReciter()).then(url=>{
+    // Warm the browser's own HTTP cache with the next ayah's audio bytes while the
+    // current ayah is still playing (a hidden Audio element with preload="auto" is
+    // enough to trigger the download without affecting the visible player). When
+    // playback reaches this ayah, quranAudioPlayer.src is set to the same URL and
+    // the browser can serve it from cache instantly instead of starting a fresh
+    // network request - this is what removes the audible gap between ayat, without
+    // switching away from the current per-ayah playback/tracking/repeat/navigation
+    // system (a single unsplit CDN file for the whole surah has no reliable public
+    // per-ayah timestamp data to keep those features working).
+    try{
+      const pre=new Audio();
+      pre.preload='auto';
+      pre.src=url;
+      pre.load();
+    }catch(e){}
+  }).catch(()=>{});
 }
 async function playListenAyah(idx){
   if(!currentSurahData)return;
@@ -5078,7 +5104,38 @@ if(master){
   master.addEventListener('change',async function(){
     const s=notifSettings();
     if(this.checked){
-      if('Notification' in window && Notification.permission==='default'){
+      if(!('Notification' in window)){
+        // Browser/device does not support notifications at all.
+        this.checked=false; s.master=false;
+        openModal(`<h3>الإشعارات غير مدعومة</h3><p>المتصفح أو الجهاز الحالي لا يدعم إشعارات الويب، لذلك لا يمكن تفعيلها من هنا.</p>`);
+      }else if(Notification.permission==='denied'){
+        // The user previously chose "Block" in the browser's own permission prompt.
+        // Calling requestPermission() again here would silently resolve to "denied"
+        // without showing anything (repeated, useless prompts), so instead explain
+        // why it's off and how to re-enable it from the browser's own settings.
+        this.checked=false; s.master=false;
+        let reReq=false;
+        try{
+          if(navigator.permissions && navigator.permissions.query){
+            const status=await navigator.permissions.query({name:'notifications'});
+            // Some browsers allow requesting again even after a stored "denied" state
+            // changes underneath us; re-check right before deciding what to show.
+            reReq = status.state==='prompt';
+          }
+        }catch(e){}
+        if(reReq){
+          try{
+            const perm=await Notification.requestPermission();
+            s.master = perm==='granted';
+            this.checked = s.master;
+          }catch(e){}
+        }
+        if(!s.master){
+          openModal(`<h3>الإشعارات مرفوضة من المتصفح</h3>
+            <p>لا يمكن تفعيل الإشعارات حالياً لأنك سبق ورفضت إذن الإشعارات لهذا الموقع من المتصفح.</p>
+            <p>لتفعيلها، افتح إعدادات الموقع من المتصفح (عادة بالضغط على أيقونة القفل بجانب عنوان الموقع) واسمح بالإشعارات، ثم أعد الضغط على هذا المفتاح.</p>`);
+        }
+      }else if(Notification.permission==='default'){
         try{
           const perm=await Notification.requestPermission();
           s.master=perm==='granted';
@@ -5248,7 +5305,26 @@ function selectedDhikrObjV3(){
 function syncSelectedDhikrV3(){
   const box=document.getElementById('tasbihSelectedDhikr'); if(!box)return;
   const s=selectedDhikrObjV3();
-  box.innerHTML=s?`<strong>الذكر المختار:</strong> ${escapeHtml(s.d.t)}<br><span class="small-note">المتبقي: ${dhikrStateV3[s.key]??s.d.c} مرة</span>`:'<span class="small-note">اختر أي ذكر من القائمة ليظهر هنا مع عدد مرات قوله.</span>';
+  box.innerHTML=s?`<span><strong>الذكر المختار:</strong> ${escapeHtml(s.d.t)}<br><span class="small-note">المتبقي: ${dhikrStateV3[s.key]??s.d.c} مرة</span></span>`+
+    `<button type="button" class="tasbih-remove-btn" id="removeSelectedDhikrBtnV3" title="إزالة الذكر المختار">✕</button>`
+    :'<span class="small-note">اختر أي ذكر من القائمة ليظهر هنا مع عدد مرات قوله.</span>';
+  const rmBtn=document.getElementById('removeSelectedDhikrBtnV3');
+  if(rmBtn) rmBtn.addEventListener('click', ()=>clearSelectedDhikrV3(true));
+}
+// Deselects the current dhikr regardless of how it was chosen (a quick-pick fixed
+// dhikr, an item from "الأذكار المأثورة", or the active step of an automatic
+// sequence), so the "الذكر المختار" box clears and the dhikr becomes selectable
+// again - used both by the manual × button and by automatic removal on completion.
+function clearSelectedDhikrV3(showMsg){
+  const s=selectedDhikrObjV3(); if(!s) return;
+  if(String(s.key).startsWith('__fixed__::')){
+    if(typeof window.removeFixedDhikrSelectionV3==='function') window.removeFixedDhikrSelectionV3();
+  }else{
+    selectedDhikrKeyV3=null; saveJSON('mc-selected-dhikr-key',null);
+    if(s.cat) renderAdhkarListV3(s.cat);
+  }
+  syncSelectedDhikrV3();
+  if(showMsg) showToast('تمت إزالة الذكر من الاختيار، وأصبح متاحاً للاختيار مرة أخرى.');
 }
 function orderedDhikrV3(cat){
   return (ADHKAR_DATA[cat]||[]).map((d,i)=>({d,i})).sort((a,b)=>Number(!!dhikrDoneV3[cat+'::'+a.i])-Number(!!dhikrDoneV3[cat+'::'+b.i]));
@@ -5324,13 +5400,16 @@ if(tapCircleV3)tapCircleV3.addEventListener('click',e=>{
   document.getElementById('tasbihCount').textContent=dhikrStateV3[s.key]; saveDhikrV3(); syncSelectedDhikrV3();
   if(navigator.vibrate)navigator.vibrate(15); if(loadJSON('mc-sound-effects',false))playUiSound('tap');
   if(dhikrStateV3[s.key]===0){
-    dhikrDoneV3[s.key]=true;dhikrStateV3[s.key]=0;saveDhikrV3();celebrate('أحسنت! 🎉','أتممت عدد مرات هذا الذكر.');renderAdhkarListV3(s.cat);
+    dhikrDoneV3[s.key]=true;dhikrStateV3[s.key]=0;saveDhikrV3();celebrate('أحسنت! 🎉','أتممت عدد مرات هذا الذكر.');
+    if(s.cat) renderAdhkarListV3(s.cat); // only category-based dhikr live in this list
+    let movedToNext=false;
     if(autoMode){
       const completedKey=s.key;
       const list=loadJSON('mc-auto-dhikr-list',[]), pos=list.indexOf(completedKey), next=list[pos+1];
       if(next){
         const [cat,idx]=next.split('::'), d=ADHKAR_DATA[cat]?.[parseInt(idx)];
         if(d){
+          movedToNext=true;
           // Let the celebration effects finish before moving to the next dhikr.
           setTimeout(()=>{
             if(document.getElementById('tasbihSelect')?.value!=='__auto__')return;
@@ -5343,6 +5422,11 @@ if(tapCircleV3)tapCircleV3.addEventListener('click',e=>{
           },4000);
         }
       }else if(list.length){setTimeout(()=>showToast('أحسنت! أتممت قائمة الأذكار التلقائية كاملة.'),4000);}
+    }
+    // Whenever the finished dhikr isn't being replaced by the next one in an automatic
+    // sequence, it must not linger as "الذكر المختار" - remove it and let it be chosen again.
+    if(!movedToNext){
+      setTimeout(()=>{ if(selectedDhikrKeyV3===s.key) clearSelectedDhikrV3(false); },4000);
     }
   }
 },true);
@@ -5672,6 +5756,20 @@ refreshNotifications=function(){
     select.innerHTML=html;
     if([...select.options].some(o=>o.value===currentVal)) select.value=currentVal;
   }
+  // Reusable removal step for the active quick-pick fixed dhikr: clears the
+  // selection and restores it into the "اختر الذكر" dropdown. Used by both the
+  // manual × button and by automatic removal once the dhikr's count reaches 0.
+  function removeFixedDhikrSelection(){
+    if(!activeFixedText) return;
+    const key='__fixed__::'+activeFixedText;
+    removedOptions=removedOptions.filter(t=>t!==activeFixedText);
+    saveJSON('mc-tasbih-removed-options',removedOptions);
+    if(selectedDhikrKeyV3===key){ selectedDhikrKeyV3=null; saveJSON('mc-selected-dhikr-key',null); }
+    activeFixedText=null; saveJSON('mc-tasbih-active-fixed',null);
+    select.value='';
+    rebuildSelect();
+  }
+  window.removeFixedDhikrSelectionV3=removeFixedDhikrSelection;
   function renderSelectedFixedBox(){
     const box=document.getElementById('tasbihSelectedDhikr'); if(!box) return;
     if(!activeFixedText) return false;
@@ -5680,12 +5778,7 @@ refreshNotifications=function(){
     box.innerHTML=`<span><strong>الذكر المختار:</strong> ${escapeHtml(activeFixedText)}<br><span class="small-note">المتبقي: ${remaining} مرة</span></span>`+
       `<button type="button" class="tasbih-remove-btn" id="removeFixedDhikrBtn" title="إزالة الذكر المختار">✕</button>`;
     document.getElementById('removeFixedDhikrBtn').addEventListener('click', ()=>{
-      removedOptions=removedOptions.filter(t=>t!==activeFixedText);
-      saveJSON('mc-tasbih-removed-options',removedOptions);
-      if(selectedDhikrKeyV3===key){ selectedDhikrKeyV3=null; saveJSON('mc-selected-dhikr-key',null); }
-      activeFixedText=null; saveJSON('mc-tasbih-active-fixed',null);
-      select.value='';
-      rebuildSelect();
+      removeFixedDhikrSelection();
       syncSelectedDhikrV3();
       showToast('تمت إزالة الذكر من الاختيار، وأصبح متاحاً في القائمة مجدداً.');
     });
@@ -5762,6 +5855,11 @@ refreshNotifications=function(){
 
   el.addEventListener('pointerdown', e=>{
     if(e.button!==undefined && e.button!==0) return; // left mouse button / touch only
+    // Never start drag-tracking (and never capture the pointer) when the press starts
+    // on one of the shortcut's own buttons - capturing the pointer on the container
+    // was retargeting the click event away from the button, which is why the
+    // play/pause, expand and stop buttons stopped responding to taps/clicks.
+    if(e.target && e.target.closest && e.target.closest('.qfm-btn')) return;
     dragging=true; moved=false; activePointerId=e.pointerId;
     const rect=el.getBoundingClientRect();
     startX=e.clientX; startY=e.clientY; origLeft=rect.left; origTop=rect.top;
