@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>المسلم الشامل | هبة كتانة</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0b3d2e">
 <link rel="icon" type="image/png" href="33.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -5144,8 +5146,74 @@ if(master){
       }
     }else{s.master=false;}
     saveNotifSettings(s); this.checked=s.master; syncNotifSettingsUI(); syncPrayerNotifUI(); refreshNotifications();
+    // Keep the real background push subscription (works even with the site closed)
+    // in sync with the on/off switch. This is separate from the in-page notification
+    // logic above, which only works while a tab is open.
+    if(s.master){ subscribeToPushV1().catch(()=>{}); } else { unsubscribeFromPushV1().catch(()=>{}); }
   });
 }
+
+/* ============ Real background push subscription (Web Push + VAPID) ============
+   This talks to a small Cloudflare Worker (see /push-worker in the project) that
+   stores the subscription and sends prayer-time push notifications on a cron,
+   so reminders still arrive even when the site itself isn't open. Fill in your
+   own deployed worker URL and VAPID public key below once you deploy it -
+   until then this silently no-ops and the site behaves exactly as before
+   (in-page notifications only, while a tab is open). */
+const PUSH_WORKER_URL = 'https://muslim-comprehensive-push.hibakittaneh3.workers.dev'; // e.g. 'https://muslim-comprehensive-push.your-subdomain.workers.dev'
+const VAPID_PUBLIC_KEY = 'BCAv53_Y-CTADfDzK4jLw_gARr8zsAjHUNIUveiqC0UQdxjXLGI-pWwO1azZlOID8lq5SRl_xZnLhbTC0gNH7rQ'; // paste the public key printed by `npx @pushforge/builder vapid`
+
+function urlBase64ToUint8Array(base64String){
+  const padding='='.repeat((4-base64String.length%4)%4);
+  const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+  const raw=atob(base64);
+  return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+}
+async function subscribeToPushV1(){
+  if(!PUSH_WORKER_URL || !VAPID_PUBLIC_KEY) return; // not deployed/configured yet
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub){
+    sub=await reg.pushManager.subscribe({
+      userVisibleOnly:true,
+      applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+    });
+  }
+  const s=notifSettings();
+  const prayers=['Fajr','Dhuhr','Asr','Maghrib','Isha'].filter(p=>s['prayer_'+p]!==false);
+  await fetch(PUSH_WORKER_URL+'/api/subscribe',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      subscription:sub.toJSON(),
+      lat:userCoords?.lat ?? null, lng:userCoords?.lng ?? null,
+      prayers,
+      tz:Intl.DateTimeFormat().resolvedOptions().timeZone
+    })
+  }).catch(()=>{});
+}
+async function unsubscribeFromPushV1(){
+  if(!('serviceWorker' in navigator)) return;
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    const sub=await reg.pushManager.getSubscription();
+    if(sub){
+      if(PUSH_WORKER_URL){
+        await fetch(PUSH_WORKER_URL+'/api/unsubscribe',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({endpoint:sub.endpoint})
+        }).catch(()=>{});
+      }
+      await sub.unsubscribe();
+    }
+  }catch(e){}
+}
+// Re-sync the push subscription's prayer list whenever per-prayer toggles change,
+// and keep it alive across visits for anyone who already had notifications on.
+document.querySelectorAll('.prayer-notif-toggle').forEach(cb=>{
+  cb.addEventListener('change',()=>{ if(notifSettings().master) subscribeToPushV1().catch(()=>{}); });
+});
+if(notifSettings().master) subscribeToPushV1().catch(()=>{});
 
 // Make notification generation respect the master switch and per-prayer switches.
 const __originalBuildNotifications=buildNotifications;
