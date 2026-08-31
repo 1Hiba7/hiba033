@@ -688,6 +688,11 @@ footer.site{
 .listen-controls button{min-width:0; white-space:nowrap;}
 .listen-repeat-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;margin-top:14px;}
 .listen-repeat-row label{margin:0;}
+/* نوع التكرار + عدد المرات: عنصران جنباً إلى جنب حتى على الشاشات الصغيرة جداً */
+.repeat-type-count-row{display:flex;gap:10px;margin-top:14px;align-items:flex-start;}
+.repeat-type-count-row .repeat-field{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:4px;}
+.repeat-type-count-row label{margin:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.repeat-type-count-row select{width:100%;min-width:0;}
 .next-prayer-box{padding:16px;border:1px solid var(--border);border-radius:14px;text-align:center;background:var(--bg);}
 .next-prayer-name{font-size:20px;font-weight:800;color:var(--primary);margin:3px 0;}
 .next-prayer-countdown{font-size:30px;font-weight:900;letter-spacing:1px;direction:ltr;}
@@ -706,6 +711,9 @@ footer.site{
   .listen-controls button{font-size:10px;padding:7px 3px;}
   .listen-repeat-row{grid-template-columns:1fr 1fr;}
   .listen-repeat-row label{grid-column:1/-1;}
+  .repeat-type-count-row{gap:6px;}
+  .repeat-type-count-row label{font-size:11px;}
+  .repeat-type-count-row select{font-size:12px;padding:6px 4px;}
 }
 
 .dhikr-item.dhikr-done{opacity:.55;background:var(--bg);border-radius:12px;padding:12px;}
@@ -1506,7 +1514,7 @@ footer.site{
       </div>
       <div class="help-item" data-kw="حفظ ايات علامة مرجعية">
         <h4><span class="ic">🔖</span> حفظ الآيات ووضع علامة مرجعية</h4>
-        <p>اضغط على أي آية في المصحف لفتح لوحة التفسير أسفل الشاشة، ثم اضغط زر "🔖 حفظ الآية" وستظهر رسالة تسألك عن اسم العلامة لحفظها. تنطبق الفكرة نفسها على الأحاديث بزر "حفظ 🔖" أسفل كل حديث.</p>
+        <p>اضغط على أي آية في المصحف لفتح لوحة التفسير أسفل الشاشة، ثم اضغط زر "🔖 علامة مرجعية" وستظهر رسالة تسألك عن اسم العلامة لحفظها. تنطبق الفكرة نفسها على الأحاديث بزر "حفظ 🔖" أسفل كل حديث.</p>
       </div>
       <div class="help-item" data-kw="محفوظات بحث خطط صوت">
         <h4><span class="ic">🗂️</span> المحفوظات</h4>
@@ -1627,9 +1635,9 @@ footer.site{
   <div class="handle"></div>
   <h3 id="drawerTitle">التفسير</h3>
   <div class="txt" id="drawerText"></div>
-  <button class="btn outline sm" id="drawerBookmarkBtn" style="margin-top:16px;">🔖 حفظ الآية</button>
+  <button class="btn outline sm" id="drawerBookmarkBtn" style="margin-top:16px;">🔖 علامة مرجعية</button>
   <button class="btn outline sm" id="drawerAudioBtn" style="margin-top:16px; margin-inline-start:8px;">🔊 استماع للآية</button>
-  <button class="btn outline sm" id="drawerCopyBtn" style="margin-top:16px; margin-inline-start:8px;">📋 نسخ الآية مع رقمها</button>
+  <button class="btn outline sm" id="drawerCopyBtn" style="margin-top:16px; margin-inline-start:8px;">📋 نسخ</button>
 </div>
 
 <!-- Listen drawer (bottom sheet, matches the tafsir drawer design) -->
@@ -1648,19 +1656,23 @@ footer.site{
     <button class="btn" id="listenPlayPauseBtn">▶ تشغيل</button>
     <button class="btn outline sm" id="listenNextBtn">الآية التالية ⏭</button>
   </div>
-  <div class="listen-repeat-row">
-    <label for="listenRepeatType">نوع التكرار</label>
-    <select id="listenRepeatType">
-      <option value="ayah">تكرار الآية</option>
-      <option value="surah">تكرار السورة</option>
-    </select>
-    <label for="listenRepeatSelect">عدد المرات</label>
-    <select id="listenRepeatSelect">
-      <option value="0">بدون تكرار</option><option value="2">مرتان</option><option value="3">3 مرات</option>
-      <option value="5">5 مرات</option><option value="10">10 مرات</option><option value="custom">عدد مخصص</option><option value="infinite">∞ لا نهائي</option>
-    </select>
-    <input id="listenRepeatCustom" type="number" min="1" max="999" value="2" placeholder="عدد المرات" style="display:none;">
+  <div class="repeat-type-count-row">
+    <div class="repeat-field">
+      <label for="listenRepeatType">نوع التكرار</label>
+      <select id="listenRepeatType">
+        <option value="ayah">تكرار الآية</option>
+        <option value="surah">تكرار السورة</option>
+      </select>
+    </div>
+    <div class="repeat-field">
+      <label for="listenRepeatSelect">عدد المرات</label>
+      <select id="listenRepeatSelect">
+        <option value="0">بدون تكرار</option><option value="2">مرتان</option><option value="3">3 مرات</option>
+        <option value="5">5 مرات</option><option value="10">10 مرات</option><option value="custom">عدد مخصص</option><option value="infinite">∞ لا نهائي</option>
+      </select>
+    </div>
   </div>
+  <input id="listenRepeatCustom" type="number" min="1" max="999" value="2" placeholder="عدد المرات" style="display:none; width:100%; margin-top:8px;">
   <div class="listen-range-box" id="listenRangeBox">
     <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
       <input type="checkbox" id="rangeRepeatToggle"> تحديد نطاق دقيق للتكرار (من آية سورة - إلى آية سورة)
@@ -2117,6 +2129,7 @@ async function loadSurah(num, jumpToAyah){
     html += `<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
       <button class="btn outline sm" id="surahAudioBtn">🔊 الاستماع</button>
       <button class="btn outline sm" id="surahFavAudioBtn">⭐ إضافة للاستماع المفضل</button>
+      <button class="btn outline sm" id="surahCopyBtn">📋 نسخ السورة</button>
     </div>`;
     if(num!==9){
       html += `<div class="basmala">${ISTIADHAH_TEXT}</div>`;
@@ -2145,6 +2158,8 @@ async function loadSurah(num, jumpToAyah){
     document.getElementById('surahAudioBtn').addEventListener('click', ()=>openListenDrawer());
     document.getElementById('surahFavAudioBtn').addEventListener('click', ()=>toggleAudioFavorite(currentSurahData.num, arabicEd.name));
     syncSurahFavAudioBtn();
+    if(typeof syncReciterFavToggleBtn==='function') syncReciterFavToggleBtn();
+    document.getElementById('surahCopyBtn').addEventListener('click', ()=>copyWholeSurah());
 
     if(jumpToAyah){
       const idx = jumpToAyah-1;
@@ -2156,6 +2171,28 @@ async function loadSurah(num, jumpToAyah){
     }
   }catch(e){
     container.innerHTML = '<div class="loading">تعذر تحميل السورة، تحقق من اتصال الإنترنت وحاول مجدداً.</div>';
+  }
+}
+/* Copies the whole open surah's text (name + number on the first line, then each
+   ayah on its own line, in order) - no UI elements/buttons are ever included. */
+async function copyWholeSurah(){
+  if(!currentSurahData) return;
+  const btn = document.getElementById('surahCopyBtn');
+  const lines = currentSurahData.arabic.ayahs.map(a=>a.text);
+  const text = `${currentSurahData.arabic.name} - ${currentSurahData.num}\n\n${lines.join('\n')}`;
+  let ok=false;
+  try{ if(navigator.clipboard?.writeText){ await navigator.clipboard.writeText(text); ok=true; } }catch(e){}
+  if(!ok){
+    try{
+      const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select(); ok=document.execCommand('copy'); ta.remove();
+    }catch(e){}
+  }
+  if(ok){
+    if(btn){ const original=btn.textContent; btn.textContent='تم النسخ ✓'; setTimeout(()=>{btn.textContent=original;},1500); }
+    showToast('تم نسخ السورة كاملة.');
+  }else{
+    showToast('تعذر نسخ السورة. اسمح للموقع بالوصول إلى الحافظة أو حاول مجدداً.');
   }
 }
 let currentDrawerAyahIdx = null;
@@ -2227,6 +2264,7 @@ async function loadAllArabicReciters(){
       if(!RECITERS.some(r=>r.id===e.identifier)) RECITERS.push({id:e.identifier,name:e.name||e.englishName||e.identifier});
     });
     populateReciterSelect();
+    if(typeof syncReciterFavToggleBtn==='function') syncReciterFavToggleBtn();
   }catch(e){ /* keep the reliable built-in list */ }
 }
 loadAllArabicReciters();
@@ -2312,35 +2350,37 @@ async function resolveAyahAudioUrl(globalNum,reciter){
   const res=await fetch(`https://api.alquran.cloud/v1/ayah/${globalNum}/${encodeURIComponent(reciter)}`);
   if(!res.ok)throw new Error('audio-api');
   const data=await res.json();
-  const url=data?.data?.audio;
-  if(!url)throw new Error('audio-url');
-  ayahAudioUrlCache[key]=url;
-  return url;
+  const remoteUrl=data?.data?.audio;
+  if(!remoteUrl)throw new Error('audio-url');
+  // Root-cause fix for the gap between ayat: the alquran.cloud API only exposes one
+  // audio file per ayah (no per-ayah start/end timestamps inside a single continuous
+  // recording are published), so the previous "reduce the delay" attempts were just
+  // shrinking an artificial timeout. The real source of the audible gap - most
+  // noticeable on short ayahs - is the network round-trip needed to fetch the next
+  // ayah's audio. So instead of only warming the HTTP cache, fully download the audio
+  // bytes now (as a Blob) and hand back a local object URL. Once this has been
+  // prefetched ahead of time (see prefetchNextAyahUrl below), switching to it at
+  // playback time is a same-machine blob read with no network wait at all.
+  let playUrl = remoteUrl;
+  try{
+    const audioRes = await fetch(remoteUrl);
+    if(audioRes.ok){
+      const blob = await audioRes.blob();
+      playUrl = URL.createObjectURL(blob);
+    }
+  }catch(e){ /* network hiccup: fall back to streaming the remote URL directly */ }
+  ayahAudioUrlCache[key]=playUrl;
+  return playUrl;
 }
-/* Resolve the next ayah's audio URL ahead of time (while the current ayah is still
-   playing) so that when it ends, the following ayah starts with minimal delay -
-   without changing anything about how prev/next navigation or "current ayah" work. */
+/* Resolve (and fully download) the next ayah's audio ahead of time, while the current
+   ayah is still playing, so that when it ends the following ayah starts with no gap -
+   without changing anything about how prev/next navigation, repeat, or the audio
+   element's events work elsewhere in the app. */
 function prefetchNextAyahUrl(idx){
   if(!currentSurahData)return;
   const ayahs=currentSurahData.arabic.ayahs;
   if(idx<0||idx>=ayahs.length)return;
-  resolveAyahAudioUrl(ayahs[idx].number,getSelectedReciter()).then(url=>{
-    // Warm the browser's own HTTP cache with the next ayah's audio bytes while the
-    // current ayah is still playing (a hidden Audio element with preload="auto" is
-    // enough to trigger the download without affecting the visible player). When
-    // playback reaches this ayah, quranAudioPlayer.src is set to the same URL and
-    // the browser can serve it from cache instantly instead of starting a fresh
-    // network request - this is what removes the audible gap between ayat, without
-    // switching away from the current per-ayah playback/tracking/repeat/navigation
-    // system (a single unsplit CDN file for the whole surah has no reliable public
-    // per-ayah timestamp data to keep those features working).
-    try{
-      const pre=new Audio();
-      pre.preload='auto';
-      pre.src=url;
-      pre.load();
-    }catch(e){}
-  }).catch(()=>{});
+  resolveAyahAudioUrl(ayahs[idx].number,getSelectedReciter()).catch(()=>{});
 }
 async function playListenAyah(idx){
   if(!currentSurahData)return;
@@ -2368,6 +2408,7 @@ function openListenDrawer(mode='surah',idx=0){
   updateListenModeUI(); updateListenNowPlaying(); updateListenPlayPauseBtn();
   listenDrawer.classList.add('show'); listenDrawerBack.classList.add('show');
   syncQuranFloatMini();
+  syncReciterFavToggleBtn();
 }
 /* Re-show the hidden control panel WITHOUT touching playback - used by the floating
    mini-player so the user can bring the full controls back while audio keeps playing. */
@@ -5237,7 +5278,7 @@ function currentAyahText(){
 const copyBtn=document.getElementById('drawerCopyBtn');
 if(copyBtn)copyBtn.addEventListener('click',async()=>{
   const text=currentAyahText();if(!text)return;
-  try{await navigator.clipboard.writeText(text);copyBtn.textContent='تم النسخ ✓';setTimeout(()=>copyBtn.textContent='📋 نسخ الآية مع رقمها',1200);}catch(e){showToast('تعذر نسخ الآية.');}
+  try{await navigator.clipboard.writeText(text);copyBtn.textContent='تم النسخ ✓';setTimeout(()=>copyBtn.textContent='📋 نسخ',1200);}catch(e){showToast('تعذر نسخ الآية.');}
 });
 
 // Expand the dhikr collection with additional vocalized items; keep existing entries intact.
