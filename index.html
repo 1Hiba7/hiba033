@@ -206,6 +206,27 @@ nav.tabs button.active{background:var(--primary); color:#fff; box-shadow:-4px 3p
 .auto-dhikr-picker input{width:auto;}
 nav.tabs button:not(.active):hover{background:var(--accent-soft); color:var(--text);}
 
+/* ---------- طريقة عرض أقسام الموقع: قائمة جانبية (item 16) ---------- */
+html[data-nav-layout="sidebar"] #tabsWrap{
+  position:fixed; top:68px; bottom:0; inset-inline-start:0; width:220px; max-width:none; margin:0;
+  background:var(--bg-alt); border-inline-end:1px solid var(--border); overflow-y:auto; z-index:480; padding:14px 0;
+}
+html[data-nav-layout="sidebar"] #tabsWrap::after{display:none;}
+html[data-nav-layout="sidebar"] nav.tabs{
+  flex-direction:column; overflow-x:visible; overflow-y:auto; padding:0 10px; gap:4px; cursor:default; max-width:none; margin:0;
+}
+html[data-nav-layout="sidebar"] nav.tabs button{width:100%; text-align:start;}
+html[data-nav-layout="sidebar"] main{margin-inline-start:220px; max-width:calc(var(--container-max) + 220px);}
+@media(max-width:900px){
+  html[data-nav-layout="sidebar"] #tabsWrap{
+    position:fixed; top:auto; bottom:0; inset-inline-start:0; width:100%; height:auto; max-height:60px;
+    border-inline-end:none; border-top:1px solid var(--border); padding:0; z-index:495;
+  }
+  html[data-nav-layout="sidebar"] nav.tabs{flex-direction:row; overflow-x:auto; overflow-y:visible; padding:8px 10px;}
+  html[data-nav-layout="sidebar"] nav.tabs button{width:auto; white-space:nowrap; text-align:center;}
+  html[data-nav-layout="sidebar"] main{margin-inline-start:0; max-width:var(--container-max); padding-bottom:96px;}
+}
+
 main{max-width:var(--container-max); margin:0 auto; padding:26px clamp(20px, 3vw, 48px) 80px; position:relative; z-index:1;}
 .section{display:none; animation:fadeIn .4s ease;}
 .section.active{display:block;}
@@ -326,7 +347,7 @@ html[data-theme="dark"] .waqf-muanaqah{background:rgba(179,69,47,.28);}
 .bookmark-btn:hover{opacity:1;}
 .result-item{padding:12px 0; border-bottom:1px dashed var(--border); cursor:pointer;}
 .result-item:hover{background:var(--accent-soft);}
-mark{background:var(--accent); color:#fff; border-radius:3px; padding:0 2px;}
+mark{background:var(--search-highlight, var(--accent)); color:var(--search-highlight-text, #fff); border-radius:3px; padding:0 2px;}
 
 /* Tafsir drawer (bottom sheet) */
 .drawer-back{position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1400; display:none;}
@@ -827,6 +848,22 @@ footer.site{
 
     <div class="card mushaf-page" style="margin-top:18px;" id="surahContainer">
       <div class="loading">اختر سورة لعرضها</div>
+    </div>
+
+    <!-- فضل قراءة القرآن (item 13): بطاقة هادئة قابلة للطي، وليست نافذة منبثقة -->
+    <div class="card" id="quranVirtuesCard" style="margin-top:18px;">
+      <div id="quranVirtuesToggle" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <h3 style="margin:0;">📖 فضل قراءة القرآن</h3>
+        <span id="quranVirtuesChevron" class="small-note">إظهار ▾</span>
+      </div>
+      <div id="quranVirtuesBody" style="display:none; margin-top:12px;">
+        <div class="star-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
+        <div style="font-family:'Amiri',serif; font-size:16px; line-height:2.1; color:var(--text);">
+          <p>عن عثمان بن عفان رضي الله عنه، عن النبي ﷺ قال: «خيركم من تعلم القرآن وعلَّمه» — رواه البخاري.</p>
+          <p>عن أبي أمامة الباهلي رضي الله عنه قال: سمعت رسول الله ﷺ يقول: «اقرؤوا القرآن، فإنه يأتي يوم القيامة شفيعاً لأصحابه» — رواه مسلم.</p>
+          <p>عن عبد الله بن مسعود رضي الله عنه قال: قال رسول الله ﷺ: «من قرأ حرفاً من كتاب الله فله به حسنة، والحسنة بعشر أمثالها، لا أقول الم حرف، ولكن ألف حرف، ولام حرف، وميم حرف» — رواه الترمذي وقال: حديث حسن صحيح.</p>
+        </div>
+      </div>
     </div>
 
   </section>
@@ -1431,6 +1468,70 @@ footer.site{
         </select>
       </div>
       <button class="btn outline sm" id="resetCompassSkinBtn" style="margin-top:6px;">إعادة تعيين مظهر البوصلة للوضع الافتراضي</button>
+      <div class="small-note" style="margin-top:14px;">معاينة مباشرة:</div>
+      <div class="qibla-wrap" style="margin-top:6px;">
+        <div class="qibla-dial" id="compassSkinPreviewDial" style="width:120px; height:120px; transform:scale(1);">
+          <div class="qibla-pointer"></div>
+          <div class="qibla-rose">
+            <span class="dir-label dir-n">N</span>
+            <span class="dir-label dir-e">E</span>
+            <span class="dir-label dir-s">S</span>
+            <span class="dir-label dir-w">W</span>
+            <div class="qibla-needle" style="transform:rotate(35deg);"><div class="qibla-kaaba">🕋</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>📖 كتب التفسير</h3>
+      <div class="settings-row">
+        <div>
+          <div class="lbl">كتاب التفسير المعتمد</div>
+          <div class="desc">يُستخدم هذا الكتاب تلقائياً عند عرض تفسير أي آية في الموقع. يُحفظ اختيارك تلقائياً.</div>
+        </div>
+        <select id="tafsirBookSelect" class="btn outline sm" style="width:auto; min-width:170px; flex:0 0 auto;"></select>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>لون تمييز نتائج البحث</h3>
+      <div class="settings-row">
+        <div>
+          <div class="lbl">لون التمييز في نتائج البحث</div>
+          <div class="desc">يُطبَّق هذا اللون على تمييز نتائج البحث في الموقع (القرآن، الأحاديث، أحكام التجويد). الافتراضي هو البرتقالي.</div>
+        </div>
+        <input type="color" id="searchHighlightColorInput" value="#C9962B" style="width:52px; height:36px; padding:2px; border:1px solid var(--border); border-radius:8px; background:var(--bg); cursor:pointer;">
+      </div>
+      <button class="btn outline sm" id="resetSearchHighlightBtn" style="margin-top:6px;">استعادة اللون الافتراضي</button>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>نظام عرض أوقات الصلاة</h3>
+      <div class="settings-row">
+        <div>
+          <div class="lbl">صيغة عرض الوقت</div>
+          <div class="desc">تُطبَّق هذه الصيغة على جميع أوقات الصلاة الظاهرة في الموقع.</div>
+        </div>
+        <select id="prayerTimeFormatSelect" class="btn outline sm" style="width:auto; min-width:150px; flex:0 0 auto;">
+          <option value="12">نظام 12 ساعة (ص/م)</option>
+          <option value="24">نظام 24 ساعة</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h3>طريقة عرض أقسام الموقع</h3>
+      <div class="settings-row">
+        <div>
+          <div class="lbl">شكل التنقل بين الأقسام</div>
+          <div class="desc">اختر بين شريط علوي أو قائمة جانبية للتنقل بين أقسام الموقع.</div>
+        </div>
+        <select id="navLayoutSelect" class="btn outline sm" style="width:auto; min-width:150px; flex:0 0 auto;">
+          <option value="topbar">شريط علوي</option>
+          <option value="sidebar">قائمة جانبية</option>
+        </select>
+      </div>
     </div>
 
     <div class="card settings-danger-card" style="margin-top:18px;">
@@ -1612,7 +1713,7 @@ footer.site{
 
 <footer class="site">
   جميع الحقوق محفوظة لـ هبة كتانة / قلقيلية الشرعية / وزارة الأوقاف / فلسطين
-  <a href="https://1hiba7.github.io/Hiba_Kittaneh/" id="backHome">
+  <a href="index.html" id="backHome">
     <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
     <span>العودة للموسوعة الرئيسية</span>
   </a>
@@ -1997,14 +2098,18 @@ document.getElementById('hadithExplainToggle').addEventListener('click', functio
   this.textContent = box.classList.contains('show') ? 'إخفاء الشرح' : 'عرض الشرح';
 });
 
+/* ---- Selected tafsir book (default: ar.muyassar) - settings-page selectable ---- */
+function getSelectedTafsirEdition(){ return loadJSON('mc-tafsir-edition','ar.muyassar'); }
+
 async function loadAyahOfDay(){
   try{
     const num = (dayOfYear() % 6236) + 1;
-    const res = await fetch(`https://api.alquran.cloud/v1/ayah/${num}/editions/quran-uthmani,ar.muyassar`);
+    const tafsirEd = getSelectedTafsirEdition();
+    const res = await fetch(`https://api.alquran.cloud/v1/ayah/${num}/editions/quran-uthmani,${tafsirEd}`);
     const data = await res.json();
     if(data && data.data){
       const arabic = data.data.find(d=>d.edition.identifier==='quran-uthmani');
-      const tafsir = data.data.find(d=>d.edition.identifier==='ar.muyassar');
+      const tafsir = data.data.find(d=>d.edition.identifier===tafsirEd);
       document.getElementById('ayahOfDay').innerHTML = `${escapeHtml(arabic.text)}<span class="ayah-source ayah-source-inline" id="ayahOfDaySource">سورة ${escapeHtml(arabic.surah.name)} - آية ${arabic.numberInSurah}</span>`;
       document.getElementById('ayahTafsirBox').textContent = tafsir ? tafsir.text : 'لا يتوفر تفسير حالياً.';
     }
@@ -2107,10 +2212,10 @@ async function loadSurah(num, jumpToAyah){
   const container = document.getElementById('surahContainer');
   container.innerHTML = '<div class="loading">جاري تحميل السورة والتفسير...</div>';
   try{
-    const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/editions/quran-uthmani,ar.muyassar`);
+    const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/editions/quran-uthmani,${getSelectedTafsirEdition()}`);
     const data = await res.json();
     const arabicEd = data.data.find(d=>d.edition.identifier==='quran-uthmani');
-    const tafsirEd = data.data.find(d=>d.edition.identifier==='ar.muyassar');
+    const tafsirEd = data.data.find(d=>d.edition.identifier===getSelectedTafsirEdition());
 
     // Normalize ayah 1 text: remove an embedded leading Basmala if present.
     // Al-Fatihah (1) and At-Tawbah (9) are excluded: Al-Fatihah's first ayah IS the
@@ -3950,7 +4055,7 @@ function renderPrayerTimes(){
   grid.innerHTML = Object.entries(PRAYER_NAMES).map(([k,ar])=>`
     <div class="card time-card ${k===closest?'now':''}">
       <div class="n">${ar}</div>
-      <div class="t">${t[k]}</div>
+      <div class="t">${typeof formatPrayerTimeDisplay==='function' ? formatPrayerTimeDisplay(t[k]) : t[k]}</div>
     </div>`).join('');
   window.__prayerTimings = t;
   checkWaterTool(t);
@@ -4160,6 +4265,16 @@ if(resetCompassSkinBtnV1){
     saveJSON('mc-compass-skin', compassSkin);
     applyCompassSkin(compassSkin);
   });
+}
+
+/* ---------- Settings-page live preview of the qibla compass skin (item 15) ---------- */
+function applyCompassSkinPreview(skin){
+  const prev = document.getElementById('compassSkinPreviewDial');
+  if(prev) prev.dataset.skin = skin;
+}
+applyCompassSkinPreview(compassSkin);
+if(compassSkinSelectV1){
+  compassSkinSelectV1.addEventListener('change', ()=>applyCompassSkinPreview(compassSkinSelectV1.value));
 }
 
 /* ============================================================
@@ -4728,6 +4843,31 @@ const TOTAL_MUSHAF_PAGES = 604;
 // Approximate juz starting pages for the commonly-used 604-page (King Fahd Complex) mushaf layout.
 const JUZ_START_PAGES = [1,22,42,62,82,102,121,142,162,182,201,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
 
+/* Which juz (0-based index) a given page falls in. */
+function getJuzIndexForPage(page){
+  for(let i=JUZ_START_PAGES.length-1; i>=0; i--){
+    if(page >= JUZ_START_PAGES[i]) return i;
+  }
+  return 0;
+}
+/* Builds the ordered list of juz-segments memorization should pass through when going
+   "backward" (نزولاً): from the juz containing startPage down to juz 1, always covering
+   each juz's pages ascending (its own first page to its own last page) before moving on
+   to the juz before it - never a flat linear countdown that cuts across juz boundaries.
+   The juz containing startPage begins at startPage itself (not necessarily that juz's own
+   first page), so a not-yet-finished juz is still fully included in the plan. */
+function buildBackwardJuzSegments(startPage){
+  const segments = [];
+  const startJuzIdx = getJuzIndexForPage(startPage);
+  for(let juzIdx=startJuzIdx; juzIdx>=0; juzIdx--){
+    const juzStart = JUZ_START_PAGES[juzIdx];
+    const juzEnd = juzIdx===JUZ_START_PAGES.length-1 ? TOTAL_MUSHAF_PAGES : (JUZ_START_PAGES[juzIdx+1]-1);
+    const from = (juzIdx===startJuzIdx) ? startPage : juzStart;
+    segments.push({from, to:juzEnd, length: juzEnd-from+1});
+  }
+  return segments;
+}
+
 function initHifzStartUI(){
   const juzSel = document.getElementById('hifzJuzSelect');
   juzSel.innerHTML = JUZ_START_PAGES.map((p,i)=>`<option value="${i+1}">الجزء ${i+1} (من صفحة ${p})</option>`).join('');
@@ -4802,9 +4942,13 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
 
   // Build the plan day-by-day, but only ever counting "حفظ" days toward pages memorized,
   // and STOP as soon as the whole target range is covered - no extra/overflow days are created.
+  // For the backward direction, pages are consumed juz-by-juz (ascending within each juz,
+  // then jumping to the previous juz) instead of a flat linear countdown - see #12/#14 fix.
+  const backwardSegments = direction==='backward' ? buildBackwardJuzSegments(startPage) : null;
+  let segIdx = 0, segPos = 0; // cursor into backwardSegments, only used when direction==='backward'
   const plan = [];
   let pagesCovered = 0;
-  let currentPage = startPage;
+  let currentPage = startPage; // only used for the forward direction
   let dayCursor = new Date().getDay(); // 0=Sunday
   let guard = 0;
   while(pagesCovered < remainingPages && guard < 3000){
@@ -4815,17 +4959,33 @@ document.getElementById('hifzCalcBtn').addEventListener('click', ()=>{
       plan.push({type:'rest', label:'يوم راحة'});
     } else if(type==='review'){
       plan.push({type:'review', label:'مراجعة ما سبق حفظه'});
-    } else {
+    } else if(direction==='backward'){
+      const seg = backwardSegments[segIdx];
+      const remainInSeg = seg.length - segPos;
       const pagesLeftToCover = remainingPages - pagesCovered;
-      const pagesToday = Math.min(perDay, pagesLeftToCover);
-      const fromPage = direction==='forward' ? currentPage : currentPage - pagesToday + 1;
-      const toPage = direction==='forward' ? currentPage + pagesToday - 1 : currentPage;
+      // Cap today's pages at the end of the current juz, so a single day's range never
+      // crosses into the previous juz - the next hifz-day simply starts the next juz fresh.
+      const pagesToday = Math.min(perDay, remainInSeg, pagesLeftToCover);
+      const fromPage = seg.from + segPos;
+      const toPage = fromPage + pagesToday - 1;
       const label = pagesToday <= 1
-        ? `صفحة ${Math.round(direction==='forward'?fromPage:toPage)}`
+        ? `صفحة ${Math.round(fromPage)}`
         : `صفحات ${Math.round(fromPage)} - ${Math.round(toPage)}`;
       plan.push({type:'hifz', label});
       pagesCovered += pagesToday;
-      currentPage = direction==='forward' ? currentPage + pagesToday : currentPage - pagesToday;
+      segPos += pagesToday;
+      if(segPos >= seg.length - 1e-9 && segIdx < backwardSegments.length-1){ segIdx++; segPos = 0; }
+    } else {
+      const pagesLeftToCover = remainingPages - pagesCovered;
+      const pagesToday = Math.min(perDay, pagesLeftToCover);
+      const fromPage = currentPage;
+      const toPage = currentPage + pagesToday - 1;
+      const label = pagesToday <= 1
+        ? `صفحة ${Math.round(fromPage)}`
+        : `صفحات ${Math.round(fromPage)} - ${Math.round(toPage)}`;
+      plan.push({type:'hifz', label});
+      pagesCovered += pagesToday;
+      currentPage = currentPage + pagesToday;
     }
     dayCursor++;
   }
@@ -5547,7 +5707,34 @@ syncSelectedDhikrV3();
 
 
 /* ===================== USER UPDATE v4 ===================== */
-/* Tajwid search */
+/* Tajwid search - now also highlights the matching text inside each result
+   (same <mark> technique used for hadith search results, see highlightMatch),
+   so the matched result is visually clear/selected the same way. */
+function highlightElementMatches(el, q){
+  const re = buildFlexibleRegex(q);
+  if(!re) return;
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+  const nodes = []; let n;
+  while((n = walker.nextNode())) nodes.push(n);
+  nodes.forEach(node=>{
+    const text = node.nodeValue;
+    if(!text) return;
+    re.lastIndex = 0;
+    if(!re.test(text)) return;
+    re.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let lastEnd = 0, m;
+    while((m = re.exec(text))){
+      if(m.index === re.lastIndex) re.lastIndex++;
+      if(m.index > lastEnd) frag.appendChild(document.createTextNode(text.slice(lastEnd, m.index)));
+      const mark = document.createElement('mark'); mark.textContent = m[0];
+      frag.appendChild(mark);
+      lastEnd = m.index + m[0].length;
+    }
+    frag.appendChild(document.createTextNode(text.slice(lastEnd)));
+    node.parentNode.replaceChild(frag, node);
+  });
+}
 (function initTajwidSearchV4(){
   const input=document.getElementById('tajwidSearchInput');
   const clear=document.getElementById('tajwidSearchClear');
@@ -5555,15 +5742,138 @@ syncSelectedDhikrV3();
   if(!input||!section)return;
   const cards=[...section.querySelectorAll('.card')].filter(c=>c!==input.closest('.card'));
   function filter(){
-    const q=input.value.trim().toLowerCase();
+    const q=input.value.trim();
+    const qLower=q.toLowerCase();
     cards.forEach(card=>{
+      // Restore the card's original markup before re-highlighting on every
+      // keystroke, so matches never end up nested inside a previous <mark>.
+      if(card.dataset.origHtml===undefined) card.dataset.origHtml=card.innerHTML;
+      card.innerHTML=card.dataset.origHtml;
       if(!q){card.style.display='';return;}
-      const match=card.textContent.toLowerCase().includes(q);
+      const match=card.textContent.toLowerCase().includes(qLower);
       card.style.display=match?'':'none';
+      if(match) highlightElementMatches(card, q);
     });
   }
   input.addEventListener('input',filter);
   clear.addEventListener('click',()=>{input.value='';filter();input.focus();});
+})();
+
+/* ---------- طياقة "فضل قراءة القرآن" - قابلة للطي، غير مزعجة (item 13) ---------- */
+(function initQuranVirtuesToggleV5(){
+  const toggle = document.getElementById('quranVirtuesToggle');
+  const body = document.getElementById('quranVirtuesBody');
+  const chevron = document.getElementById('quranVirtuesChevron');
+  if(!toggle || !body) return;
+  toggle.addEventListener('click', ()=>{
+    const show = body.style.display === 'none';
+    body.style.display = show ? '' : 'none';
+    if(chevron) chevron.textContent = show ? 'إخفاء ▴' : 'إظهار ▾';
+  });
+})();
+(function initTafsirBookSelectV5(){
+  const sel = document.getElementById('tafsirBookSelect');
+  if(!sel) return;
+  const FALLBACK_TAFSIR = [
+    {id:'ar.muyassar', name:'التفسير الميسر'},
+    {id:'ar.jalalayn', name:'تفسير الجلالين'},
+    {id:'ar.qurtubi', name:'تفسير القرطبي'}
+  ];
+  function populate(list){
+    const saved = getSelectedTafsirEdition();
+    sel.innerHTML = list.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+    if(![...sel.options].some(o=>o.value===saved)){
+      const opt=document.createElement('option'); opt.value=saved; opt.textContent=saved; sel.appendChild(opt);
+    }
+    sel.value = saved;
+  }
+  populate(FALLBACK_TAFSIR);
+  fetch('https://api.alquran.cloud/v1/edition?format=text&type=tafsir')
+    .then(r=>r.json())
+    .then(data=>{
+      const list=(data.data||[]).filter(e=>e.identifier && e.language==='ar').map(e=>({id:e.identifier,name:e.name||e.englishName||e.identifier}));
+      if(list.length) populate(list);
+    }).catch(()=>{ /* keep the reliable built-in list */ });
+  sel.addEventListener('change', async ()=>{
+    saveJSON('mc-tafsir-edition', sel.value);
+    if(typeof loadAyahOfDay==='function') loadAyahOfDay();
+    // Update the tafsir of the currently-open surah in place (without re-rendering
+    // the mushaf text itself) so the newly chosen book applies immediately.
+    if(currentSurahData){
+      try{
+        const res = await fetch(`https://api.alquran.cloud/v1/surah/${currentSurahData.num}/edition/${sel.value}`);
+        const data = await res.json();
+        if(data && data.data) currentSurahData.tafsir = data.data;
+      }catch(e){}
+    }
+  });
+})();
+
+/* ---------- Settings: لون تمييز نتائج البحث (item 10) ---------- */
+(function initSearchHighlightColorV5(){
+  const DEFAULT_COLOR = '#C9962B';
+  const input = document.getElementById('searchHighlightColorInput');
+  const resetBtn = document.getElementById('resetSearchHighlightBtn');
+  if(!input) return;
+  function contrastTextColor(hex){
+    const c = String(hex||'').replace('#','');
+    if(c.length!==6) return '#fff';
+    const r=parseInt(c.substr(0,2),16), g=parseInt(c.substr(2,2),16), b=parseInt(c.substr(4,2),16);
+    if([r,g,b].some(isNaN)) return '#fff';
+    const lum = (0.299*r+0.587*g+0.114*b)/255;
+    return lum>0.6 ? '#151515' : '#fff';
+  }
+  function apply(color){
+    document.documentElement.style.setProperty('--search-highlight', color);
+    document.documentElement.style.setProperty('--search-highlight-text', contrastTextColor(color));
+    input.value = color;
+  }
+  apply(loadJSON('mc-search-highlight-color', DEFAULT_COLOR));
+  input.addEventListener('input', ()=>{
+    saveJSON('mc-search-highlight-color', input.value);
+    apply(input.value);
+  });
+  if(resetBtn) resetBtn.addEventListener('click', ()=>{
+    saveJSON('mc-search-highlight-color', DEFAULT_COLOR);
+    apply(DEFAULT_COLOR);
+  });
+})();
+
+/* ---------- Settings: نظام عرض أوقات الصلاة 12/24 ساعة (item 11) ---------- */
+function getPrayerTimeFormat(){ return loadJSON('mc-prayer-time-format', '24'); }
+function formatPrayerTimeDisplay(hhmm){
+  const [h,m] = String(hhmm).split(':').map(Number);
+  if(getPrayerTimeFormat()==='12'){
+    const period = h>=12 ? 'م' : 'ص';
+    let h12 = h % 12; if(h12===0) h12 = 12;
+    return `${h12}:${String(m).padStart(2,'0')} ${period}`;
+  }
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+(function initPrayerTimeFormatV5(){
+  const sel = document.getElementById('prayerTimeFormatSelect');
+  if(!sel) return;
+  sel.value = getPrayerTimeFormat();
+  sel.addEventListener('change', ()=>{
+    saveJSON('mc-prayer-time-format', sel.value);
+    if(typeof renderPrayerTimes==='function') renderPrayerTimes();
+  });
+})();
+
+/* ---------- Settings: طريقة عرض أقسام الموقع - شريط علوي/قائمة جانبية (item 16) ---------- */
+function getNavLayout(){ return loadJSON('mc-nav-layout', 'topbar'); }
+function applyNavLayout(layout){
+  document.documentElement.setAttribute('data-nav-layout', layout);
+}
+(function initNavLayoutV5(){
+  const sel = document.getElementById('navLayoutSelect');
+  applyNavLayout(getNavLayout());
+  if(!sel) return;
+  sel.value = getNavLayout();
+  sel.addEventListener('change', ()=>{
+    saveJSON('mc-nav-layout', sel.value);
+    applyNavLayout(sel.value);
+  });
 })();
 
 /* Multi-source reciter catalog:
