@@ -206,25 +206,42 @@ nav.tabs button.active{background:var(--primary); color:#fff; box-shadow:-4px 3p
 .auto-dhikr-picker input{width:auto;}
 nav.tabs button:not(.active):hover{background:var(--accent-soft); color:var(--text);}
 
-/* ---------- طريقة عرض أقسام الموقع: قائمة جانبية (item 16) ---------- */
-html[data-nav-layout="sidebar"] #tabsWrap{
-  position:fixed; top:68px; bottom:0; inset-inline-start:0; width:220px; max-width:none; margin:0;
-  background:var(--bg-alt); border-inline-end:1px solid var(--border); overflow-y:auto; z-index:480; padding:14px 0;
+/* ---------- طريقة عرض أقسام الموقع: قائمة جانبية منسدلة من اليمين (item 6) ----------
+   Off-canvas drawer that slides in from the physical right edge (correct reading side
+   for this RTL interface), toggled by the ☰ button that replaces the star icon while
+   this layout is active. Uses a fixed panel + dim overlay rather than pushing/reflowing
+   the page, so switching layouts never changes main's box model or breaks other CSS. */
+.nav-hamburger-btn{
+  display:none; align-items:center; justify-content:center;
+  background:none; border:none; padding:4px 6px; margin:0; line-height:1;
+  font-size:26px; color:var(--primary); cursor:pointer; border-radius:8px;
 }
+html[data-theme="dark"] .nav-hamburger-btn{color:var(--accent);}
+.nav-hamburger-btn:hover{background:var(--accent-soft);}
+.sidebar-overlay{
+  position:fixed; inset:0; background:rgba(10,20,18,.5); z-index:998;
+  opacity:0; visibility:hidden; transition:opacity .28s ease, visibility .28s ease;
+}
+.sidebar-overlay.show{opacity:1; visibility:visible;}
+
+html[data-nav-layout="sidebar"] .brand-star{display:none;}
+html[data-nav-layout="sidebar"] .nav-hamburger-btn{display:inline-flex;}
+html[data-nav-layout="sidebar"] #tabsWrap{
+  position:fixed; top:0; right:0; bottom:0; inset-inline-start:auto; width:280px; max-width:82vw;
+  max-width:min(82vw, 320px); margin:0; height:100%;
+  background:var(--bg-alt); border-inline-start:1px solid var(--border);
+  box-shadow:-10px 0 30px var(--shadow);
+  overflow-y:auto; z-index:999; padding:84px 16px 24px;
+  transform:translateX(100%); transition:transform .3s ease;
+}
+html[data-nav-layout="sidebar"] #tabsWrap.open{transform:translateX(0);}
 html[data-nav-layout="sidebar"] #tabsWrap::after{display:none;}
 html[data-nav-layout="sidebar"] nav.tabs{
-  flex-direction:column; overflow-x:visible; overflow-y:auto; padding:0 10px; gap:4px; cursor:default; max-width:none; margin:0;
+  flex-direction:column; overflow-x:visible; overflow-y:visible; padding:0; gap:4px; cursor:default; max-width:none; margin:0;
 }
 html[data-nav-layout="sidebar"] nav.tabs button{width:100%; text-align:start;}
-html[data-nav-layout="sidebar"] main{margin-inline-start:220px; max-width:calc(var(--container-max) + 220px);}
-@media(max-width:900px){
-  html[data-nav-layout="sidebar"] #tabsWrap{
-    position:fixed; top:auto; bottom:0; inset-inline-start:0; width:100%; height:auto; max-height:60px;
-    border-inline-end:none; border-top:1px solid var(--border); padding:0; z-index:495;
-  }
-  html[data-nav-layout="sidebar"] nav.tabs{flex-direction:row; overflow-x:auto; overflow-y:visible; padding:8px 10px;}
-  html[data-nav-layout="sidebar"] nav.tabs button{width:auto; white-space:nowrap; text-align:center;}
-  html[data-nav-layout="sidebar"] main{margin-inline-start:0; max-width:var(--container-max); padding-bottom:96px;}
+@media(max-width:640px){
+  html[data-nav-layout="sidebar"] #tabsWrap{width:78vw; padding:78px 14px 24px;}
 }
 
 main{max-width:var(--container-max); margin:0 auto; padding:26px clamp(20px, 3vw, 48px) 80px; position:relative; z-index:1;}
@@ -304,10 +321,21 @@ html[data-theme="dark"] .ql-card svg{fill:var(--accent);}
 /* ===================== Quran - Mushaf mode ===================== */
 .quran-toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:10px;}
 .quran-toolbar > div{flex:1; min-width:160px;}
-.quran-search-inline{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;width:100%;}
-.quran-search-inline .qsearch-main{grid-column:1/-1;min-width:0;}
-.quran-search-inline .qsearch-scope{grid-column:1;width:170px;}
-.quran-search-inline .qsearch-btn{grid-column:2;align-self:end;}
+.quran-search-inline{display:flex;flex-direction:column;gap:10px;width:100%;}
+.quran-search-inline .qsearch-main{min-width:0;}
+.quran-search-inline .qsearch-scope{width:220px;max-width:100%;}
+/* Compact search box: clear (✕) + search (🔍) buttons live inside the input itself */
+.search-combo{position:relative;display:flex;align-items:center;}
+.search-combo input{width:100%;padding-inline-end:66px;}
+.search-combo-clear,.search-combo-go{
+  position:absolute;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:15px;line-height:1;
+  padding:6px 7px;border-radius:7px;color:var(--text-soft);
+}
+.search-combo-clear{inset-inline-end:34px;}
+.search-combo-go{inset-inline-end:2px;color:var(--primary);font-size:16px;}
+.search-combo-clear:hover,.search-combo-go:hover{background:var(--accent-soft);}
+html[data-theme="dark"] .search-combo-go{color:var(--accent);}
 .tajwid-search-wrap{display:flex;gap:10px;align-items:flex-end;margin-bottom:16px;}
 .tajwid-search-wrap>div:first-child{flex:1;min-width:0;}
 .quick-access{margin-top:18px;}
@@ -315,7 +343,7 @@ html[data-theme="dark"] .ql-card svg{fill:var(--accent);}
 .quick-access-item{border:1px solid var(--border);background:var(--bg);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:transform .18s ease,border-color .18s ease,background .18s ease;font-weight:700;font-size:13px;}
 .quick-access-item:hover{transform:translateY(-2px);border-color:var(--primary);background:var(--accent-soft);}
 @media(max-width:900px){.quick-access-grid{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:600px){.quran-search-inline{grid-template-columns:minmax(0,1fr) auto}.quran-search-inline .qsearch-scope{grid-column:1;width:auto}.quran-search-inline .qsearch-btn{grid-column:2}.quick-access-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.quick-access-grid{grid-template-columns:repeat(2,1fr);} .search-combo input{padding-inline-end:60px;} .search-combo-clear,.search-combo-go{font-size:13px;padding:5px 6px;} .search-combo-clear{inset-inline-end:30px;}}
 
 .font-controls{display:flex; gap:18px; flex-wrap:wrap; margin-top:14px;}
 .font-controls > div{flex:1; min-width:180px;}
@@ -336,6 +364,8 @@ html[data-theme="dark"] .waqf-muanaqah{background:rgba(179,69,47,.28);}
 .ayah-span{cursor:pointer; border-radius:5px; padding:1px 2px; transition:background .2s ease;}
 .ayah-span:hover{background:var(--accent-soft);}
 .ayah-span.active{background:var(--accent-soft); box-shadow:0 0 0 2px var(--accent) inset;}
+.ayah-span.selected-for-copy{background:var(--primary-light); box-shadow:0 0 0 2px var(--primary) inset;}
+.ayah-span.selected-for-copy .ayah-num-marker{background:var(--primary); color:#fff;}
 .ayah-num-marker{
   display:inline-flex; align-items:center; justify-content:center; width:26px;height:26px; border-radius:50%;
   background:var(--accent-soft); color:var(--accent-dark); font-size:12px; font-family:'Tajawal',sans-serif; font-weight:700;
@@ -500,9 +530,13 @@ html[data-theme="dark"] .qibla-rose .dir-n{color:var(--accent);}
   background:linear-gradient(var(--needle-top), var(--needle-bottom)); border-radius:6px;
   transform-origin:bottom center; z-index:2; transition:background .2s ease;
 }
-.qibla-needle::before{content:"◆"; position:absolute; top:-14px; right:-8px; color:var(--needle-top); font-size:16px;}
+/* Kept close to the needle's own tip (small negative offset + true centering via
+   translate(-50%,-50%)) so its farthest edge always stays inside the dial's circular
+   border at every rotation angle - previously it sat far enough above the tip that it
+   rendered outside the compass circle entirely. */
+.qibla-needle::before{content:"◆"; position:absolute; top:-7px; right:-3px; color:var(--needle-top); font-size:12px;}
 .qibla-kaaba{
-  position:absolute; top:-24px; left:50%; transform:translateX(-50%);
+  position:absolute; top:-4px; left:50%; transform:translate(-50%, -50%);
   width:16px; height:16px; background:var(--kaaba-bg); border-radius:3px;
   display:flex; align-items:center; justify-content:center; font-size:10px;
 }
@@ -764,17 +798,20 @@ footer.site{
 <header class="site">
   <div class="brand-row">
     <div class="brand">
-      <svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg>
+      <svg viewBox="0 0 24 24" class="brand-star" id="brandStarIcon"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg>
+      <button type="button" class="nav-hamburger-btn" id="navHamburgerBtn" aria-label="فتح القائمة الجانبية" title="القائمة">☰</button>
       <div>
         <h1>المسلم الشامل</h1>
         <small>موسوعتك الإسلامية اليومية</small>
       </div>
     </div>
   </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="tabs-wrap" id="tabsWrap">
   <nav class="tabs" id="tabs">
     <button data-sec="home" class="active">الرئيسية</button>
     <button data-sec="quran">القرآن الكريم</button>
+    <button data-sec="quran-virtues">📖 فضل قراءة القرآن</button>
     <button data-sec="tajwid">أحكام التجويد</button>
     <button data-sec="hadith">الأحاديث النبوية</button>
     <button data-sec="names">أسماء الله الحسنى</button>
@@ -836,11 +873,17 @@ footer.site{
 
       <div class="star-divider"><div class="line"></div><span style="font-size:12px;color:var(--text-soft)">محرك بحث الآيات</span><div class="line"></div></div>
       <div class="quran-search-inline">
-        <div class="qsearch-main"><label id="quranSearchLabel">ابحث عن كلمة داخل نص الآيات فقط</label><input type="text" id="quranSearchInput" placeholder="اكتب كلمة للبحث..."></div>
+        <div class="qsearch-main">
+          <label id="quranSearchLabel">ابحث عن كلمة داخل نص الآيات فقط</label>
+          <div class="search-combo">
+            <input type="text" id="quranSearchInput" placeholder="اكتب كلمة للبحث...">
+            <button type="button" id="quranSearchClearBtn" class="search-combo-clear" title="مسح" style="display:none;">✕</button>
+            <button type="button" id="quranSearchBtn" class="search-combo-go" title="بحث">🔍</button>
+          </div>
+        </div>
         <div class="qsearch-scope"><label>نطاق البحث</label>
           <select id="searchScope"><option value="current">السورة الحالية</option><option value="all">كل المصحف</option></select>
         </div>
-        <div class="qsearch-btn"><button class="btn outline" id="quranSearchBtn">بحث</button></div>
       </div>
       <div id="searchResultsInfo" class="small-note"></div>
       <div id="searchResultsList"></div>
@@ -850,19 +893,66 @@ footer.site{
       <div class="loading">اختر سورة لعرضها</div>
     </div>
 
-    <!-- فضل قراءة القرآن (item 13): بطاقة هادئة قابلة للطي، وليست نافذة منبثقة -->
-    <div class="card" id="quranVirtuesCard" style="margin-top:18px;">
-      <div id="quranVirtuesToggle" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px;">
-        <h3 style="margin:0;">📖 فضل قراءة القرآن</h3>
-        <span id="quranVirtuesChevron" class="small-note">إظهار ▾</span>
+  </section>
+
+  <!-- ============ فضل قراءة القرآن (قسم مستقل) ============ -->
+  <section class="section" id="sec-quran-virtues">
+    <h2>📖 فضل قراءة القرآن</h2>
+    <p class="small-note">أحاديث صحيحة موثوقة تبيّن عظيم أجر تلاوة القرآن الكريم وتدبّره وتعلّمه.</p>
+
+    <div class="card">
+      <h3>أجر القراءة حرفاً حرفاً</h3>
+      <div class="star-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
+      <div style="font-family:'Amiri',serif; font-size:16px; line-height:2.1; color:var(--text);">
+        <p>عن عبد الله بن مسعود رضي الله عنه قال: قال رسول الله ﷺ: «من قرأ حرفاً من كتاب الله فله به حسنة، والحسنة بعشر أمثالها، لا أقول الم حرف، ولكن ألف حرف، ولام حرف، وميم حرف» — رواه الترمذي وقال: حديث حسن صحيح.</p>
       </div>
-      <div id="quranVirtuesBody" style="display:none; margin-top:12px;">
-        <div class="star-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
-        <div style="font-family:'Amiri',serif; font-size:16px; line-height:2.1; color:var(--text);">
-          <p>عن عثمان بن عفان رضي الله عنه، عن النبي ﷺ قال: «خيركم من تعلم القرآن وعلَّمه» — رواه البخاري.</p>
-          <p>عن أبي أمامة الباهلي رضي الله عنه قال: سمعت رسول الله ﷺ يقول: «اقرؤوا القرآن، فإنه يأتي يوم القيامة شفيعاً لأصحابه» — رواه مسلم.</p>
-          <p>عن عبد الله بن مسعود رضي الله عنه قال: قال رسول الله ﷺ: «من قرأ حرفاً من كتاب الله فله به حسنة، والحسنة بعشر أمثالها، لا أقول الم حرف، ولكن ألف حرف، ولام حرف، وميم حرف» — رواه الترمذي وقال: حديث حسن صحيح.</p>
-        </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>القرآن شفيع لأصحابه يوم القيامة</h3>
+      <div class="star-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
+      <div style="font-family:'Amiri',serif; font-size:16px; line-height:2.1; color:var(--text);">
+        <p>عن أبي أمامة الباهلي رضي الله عنه قال: سمعت رسول الله ﷺ يقول: «اقرؤوا القرآن، فإنه يأتي يوم القيامة شفيعاً لأصحابه» — رواه مسلم.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>فضل تعلّم القرآن وتعليمه</h3>
+      <div class="star-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
+      <div style="font-family:'Amiri',serif; font-size:16px; line-height:2.1; color:var(--text);">
+        <p>عن عثمان بن عفان رضي الله عنه، عن النبي ﷺ قال: «خيركم من تعلم القرآن وعلَّمه» — رواه البخاري.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>منزلة الماهر بالقرآن ومنزلة من يتعتع فيه</h3>
+      <div class="star-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
+      <div style="font-family:'Amiri',serif; font-size:16px; line-height:2.1; color:var(--text);">
+        <p>عن عائشة رضي الله عنها قالت: قال رسول الله ﷺ: «الماهر بالقرآن مع السَّفَرة الكرام البَرَرة، والذي يقرأ القرآن ويتتعتع فيه وهو عليه شاق له أجران» — متفق عليه.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>البيت الذي يُقرأ فيه القرآن</h3>
+      <div class="star-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
+      <div style="font-family:'Amiri',serif; font-size:16px; line-height:2.1; color:var(--text);">
+        <p>عن أبي هريرة رضي الله عنه قال: قال رسول الله ﷺ: «لا تجعلوا بيوتكم مقابر، إن الشيطان ينفر من البيت الذي تُقرأ فيه سورة البقرة» — رواه مسلم.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>سورتان تحاجّان عن صاحبهما</h3>
+      <div class="star-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
+      <div style="font-family:'Amiri',serif; font-size:16px; line-height:2.1; color:var(--text);">
+        <p>عن أبي أمامة الباهلي رضي الله عنه عن النبي ﷺ قال: «اقرؤوا الزهراوين البقرة وسورة آل عمران، فإنهما تأتيان يوم القيامة كأنهما غمامتان، أو كأنهما غيايتان، أو كأنهما فرقان من طير صواف تحاجّان عن أصحابهما» — رواه مسلم.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>خيريّة تعلّم القرآن وتعليمه</h3>
+      <div class="star-divider" aria-hidden="true"><div class="line"></div><svg viewBox="0 0 24 24"><path d="M12 2 14.5 8.5 21 9l-5 4.4L17.5 20 12 16.3 6.5 20 8 13.4 3 9l6.5-.5z"/></svg><div class="line"></div></div>
+      <div style="font-family:'Amiri',serif; font-size:16px; line-height:2.1; color:var(--text);">
+        <p>عن ابن عباس رضي الله عنهما عن النبي ﷺ قال: «إن الذي ليس في جوفه شيء من القرآن كالبيت الخرب» — رواه الترمذي وقال: حديث حسن صحيح.</p>
       </div>
     </div>
 
@@ -1465,19 +1555,29 @@ footer.site{
           <option value="modern">عصري</option>
           <option value="gold">ذهبي فاخر</option>
           <option value="night">ليلي متوهج</option>
+          <option value="emerald">زمردي</option>
+          <option value="minimal">بسيط</option>
         </select>
       </div>
       <button class="btn outline sm" id="resetCompassSkinBtn" style="margin-top:6px;">إعادة تعيين مظهر البوصلة للوضع الافتراضي</button>
       <div class="small-note" style="margin-top:14px;">معاينة مباشرة:</div>
       <div class="qibla-wrap" style="margin-top:6px;">
-        <div class="qibla-dial" id="compassSkinPreviewDial" style="width:120px; height:120px; transform:scale(1);">
-          <div class="qibla-pointer"></div>
-          <div class="qibla-rose">
-            <span class="dir-label dir-n">N</span>
-            <span class="dir-label dir-e">E</span>
-            <span class="dir-label dir-s">S</span>
-            <span class="dir-label dir-w">W</span>
-            <div class="qibla-needle" style="transform:rotate(35deg);"><div class="qibla-kaaba">🕋</div></div>
+        <!-- Fixed 120x120 clipping viewport; the real 220x220 dial is scaled down as a
+             single rigid unit inside it, so every internal element (needle, kaaba
+             marker, ticks) keeps the exact same proportions/position as the real
+             compass - a plain width/height override would instead stretch the box
+             while leaving the needle's own fixed pixel size unchanged, making it
+             overflow badly at small sizes. -->
+        <div style="width:120px; height:120px; position:relative; overflow:hidden;">
+          <div class="qibla-dial" id="compassSkinPreviewDial" style="position:absolute; top:0; left:0; transform:scale(0.5455); transform-origin:top left;">
+            <div class="qibla-pointer"></div>
+            <div class="qibla-rose">
+              <span class="dir-label dir-n">N</span>
+              <span class="dir-label dir-e">E</span>
+              <span class="dir-label dir-s">S</span>
+              <span class="dir-label dir-w">W</span>
+              <div class="qibla-needle" style="transform:rotate(35deg);"><div class="qibla-kaaba">🕋</div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1525,7 +1625,7 @@ footer.site{
       <div class="settings-row">
         <div>
           <div class="lbl">شكل التنقل بين الأقسام</div>
-          <div class="desc">اختر بين شريط علوي أو قائمة جانبية للتنقل بين أقسام الموقع.</div>
+          <div class="desc">اختر بين شريط علوي، أو قائمة جانبية تنسدل من اليمين عبر زر ☰ الذي يحل محل النجمة بجانب اسم الموقع.</div>
         </div>
         <select id="navLayoutSelect" class="btn outline sm" style="width:auto; min-width:150px; flex:0 0 auto;">
           <option value="topbar">شريط علوي</option>
@@ -1879,6 +1979,7 @@ function goSection(name){
   document.getElementById('sec-'+name).classList.add('active');
   const buttons = [...document.querySelectorAll('nav.tabs#tabs button')];
   buttons.forEach(b=>b.classList.toggle('active', b.dataset.sec===name));
+  if(typeof closeSidebarDrawer==='function') closeSidebarDrawer(); // in sidebar layout, picking a section closes the off-canvas drawer
   window.scrollTo({top:0, behavior:'smooth'});
   // Center the clicked tab within the horizontal strip, unless it's the first or last tab
   const idx = buttons.findIndex(b=>b.dataset.sec===name);
@@ -1931,7 +2032,7 @@ updateTabsEdges();
 })();
 
 /* ---------- Section ordering (customizable from Settings) ---------- */
-const DEFAULT_SECTION_ORDER = ['home','quran','tajwid','hadith','names','adhkar','zakat','prayer','wird','favorites','settings','help'];
+const DEFAULT_SECTION_ORDER = ['home','quran','quran-virtues','tajwid','hadith','names','adhkar','zakat','prayer','wird','favorites','settings','help'];
 function applySectionOrder(order){
   order.forEach(sec=>{
     const btn = tabsNav.querySelector(`button[data-sec="${sec}"]`);
@@ -1950,7 +2051,7 @@ function getSectionOrder(){
 applySectionOrder(getSectionOrder());
 
 const SECTION_LABELS = {
-  home:'الرئيسية', quran:'القرآن الكريم', tajwid:'أحكام التجويد', hadith:'الأحاديث النبوية', names:'أسماء الله الحسنى',
+  home:'الرئيسية', quran:'القرآن الكريم', 'quran-virtues':'فضل قراءة القرآن', tajwid:'أحكام التجويد', hadith:'الأحاديث النبوية', names:'أسماء الله الحسنى',
   adhkar:'الأذكار والتسبيح', zakat:'حساب الزكاة', prayer:'الصلاة والقبلة والتقويم', wird:'الورد والحفظ',
   favorites:'المحفوظات', settings:'الإعدادات', help:'المساعدة'
 };
@@ -2100,6 +2201,7 @@ document.getElementById('hadithExplainToggle').addEventListener('click', functio
 
 /* ---- Selected tafsir book (default: ar.muyassar) - settings-page selectable ---- */
 function getSelectedTafsirEdition(){ return loadJSON('mc-tafsir-edition','ar.muyassar'); }
+let tafsirEditionFetchToken = 0; // guards against a stale in-flight tafsir-book fetch clobbering newer state
 
 async function loadAyahOfDay(){
   try{
@@ -2234,6 +2336,7 @@ async function loadSurah(num, jumpToAyah){
     html += `<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
       <button class="btn outline sm" id="surahAudioBtn">🔊 الاستماع</button>
       <button class="btn outline sm" id="surahFavAudioBtn">⭐ إضافة للاستماع المفضل</button>
+      <button class="btn outline sm" id="ayahSelectModeBtn">☑️ تحديد آيات للنسخ</button>
       <button class="btn outline sm" id="surahCopyBtn">📋 نسخ السورة</button>
     </div>`;
     if(num!==9){
@@ -2258,13 +2361,26 @@ async function loadSurah(num, jumpToAyah){
     applyFontSizes();
 
     container.querySelectorAll('.ayah-span').forEach(span=>{
-      span.addEventListener('click', ()=>selectAyah(parseInt(span.dataset.idx)));
+      span.addEventListener('click', ()=>handleAyahClick(parseInt(span.dataset.idx)));
     });
     document.getElementById('surahAudioBtn').addEventListener('click', ()=>openListenDrawer());
     document.getElementById('surahFavAudioBtn').addEventListener('click', ()=>toggleAudioFavorite(currentSurahData.num, arabicEd.name));
     syncSurahFavAudioBtn();
     if(typeof syncReciterFavToggleBtn==='function') syncReciterFavToggleBtn();
     document.getElementById('surahCopyBtn').addEventListener('click', ()=>copyWholeSurah());
+    // Reset the ayah-selection-for-copy state on every fresh surah load, so a stale
+    // selection from a previously viewed surah never carries over.
+    selectedAyahIndicesForCopy.clear();
+    ayahSelectModeActive = false;
+    syncAyahSelectModeUI();
+    document.getElementById('ayahSelectModeBtn').addEventListener('click', ()=>{
+      ayahSelectModeActive = !ayahSelectModeActive;
+      if(!ayahSelectModeActive){
+        selectedAyahIndicesForCopy.clear();
+        container.querySelectorAll('.ayah-span.selected-for-copy').forEach(s=>s.classList.remove('selected-for-copy'));
+      }
+      syncAyahSelectModeUI();
+    });
 
     if(jumpToAyah){
       const idx = jumpToAyah-1;
@@ -2278,12 +2394,18 @@ async function loadSurah(num, jumpToAyah){
     container.innerHTML = '<div class="loading">تعذر تحميل السورة، تحقق من اتصال الإنترنت وحاول مجدداً.</div>';
   }
 }
-/* Copies the whole open surah's text (name + number on the first line, then each
-   ayah on its own line, in order) - no UI elements/buttons are ever included. */
+/* Copies the open surah's text - either just the selected ayat (if the user picked
+   any via "تحديد آيات للنسخ"), or the whole surah otherwise (unchanged default
+   behavior). First line is always the name + number; then each ayah on its own
+   line, in order; no UI elements/buttons are ever included. */
 async function copyWholeSurah(){
   if(!currentSurahData) return;
   const btn = document.getElementById('surahCopyBtn');
-  const lines = currentSurahData.arabic.ayahs.map(a=>a.text);
+  const hasSelection = selectedAyahIndicesForCopy.size > 0;
+  const ayahList = currentSurahData.arabic.ayahs;
+  const lines = hasSelection
+    ? [...selectedAyahIndicesForCopy].sort((a,b)=>a-b).map(i=>ayahList[i]?.text).filter(Boolean)
+    : ayahList.map(a=>a.text);
   const text = `${currentSurahData.arabic.name} - ${currentSurahData.num}\n\n${lines.join('\n')}`;
   let ok=false;
   try{ if(navigator.clipboard?.writeText){ await navigator.clipboard.writeText(text); ok=true; } }catch(e){}
@@ -2295,7 +2417,7 @@ async function copyWholeSurah(){
   }
   if(ok){
     if(btn){ const original=btn.textContent; btn.textContent='تم النسخ ✓'; setTimeout(()=>{btn.textContent=original;},1500); }
-    showToast('تم نسخ السورة كاملة.');
+    showToast(hasSelection ? `تم نسخ ${lines.length} آية محددة.` : 'تم نسخ السورة كاملة.');
   }else{
     showToast('تعذر نسخ السورة. اسمح للموقع بالوصول إلى الحافظة أو حاول مجدداً.');
   }
@@ -2866,13 +2988,51 @@ function openSleepTimerModal(){
 }
 document.getElementById('openSleepTimerBtn')?.addEventListener('click', openSleepTimerModal);
 
+/* ---- Selecting specific ayat to copy (item 3): a separate mode so it never
+   interferes with the normal tap-to-open-tafsir behavior. ---- */
+let selectedAyahIndicesForCopy = new Set();
+let ayahSelectModeActive = false;
+function syncAyahSelectModeUI(){
+  const btn = document.getElementById('ayahSelectModeBtn');
+  const copyBtn = document.getElementById('surahCopyBtn');
+  if(!btn) return;
+  const count = selectedAyahIndicesForCopy.size;
+  btn.textContent = ayahSelectModeActive
+    ? (count ? `☑️ إنهاء التحديد (${count} محددة)` : '☑️ إنهاء التحديد')
+    : '☑️ تحديد آيات للنسخ';
+  btn.classList.toggle('active', ayahSelectModeActive);
+  if(copyBtn) copyBtn.textContent = (ayahSelectModeActive && count) ? `📋 نسخ المحدد (${count})` : '📋 نسخ السورة';
+}
+function handleAyahClick(idx){
+  if(ayahSelectModeActive){
+    const span = document.querySelector(`.ayah-span[data-idx="${idx}"]`);
+    if(selectedAyahIndicesForCopy.has(idx)){
+      selectedAyahIndicesForCopy.delete(idx);
+      if(span) span.classList.remove('selected-for-copy');
+    }else{
+      selectedAyahIndicesForCopy.add(idx);
+      if(span) span.classList.add('selected-for-copy');
+    }
+    syncAyahSelectModeUI();
+    return; // selection mode never opens the tafsir drawer
+  }
+  selectAyah(idx);
+}
+
 function selectAyah(idx){
   document.querySelectorAll('.ayah-span').forEach(s=>s.classList.remove('active'));
   const span = document.querySelector(`.ayah-span[data-idx="${idx}"]`);
   if(span) span.classList.add('active');
   if(!currentSurahData) return;
-  const tafsirAyahs = currentSurahData.tafsir ? currentSurahData.tafsir.ayahs : [];
-  const tafsirText = tafsirAyahs[idx] ? tafsirAyahs[idx].text : 'لا يتوفر تفسير لهذه الآية حالياً.';
+  // Defensive: never let a malformed/unexpected tafsir shape throw here - a thrown
+  // error inside a click handler would abort silently and (since the handler is
+  // re-invoked identically on every click) make the whole app look unresponsive to
+  // ayah taps until a full reload resets currentSurahData from scratch.
+  let tafsirText = 'لا يتوفر تفسير لهذه الآية حالياً.';
+  try{
+    const tafsirAyahs = (currentSurahData.tafsir && Array.isArray(currentSurahData.tafsir.ayahs)) ? currentSurahData.tafsir.ayahs : [];
+    if(tafsirAyahs[idx] && tafsirAyahs[idx].text) tafsirText = tafsirAyahs[idx].text;
+  }catch(e){ /* keep the fallback message above */ }
   const ayahNum = currentSurahData.arabic.ayahs[idx].numberInSurah;
   currentDrawerAyahIdx = idx;
   openDrawer(`تفسير آية ${ayahNum} - سورة ${currentSurahData.arabic.name}`, tafsirText);
@@ -3066,6 +3226,26 @@ document.getElementById('quranSearchBtn').addEventListener('click', async ()=>{
     info.textContent = 'تعذر إتمام البحث، تحقق من اتصال الإنترنت وحاول مجدداً.';
   }
 });
+/* Compact search box: Enter submits, ✕ clears the field and results (item 4) */
+(function initQuranSearchComboV6(){
+  const input = document.getElementById('quranSearchInput');
+  const clearBtn = document.getElementById('quranSearchClearBtn');
+  const searchBtn = document.getElementById('quranSearchBtn');
+  if(!input || !clearBtn || !searchBtn) return;
+  function syncClearBtn(){ clearBtn.style.display = input.value ? '' : 'none'; }
+  input.addEventListener('input', syncClearBtn);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); searchBtn.click(); } });
+  clearBtn.addEventListener('click', ()=>{
+    input.value = '';
+    syncClearBtn();
+    const info = document.getElementById('searchResultsInfo');
+    const list = document.getElementById('searchResultsList');
+    if(info) info.textContent = '';
+    if(list) list.innerHTML = '';
+    input.focus();
+  });
+  syncClearBtn();
+})();
 
 /* ---- Bookmarks ---- */
 document.getElementById('drawerBookmarkBtn').addEventListener('click', ()=>{
@@ -5362,7 +5542,7 @@ if(master){
    until then this silently no-ops and the site behaves exactly as before
    (in-page notifications only, while a tab is open). */
 const PUSH_WORKER_URL = 'https://muslim-comprehensive-push.hibakittaneh3.workers.dev'; // e.g. 'https://muslim-comprehensive-push.your-subdomain.workers.dev'
-const VAPID_PUBLIC_KEY = 'BCAv53_Y-CTADfDzK4jLw_gARr8zsAjHUNIUveiqC0UQdxjXLGI-pWwO1azZlOID8lq5SRl_xZnLhbTC0gNH7rQ'; // paste the public key printed by `npx @pushforge/builder vapid`
+const VAPID_PUBLIC_KEY = 'BCdvzkQ3YWYptTQL6j7Qo0HvEmy24ct4_ijPdK7Y_xVVfTBcsvrXOHS1uGInTiNGC9GDI78P2rw6TXnswAPil6c'; // paste the public key printed by `npx @pushforge/builder vapid`
 
 function urlBase64ToUint8Array(base64String){
   const padding='='.repeat((4-base64String.length%4)%4);
@@ -5759,18 +5939,6 @@ function highlightElementMatches(el, q){
   clear.addEventListener('click',()=>{input.value='';filter();input.focus();});
 })();
 
-/* ---------- طياقة "فضل قراءة القرآن" - قابلة للطي، غير مزعجة (item 13) ---------- */
-(function initQuranVirtuesToggleV5(){
-  const toggle = document.getElementById('quranVirtuesToggle');
-  const body = document.getElementById('quranVirtuesBody');
-  const chevron = document.getElementById('quranVirtuesChevron');
-  if(!toggle || !body) return;
-  toggle.addEventListener('click', ()=>{
-    const show = body.style.display === 'none';
-    body.style.display = show ? '' : 'none';
-    if(chevron) chevron.textContent = show ? 'إخفاء ▴' : 'إظهار ▾';
-  });
-})();
 (function initTafsirBookSelectV5(){
   const sel = document.getElementById('tafsirBookSelect');
   if(!sel) return;
@@ -5798,13 +5966,25 @@ function highlightElementMatches(el, q){
     saveJSON('mc-tafsir-edition', sel.value);
     if(typeof loadAyahOfDay==='function') loadAyahOfDay();
     // Update the tafsir of the currently-open surah in place (without re-rendering
-    // the mushaf text itself) so the newly chosen book applies immediately.
+    // the mushaf text/click-handlers) so the newly chosen book applies immediately -
+    // no reload required, and ayah clicks keep working the instant this resolves.
     if(currentSurahData){
+      const surahNumAtRequest = currentSurahData.num;
+      const editionAtRequest = sel.value;
+      const myToken = ++tafsirEditionFetchToken;
       try{
-        const res = await fetch(`https://api.alquran.cloud/v1/surah/${currentSurahData.num}/edition/${sel.value}`);
+        // Use the exact same multi-edition endpoint shape loadSurah() uses (NOT the
+        // singular /edition/{id} path, which returns a different/invalid response
+        // shape here and was corrupting currentSurahData.tafsir - that corruption is
+        // what made every later ayah click throw silently and look "unresponsive"
+        // until a full reload reset currentSurahData from scratch).
+        const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumAtRequest}/editions/quran-uthmani,${editionAtRequest}`);
         const data = await res.json();
-        if(data && data.data) currentSurahData.tafsir = data.data;
-      }catch(e){}
+        if(myToken !== tafsirEditionFetchToken) return; // a newer change/surah switch happened meanwhile - discard this stale result
+        if(!currentSurahData || currentSurahData.num !== surahNumAtRequest) return; // surah changed while fetching - don't misapply
+        const tafsirEd = Array.isArray(data?.data) ? data.data.find(d=>d.edition.identifier===editionAtRequest) : null;
+        if(tafsirEd && Array.isArray(tafsirEd.ayahs)) currentSurahData.tafsir = tafsirEd;
+      }catch(e){ /* keep the previous tafsir data rather than corrupting it on failure */ }
     }
   });
 })();
@@ -5860,20 +6040,52 @@ function formatPrayerTimeDisplay(hhmm){
   });
 })();
 
-/* ---------- Settings: طريقة عرض أقسام الموقع - شريط علوي/قائمة جانبية (item 16) ---------- */
+/* ---------- Settings: طريقة عرض أقسام الموقع - شريط علوي/قائمة جانبية (item 6) ---------- */
 function getNavLayout(){ return loadJSON('mc-nav-layout', 'topbar'); }
+function closeSidebarDrawer(){
+  const wrap = document.getElementById('tabsWrap');
+  const overlay = document.getElementById('sidebarOverlay');
+  if(wrap) wrap.classList.remove('open');
+  if(overlay) overlay.classList.remove('show');
+  const btn = document.getElementById('navHamburgerBtn');
+  if(btn) btn.setAttribute('aria-expanded','false');
+}
+function openSidebarDrawer(){
+  if(getNavLayout()!=='sidebar') return;
+  const wrap = document.getElementById('tabsWrap');
+  const overlay = document.getElementById('sidebarOverlay');
+  if(wrap) wrap.classList.add('open');
+  if(overlay) overlay.classList.add('show');
+  const btn = document.getElementById('navHamburgerBtn');
+  if(btn) btn.setAttribute('aria-expanded','true');
+}
+function toggleSidebarDrawer(){
+  const wrap = document.getElementById('tabsWrap');
+  if(wrap && wrap.classList.contains('open')) closeSidebarDrawer();
+  else openSidebarDrawer();
+}
 function applyNavLayout(layout){
+  // Switching layouts never needs a reload: this just flips the data attribute (CSS
+  // handles the visual switch between the horizontal topbar and the off-canvas
+  // drawer) and makes sure no leftover open/overlay state survives the switch.
   document.documentElement.setAttribute('data-nav-layout', layout);
+  closeSidebarDrawer();
 }
 (function initNavLayoutV5(){
   const sel = document.getElementById('navLayoutSelect');
   applyNavLayout(getNavLayout());
-  if(!sel) return;
-  sel.value = getNavLayout();
-  sel.addEventListener('change', ()=>{
-    saveJSON('mc-nav-layout', sel.value);
-    applyNavLayout(sel.value);
-  });
+  if(sel){
+    sel.value = getNavLayout();
+    sel.addEventListener('change', ()=>{
+      saveJSON('mc-nav-layout', sel.value);
+      applyNavLayout(sel.value);
+    });
+  }
+  const hamburgerBtn = document.getElementById('navHamburgerBtn');
+  const overlay = document.getElementById('sidebarOverlay');
+  if(hamburgerBtn) hamburgerBtn.addEventListener('click', toggleSidebarDrawer);
+  if(overlay) overlay.addEventListener('click', closeSidebarDrawer);
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeSidebarDrawer(); });
 })();
 
 /* Multi-source reciter catalog:
