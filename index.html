@@ -227,7 +227,7 @@ html[data-theme="dark"] .nav-hamburger-btn{color:var(--accent);}
 html[data-nav-layout="sidebar"] .brand-star{display:none;}
 html[data-nav-layout="sidebar"] .nav-hamburger-btn{display:inline-flex;}
 html[data-nav-layout="sidebar"] #tabsWrap{
-  position:fixed; top:0; right:-2px; bottom:0; inset-inline-start:auto; width:220px; max-width:78vw;
+  position:fixed; top:0; right:0; bottom:0; inset-inline-start:auto; width:220px; max-width:78vw;
   max-width:min(78vw, 260px); margin:0; height:100%;
   background:var(--bg-alt); border-left:3px solid var(--accent); border-right:none;
   box-shadow:0 0 24px var(--shadow);
@@ -789,6 +789,18 @@ footer.site{
 .dhikr-check.checked{background:var(--primary);color:#fff;border-color:var(--primary);}
 .tasbih-selected-dhikr{padding:10px 12px;border:1px dashed var(--border);border-radius:10px;line-height:1.9;font-family:'Amiri',serif;}
 .settings-danger-card{border-color:#b88989;}
+
+/* ===== UX polish: mobile mini player, compact edge-aligned sidebar, home date ===== */
+html[data-nav-layout="sidebar"] #tabsWrap{right:0;width:min(58vw,220px);max-width:220px;padding-right:14px;padding-left:12px;}
+html[data-nav-layout="sidebar"] nav.tabs button{padding:8px 11px;font-size:13px;}
+.home-date{position:relative;z-index:1;text-align:center;margin:0 0 18px;padding:10px 14px;border:1px solid rgba(255,255,255,.22);border-radius:14px;background:rgba(255,255,255,.09);color:#fff;font-size:14px;line-height:1.9;}
+.home-date strong{display:block;font-size:16px;color:#fff;}
+.copy-choice-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+@media(max-width:640px){
+  html[data-nav-layout="sidebar"] #tabsWrap{right:0;width:min(60vw,210px);max-width:210px;}
+  .quran-float-mini{left:50%!important;right:auto!important;top:auto!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;max-width:calc(100vw - 24px);touch-action:manipulation;}
+  .quran-float-mini .qfm-btn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+}
 </style>
 </head>
 <body>
@@ -843,6 +855,7 @@ footer.site{
   <!-- ============ HOME ============ -->
   <section class="section active" id="sec-home">
     <div class="hero">
+      <div class="home-date" id="homeDate">جاري تحميل تاريخ اليوم...</div>
       <span class="badge" style="background:rgba(255,255,255,.2); color:#fff;">آية اليوم</span>
       <div class="ayah-box" id="ayahOfDay">جاري التحميل...<span class="ayah-source ayah-source-inline" id="ayahOfDaySource"></span></div>
       <button class="tafsir-toggle" id="ayahTafsirToggle">عرض التفسير</button>
@@ -1825,7 +1838,7 @@ footer.site{
 
 <footer class="site">
   جميع الحقوق محفوظة لـ هبة كتانة / قلقيلية الشرعية / وزارة الأوقاف / فلسطين
-  <a href="index.html" id="backHome">
+  <a href="https://1hiba7.github.io/Hiba_Kittaneh/" id="backHome">
     <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
     <span>العودة للموسوعة الرئيسية</span>
   </a>
@@ -2348,8 +2361,7 @@ async function loadSurah(num, jumpToAyah){
     html += `<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
       <button class="btn outline sm" id="surahAudioBtn">🔊 الاستماع</button>
       <button class="btn outline sm" id="surahFavAudioBtn">⭐ إضافة للاستماع المفضل</button>
-      <button class="btn outline sm" id="ayahSelectModeBtn">☑️ تحديد آيات للنسخ</button>
-      <button class="btn outline sm" id="surahCopyBtn">📋 نسخ السورة</button>
+      <button class="btn outline sm" id="surahCopyBtn">📋 نسخ</button>
     </div>`;
     if(num!==9){
       html += `<div class="basmala">${ISTIADHAH_TEXT}</div>`;
@@ -2379,20 +2391,9 @@ async function loadSurah(num, jumpToAyah){
     document.getElementById('surahFavAudioBtn').addEventListener('click', ()=>toggleAudioFavorite(currentSurahData.num, arabicEd.name));
     syncSurahFavAudioBtn();
     if(typeof syncReciterFavToggleBtn==='function') syncReciterFavToggleBtn();
-    document.getElementById('surahCopyBtn').addEventListener('click', ()=>copyWholeSurah());
-    // Reset the ayah-selection-for-copy state on every fresh surah load, so a stale
-    // selection from a previously viewed surah never carries over.
-    selectedAyahIndicesForCopy.clear();
-    ayahSelectModeActive = false;
-    syncAyahSelectModeUI();
-    document.getElementById('ayahSelectModeBtn').addEventListener('click', ()=>{
-      ayahSelectModeActive = !ayahSelectModeActive;
-      if(!ayahSelectModeActive){
-        selectedAyahIndicesForCopy.clear();
-        container.querySelectorAll('.ayah-span.selected-for-copy').forEach(s=>s.classList.remove('selected-for-copy'));
-      }
-      syncAyahSelectModeUI();
-    });
+    // Reset the ayah-selection-for-copy state on every fresh surah load.
+    selectedAyahIndicesForCopy.clear(); ayahSelectModeActive = false; syncAyahSelectModeUI();
+    document.getElementById('surahCopyBtn').addEventListener('click', ()=>openCopyChoices());
 
     if(jumpToAyah){
       const idx = jumpToAyah-1;
@@ -2406,14 +2407,25 @@ async function loadSurah(num, jumpToAyah){
     container.innerHTML = '<div class="loading">تعذر تحميل السورة، تحقق من اتصال الإنترنت وحاول مجدداً.</div>';
   }
 }
+/* One compact copy button: choose whole surah or selected ayat without permanently consuming toolbar space. */
+function openCopyChoices(){
+  if(!currentSurahData) return;
+  const selected=selectedAyahIndicesForCopy.size;
+  openModal(`<h3>نسخ النص</h3><p class="small-note">اختر ما تريد نسخه.</p><div class="copy-choice-row"><button class="btn" id="copyWholeChoice">📋 نسخ السورة كاملة</button><button class="btn outline" id="copySelectedChoice">☑️ ${selected?'نسخ المحدد ('+selected+')':'تحديد آيات للنسخ'}</button></div>`);
+  document.getElementById('copyWholeChoice')?.addEventListener('click',()=>{closeModal(); copyWholeSurah('whole');});
+  document.getElementById('copySelectedChoice')?.addEventListener('click',()=>{
+    if(selectedAyahIndicesForCopy.size){ closeModal(); copyWholeSurah('selected'); return; }
+    closeModal(); ayahSelectModeActive=true; syncAyahSelectModeUI(); showToast('اضغط على الآيات التي تريد تحديدها، ثم اضغط زر نسخ مرة أخرى.');
+  });
+}
 /* Copies the open surah's text - either just the selected ayat (if the user picked
    any via "تحديد آيات للنسخ"), or the whole surah otherwise (unchanged default
    behavior). First line is always the name + number; then each ayah on its own
    line, in order; no UI elements/buttons are ever included. */
-async function copyWholeSurah(){
+async function copyWholeSurah(mode=null){
   if(!currentSurahData) return;
   const btn = document.getElementById('surahCopyBtn');
-  const hasSelection = selectedAyahIndicesForCopy.size > 0;
+  const hasSelection = mode==='selected' ? selectedAyahIndicesForCopy.size > 0 : (mode==='whole' ? false : selectedAyahIndicesForCopy.size > 0);
   const ayahList = currentSurahData.arabic.ayahs;
   const lines = hasSelection
     ? [...selectedAyahIndicesForCopy].sort((a,b)=>a-b).map(i=>ayahList[i]?.text).filter(Boolean)
@@ -4264,6 +4276,7 @@ async function loadPrayerTimes(){
   }
   navigator.geolocation.getCurrentPosition(async pos=>{
     userCoords = {lat:pos.coords.latitude, lng:pos.coords.longitude};
+    saveJSON('mc-last-location', userCoords);
     label.textContent = `الموقع: ${userCoords.lat.toFixed(2)}, ${userCoords.lng.toFixed(2)}`;
     // Keep the qibla bearing correct if the location is refreshed while the compass is already running.
     if(typeof compassActive!=='undefined' && compassActive && typeof updateQiblaBearing==='function'){
@@ -4286,8 +4299,15 @@ async function loadPrayerTimes(){
   });
 }
 document.getElementById('refreshLocation').addEventListener('click', loadPrayerTimes);
-
-loadPrayerTimes();
+// Do not request geolocation automatically on first paint. Permission prompts are now user-led.
+(function initLocationWithoutPrompt(){
+  const cached=loadJSON('mc-last-location',null);
+  const label=document.getElementById('locationLabel');
+  if(cached && Number.isFinite(cached.lat) && Number.isFinite(cached.lng)){
+    userCoords={lat:cached.lat,lng:cached.lng};
+    label.textContent='يتم استخدام آخر موقع محفوظ. اضغط «تحديث الموقع» لتحديثه.';
+  }else label.textContent='اضغط «تحديث الموقع» للسماح بتحديد موقعك وتحميل المواقيت.';
+})();
 
 /* ============================================================
    QIBLA COMPASS
@@ -4530,12 +4550,13 @@ let calMonth, calYear;
 function renderCalendar(){
   const wrap = document.getElementById('calGrid');
   const title = document.getElementById('calTitle');
-  const monthNames = Array.from({length:3},(_,i)=>new Date(calYear,calMonth-1+i).toLocaleDateString('ar-EG',{month:'long',year:'numeric'}));
-  title.textContent = `${monthNames[0]} — ${monthNames[2]}`;
+  const monthsToShow = window.matchMedia('(min-width:1200px)').matches ? 3 : (window.matchMedia('(min-width:700px)').matches ? 2 : 1);
+  const monthNames = Array.from({length:monthsToShow},(_,i)=>new Date(calYear,calMonth-1+i).toLocaleDateString('ar-EG',{month:'long',year:'numeric'}));
+  title.textContent = monthsToShow===1 ? monthNames[0] : `${monthNames[0]} — ${monthNames[monthNames.length-1]}`;
   const dowNames = ["أحد","اثنين","ثلاثاء","أربعاء","خميس","جمعة","سبت"];
   const todayStr = new Date().toDateString();
   let allHtml='';
-  for(let offset=0; offset<3; offset++){
+  for(let offset=0; offset<monthsToShow; offset++){
     const d0=new Date(calYear,calMonth-1+offset,1);
     const y=d0.getFullYear(), m=d0.getMonth()+1;
     const totalDays=daysInGregorianMonth(y,m), firstDow=d0.getDay();
@@ -4573,6 +4594,16 @@ document.getElementById('nextMonth').addEventListener('click', ()=>{
   calMonth = now.getMonth()+1; calYear = now.getFullYear();
   renderCalendar();
 })();
+window.addEventListener('resize',(()=>{let t; return ()=>{clearTimeout(t);t=setTimeout(()=>{if(typeof renderCalendar==='function')renderCalendar();},180);};})());
+
+/* Home page: show today's Gregorian and Hijri dates together. */
+function updateHomeDate(){
+  const el=document.getElementById('homeDate'); if(!el) return;
+  const now=new Date(), h=gregorianToHijri(now.getFullYear(),now.getMonth()+1,now.getDate());
+  const greg=now.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  el.innerHTML=`<strong>${greg}</strong><span>${h.day} ${HIJRI_MONTH_AR[h.month-1]} ${h.year} هـ</span>`;
+}
+updateHomeDate();
 
 /* ---- Countdown to next occasion (using local Hijri conversion) ---- */
 function initCountdown(){
@@ -5306,7 +5337,7 @@ document.getElementById('helpSearchInput').addEventListener('input', function(){
   const denyBtn = document.getElementById('notifPermDenyBtn');
   if(!back || !allowBtn || !denyBtn) return;
 
-  setTimeout(()=>{ back.classList.add('show'); }, 1500);
+  setTimeout(()=>{ back.classList.add('show'); }, 3500);
 
   allowBtn.addEventListener('click', async ()=>{
     back.classList.remove('show');
@@ -6468,6 +6499,39 @@ refreshNotifications=function(){
 })();
 
 /* ============================================================
+   Media Session: dynamic lock-screen/notification artwork per surah.
+   Android media notifications use MediaSession artwork, not the site's favicon.
+   ============================================================ */
+let __mediaArtworkUrl=null;
+function makeSurahArtwork(title){
+  const safe=String(title||'القرآن الكريم').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="100%" height="100%" fill="#0b3d2e"/><circle cx="256" cy="256" r="205" fill="none" stroke="#c9962b" stroke-width="10" opacity=".8"/><path d="M260 105a145 145 0 1 0 0 302 120 120 0 1 1 0-302" fill="#c9962b" opacity=".85"/><text x="256" y="255" text-anchor="middle" fill="#fff" font-size="48" font-family="Arial, sans-serif" direction="rtl">${safe}</text><text x="256" y="325" text-anchor="middle" fill="#e7c66d" font-size="28" font-family="Arial, sans-serif">القرآن الكريم</text></svg>`;
+  const blob=new Blob([svg],{type:'image/svg+xml'}); return URL.createObjectURL(blob);
+}
+function updateMediaSessionMetadata(){
+  if(!('mediaSession' in navigator)||!currentSurahData)return;
+  try{
+    if(__mediaArtworkUrl) URL.revokeObjectURL(__mediaArtworkUrl);
+    __mediaArtworkUrl=makeSurahArtwork(currentSurahData.arabic.name);
+    const a=currentSurahData.arabic.ayahs[listenAyahIdx];
+    navigator.mediaSession.metadata=new MediaMetadata({title:`سورة ${currentSurahData.arabic.name}`,artist:a?`الآية ${a.numberInSurah}`:'القرآن الكريم',album:'المسلم الشامل',artwork:[{src:__mediaArtworkUrl,sizes:'512x512',type:'image/svg+xml'}]});
+    navigator.mediaSession.setActionHandler('play',()=>quranAudioPlayer.play());
+    navigator.mediaSession.setActionHandler('pause',()=>quranAudioPlayer.pause());
+    navigator.mediaSession.setActionHandler('previoustrack',()=>playListenAyah(Math.max(0,listenAyahIdx-1)));
+    navigator.mediaSession.setActionHandler('nexttrack',()=>currentSurahData&&playListenAyah(Math.min(currentSurahData.arabic.ayahs.length-1,listenAyahIdx+1)));
+  }catch(e){}
+}
+// Keep the artwork/title synchronized whenever the current ayah changes.
+const __updateListenNowPlayingForMedia=updateListenNowPlaying;
+updateListenNowPlaying=function(){__updateListenNowPlayingForMedia(); updateMediaSessionMetadata();};
+['quranFloatPlayPause','quranFloatExpand','quranFloatStop'].forEach(id=>{
+  const b=document.getElementById(id); if(!b)return;
+  b.addEventListener('pointerdown',e=>e.stopPropagation(),{passive:true});
+  b.addEventListener('touchstart',e=>e.stopPropagation(),{passive:true});
+});
+if(window.matchMedia('(max-width:640px)').matches){ localStorage.removeItem('mc-quran-float-pos'); }
+
+/* ============================================================
    Draggable floating Quran audio shortcut (quranFloatMini).
    Works with mouse (desktop) and touch (mobile/tablet) via Pointer Events,
    distinguishes a tap (which still triggers the normal button actions) from
@@ -6476,7 +6540,7 @@ refreshNotifications=function(){
    ============================================================ */
 (function draggableQuranFloatMini(){
   const el=document.getElementById('quranFloatMini');
-  if(!el) return;
+  if(!el || window.matchMedia('(max-width:640px)').matches) return;
   const DRAG_THRESHOLD=6;
   let dragging=false, moved=false, startX=0, startY=0, origLeft=0, origTop=0, activePointerId=null;
 
